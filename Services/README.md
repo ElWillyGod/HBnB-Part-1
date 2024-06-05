@@ -1,3 +1,3 @@
-# services layer
+# Business Logic layer
 
-This is where our API greets the world. It handles all the requests and responses.
+The brain of the operation. This is where all the processing and decision-making happens.
