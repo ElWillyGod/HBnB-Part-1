@@ -5,7 +5,6 @@
     Cosas importantes.
 '''
 
-from _typeshed import Self, TraceFunction
 from abc import ABC
 from datetime import datetime
 import uuid
