@@ -145,108 +145,116 @@ class API_3_User(API_BaseTest):
         user.last_name
 
     def test_3_03_email_Type(self):
-        with self.assertRaises(TypeError, msg="Email type not checked"):
+        with self.assertRaises(TypeError, msg="email must be a string"):
             self.createInstance(email=None)
-        with self.assertRaises(TypeError, msg="Email type not checked"):
+        with self.assertRaises(TypeError, msg="email must be a string"):
             self.createInstance(email=69)
 
     def test_3_04_email_Emptiness(self):
-        with self.assertRaises(ValueError, msg="Email emptiness not checked"):
+        with self.assertRaises(ValueError, msg="email cannot be empty"):
             self.createInstance(email="")
-        with self.assertRaises(ValueError, msg="Email emptiness not checked"):
+        with self.assertRaises(ValueError, msg="email cannot be empty"):
             self.createInstance(email="    ")
-        with self.assertRaises(ValueError, msg="Email emptiness not checked"):
+        with self.assertRaises(ValueError, msg="email cannot be empty"):
             self.createInstance(email="@")
 
     def test_3_05_email_Format(self):
-        with self.assertRaises(ValueError, msg="Email has to have @"):
+        with self.assertRaises(ValueError, msg="email must have @"):
             self.createInstance(email="my_email")
-        with self.assertRaises(ValueError, msg="Email has to have domain"):
+        with self.assertRaises(ValueError, msg="email must have domain"):
             self.createInstance(email="my_email@")
-        with self.assertRaises(ValueError, msg="Email has to have name"):
+        with self.assertRaises(ValueError, msg="email must have name"):
             self.createInstance(email="@gmail.com")
 
     def test_3_06_email_Spaces(self):
         with self.assertRaises(ValueError,
-                               msg="Email can't have empty spaces"):
+                               msg="email cannot have spaces"):
             self.createInstance(email="    tester@gmail.com     ")
         with self.assertRaises(ValueError,
-                               msg="Email can't have empty spaces"):
+                               msg="email cannot have spaces"):
             self.createInstance(email="test @gmail.com")
         with self.assertRaises(ValueError,
-                               msg="Email can't have empty spaces"):
+                               msg="email cannot have spaces"):
             self.createInstance(email="test@g ma il.com")
 
     def test_3_07_first_name_Type(self):
         with self.assertRaises(TypeError,
-                               msg="Name type not checked"):
+                               msg="first_name must be a string"):
             self.createInstance(first_name=None)
         with self.assertRaises(TypeError,
-                               msg="Name type not checked"):
+                               msg="first_name must be a string"):
             self.createInstance(first_name=69)
 
     def test_3_08_first_name_Emptiness(self):
-        with self.assertRaises(ValueError, msg="Name emptiness not checked"):
+        with self.assertRaises(ValueError,
+                               msg="first_name must not be empty"):
             self.createInstance(first_name="")
-        with self.assertRaises(ValueError, msg="Name emptiness not checked"):
+        with self.assertRaises(ValueError,
+                               msg="first_name must not be empty"):
             self.createInstance(first_name="  ")
 
     def test_3_09_first_name_Spaces(self):
-        with self.assertRaises(ValueError, msg="Name can't have empty spaces"):
+        with self.assertRaises(ValueError,
+                               msg="first_name cannot have spaces"):
             self.createInstance(first_name=" Tester ")
-        with self.assertRaises(ValueError, msg="Name type not checked"):
+        with self.assertRaises(ValueError,
+                               msg="first_name cannot have spaces"):
             self.createInstance(first_name="Te ste r")
 
     def test_3_10_first_name_SpecialCharacters(self):
         with self.assertRaises(ValueError,
-                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+                               msg="first_name must only contain a-zA-z0-9,-_"):
             self.createInstance(first_name="@tester")
         with self.assertRaises(ValueError,
-                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+                               msg="first_name must only contain a-zA-z0-9,-_"):
             self.createInstance(first_name="Hello******")
         with self.assertRaises(ValueError,
-                               msg="Name cannot be only underscores"):
+                               msg="first_name must have at least one letter"):
             self.createInstance(first_name="____")
         with self.assertRaises(ValueError,
-                               msg="Name cannot be only hyphens"):
-            self.createInstance(first_name="----")
+                               msg="first_name must have at least one letter"):
+            self.createInstance(first_name="-__-")
         with self.assertRaises(ValueError,
-                               msg="Name cannot be only numers"):
+                               msg="first_name must have at least one letter"):
             self.createInstance(first_name="01234567")
 
     def test_3_11_last_name_Type(self):
-        with self.assertRaises(TypeError, msg="Name type not checked"):
+        with self.assertRaises(TypeError, msg="last_name must be a string"):
             self.createInstance(last_name=None)
-        with self.assertRaises(TypeError, msg="Name type not checked"):
+        with self.assertRaises(TypeError, msg="last_name must be a string"):
             self.createInstance(last_name=69)
 
     def test_3_12_last_name_Emptiness(self):
-        with self.assertRaises(ValueError, msg="Name emptiness not checked"):
+        with self.assertRaises(ValueError,
+                               msg="last_name must not be empty"):
             self.createInstance(last_name="")
-        with self.assertRaises(ValueError, msg="Name emptiness not checked"):
+        with self.assertRaises(ValueError,
+                               msg="last_name must not be empty"):
             self.createInstance(last_name="    ")
 
     def test_3_13_last_name_Spaces(self):
-        with self.assertRaises(ValueError, msg="Name can't have empty spaces"):
+        with self.assertRaises(ValueError,
+                               msg="last_name cannot have spaces"):
             self.createInstance(last_name=" MCGee ")
-        with self.assertRaises(ValueError, msg="Name type not checked"):
+        with self.assertRaises(ValueError,
+                               msg="last_name cannot have spaces"):
             self.createInstance(last_name="MC Gee")
 
     def test_3_14_last_name_SpecialCharacters(self):
         with self.assertRaises(ValueError,
-                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+                               msg="last_name must only contain a-zA-z0-9,-_"):
             self.createInstance(last_name="@MCGee")
         with self.assertRaises(ValueError,
-                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+                               msg="last_name must only contain a-zA-z0-9,-_"):
             self.createInstance(last_name="MC$Gee")
         with self.assertRaises(ValueError,
-                               msg="Name cannot be only underscores"):
+                               msg="last_name must have at least one letter"):
             self.createInstance(last_name="____")
         with self.assertRaises(ValueError,
-                               msg="Name cannot be only hyphens"):
-            self.createInstance(last_name="----")
+                               msg="last_name must have at least one letter"):
+            self.createInstance(last_name="-__-")
         with self.assertRaises(ValueError,
-                               msg="Name cannot be only numers"):
+                               msg="last_name must have at least one letter"):
             self.createInstance(last_name="012345678")
 
 
@@ -300,21 +308,21 @@ class API_4_Country(API_BaseTest):
             self.createInstance(code="UY")
 
     def test_4_07_name_Type(self):
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name=None)
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name=69)
 
     def test_4_08_name_Emptiness(self):
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name="")
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name="    ")
 
     def test_4_09_name_InvalidContent(self):
-        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
             self.createInstance(name="A55GHAR")
-        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
             self.createInstance(name="$Hola")
 
 
@@ -343,22 +351,22 @@ class API_5_City(API_BaseTest):
         city.country_code
 
     def test_5_03_nameType(self):
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name=None)
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name=69)
 
     def test_5_04_nameEmptiness(self):
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name="")
-        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+        with self.assertRaises(TypeError, msg="Name must be a string"):
             self.createInstance(name="    ")
 
     def test_5_05_nameInvalidContent(self):
         City = self.importClass()
-        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
             self.createInstance(name="A55ghar")
-        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
             self.createInstance(name="$Hola")
 
 
