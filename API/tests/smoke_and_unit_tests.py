@@ -32,7 +32,7 @@ class SmokePass():
     passedSmoke = False
 
 
-class API_1_SmokeTest(unittest.TestCase):
+class API_1_Smoke(unittest.TestCase):
     '''
         Tests if the module doesn't cause a nuclear explosion.
     '''
@@ -45,12 +45,12 @@ class API_1_SmokeTest(unittest.TestCase):
         else:
             # Python 3.11+
             result = self._outcome.result
-        ok = all(test != self for test, text in result.errors + result.failures)
+        ok = all(test != self for test, text in
+                 result.errors + result.failures)
         if ok:
             SmokePass.passedSmoke = True
         else:
             print("\033[31m\033[5m\n   <<EXLPOSION NUCLEAR!!!>>\n\033[0m")
-
 
     def test_1_01_smoke(self):
         __import__(MODULE)
@@ -73,260 +73,331 @@ class API_BaseTest(unittest.TestCase):
             self.skipTest("Sanity Test Failed")
 
 
-class API_2_TrackedObjectTests(API_BaseTest):
+class API_2_TrackedObject(API_BaseTest):
     '''
         Tests the TrackedObject class.
         TrackedObject()
     '''
 
     @classmethod
-    def importClass(self):
+    def importClass(cls):
         return __import__(MODULE).TrackedObject
 
+    @classmethod
+    def createInstance(cls):
+        TrackedObject = cls.importClass()
+        return TrackedObject()
+
     def test_2_01_sanity(self):
-        TrackedObject = self.importClass()
-        to = TrackedObject()
+        self.createInstance()
         self.__class__.passedSanity = True
 
     def test_2_02_basicOperations(self):
-        TrackedObject = self.importClass()
-        to = TrackedObject()
+        to = self.createInstance()
         to.id
         to.created_at
         to.updated_at
         to.update_time()
 
 
-class API_3_UserTests(API_BaseTest):
+class API_3_User(API_BaseTest):
     '''
         Tests the User class.
         User(email, first_name, last_name)
     '''
 
     @classmethod
-    def importClass(self):
+    def importClass(cls):
         return __import__(MODULE).User
 
+    @classmethod
+    def createInstance(
+        cls, email="test@test.com",
+        first_name="tester",
+            last_name="MCGee"):
+        User = cls.importClass()
+        return User(email, first_name, last_name)
+
     def test_3_01_sanity(self):
-        User = self.importClass()
-        user = User("test@test.com", "tester", "MCGee")
+        self.createInstance()
         self.__class__.passedSanity = True
 
-
-    def test_3_02_basicOperations(self):
-        User = self.importClass()
-        user = User("test@test.com", "tester", "MCGee")
+    def test_3_02_basic_Operations(self):
+        user = self.createInstance()
         user.email
         user.first_name
         user.last_name
 
-    def test_3_03_testEmailType(self):
-        User = self.importClass()
+    def test_3_03_email_Type(self):
         with self.assertRaises(TypeError, msg="Email type not checked"):
-            user = User(None, "tester", "MCGee")
+            self.createInstance(email=None)
         with self.assertRaises(TypeError, msg="Email type not checked"):
-            user = User(69, "tester", "MCGee")
+            self.createInstance(email=69)
 
-    def test_3_04_testEmailEmptiness(self):
-        User = self.importClass()
+    def test_3_04_email_Emptiness(self):
         with self.assertRaises(ValueError, msg="Email emptiness not checked"):
-            user = User("", "tester", "MCGee")
+            self.createInstance(email="")
         with self.assertRaises(ValueError, msg="Email emptiness not checked"):
-            user = User("    ", "tester", "MCGee")
+            self.createInstance(email="    ")
         with self.assertRaises(ValueError, msg="Email emptiness not checked"):
-            user = User("@", "tester", "MCGee")
+            self.createInstance(email="@")
 
-    def test_3_05_testEmailFormat(self):
-        User = self.importClass()
+    def test_3_05_email_Format(self):
         with self.assertRaises(ValueError, msg="Email has to have @"):
-            user = User("my_email", "tester", "MCGee")
+            self.createInstance(email="my_email")
         with self.assertRaises(ValueError, msg="Email has to have domain"):
-            user = User("my_email@", "tester", "MCGee")
+            self.createInstance(email="my_email@")
         with self.assertRaises(ValueError, msg="Email has to have name"):
-            user = User("@gmail.com", "tester", "MCGee")
+            self.createInstance(email="@gmail.com")
 
-    def test_3_06_testEmailSpaces(self):
-        User = self.importClass()
-        with self.assertRaises(ValueError, msg="Email can't have empty spaces"):
-            user = User("    tester@gmail.com     ", "tester", "MCGee")
-        with self.assertRaises(ValueError, msg="Email can't have empty spaces"):
-            user = User("test @gmail.com", "tester", "MCGee")
-        with self.assertRaises(ValueError, msg="Email can't have empty spaces"):
-            user = User("test@g ma il.com", "tester", "MCGee")
+    def test_3_06_email_Spaces(self):
+        with self.assertRaises(ValueError,
+                               msg="Email can't have empty spaces"):
+            self.createInstance(email="    tester@gmail.com     ")
+        with self.assertRaises(ValueError,
+                               msg="Email can't have empty spaces"):
+            self.createInstance(email="test @gmail.com")
+        with self.assertRaises(ValueError,
+                               msg="Email can't have empty spaces"):
+            self.createInstance(email="test@g ma il.com")
 
-    def test_3_07_testFirstNameType(self):
-        User = self.importClass()
-        with self.assertRaises(TypeError, msg="Name type not checked"):
-            user = User("test@test.com", None, "MCGee")
-        with self.assertRaises(TypeError, msg="Name type not checked"):
-            user = User("test@test.com", 69, "MCGee")
+    def test_3_07_first_name_Type(self):
+        with self.assertRaises(TypeError,
+                               msg="Name type not checked"):
+            self.createInstance(first_name=None)
+        with self.assertRaises(TypeError,
+                               msg="Name type not checked"):
+            self.createInstance(first_name=69)
 
-    def test_3_08_testFirstNameEmptiness(self):
-        User = self.importClass()
+    def test_3_08_first_name_Emptiness(self):
         with self.assertRaises(ValueError, msg="Name emptiness not checked"):
-            user = User("test@test.com", "", "MCGee")
+            self.createInstance(first_name="")
         with self.assertRaises(ValueError, msg="Name emptiness not checked"):
-            user = User("test@test.com", "  ", "MCGee")
+            self.createInstance(first_name="  ")
 
-    def test_3_09_testFirstNameSpaces(self):
-        User = self.importClass()
+    def test_3_09_first_name_Spaces(self):
         with self.assertRaises(ValueError, msg="Name can't have empty spaces"):
-            user = User("test@test.com", " Tester ", "MCGee")
+            self.createInstance(first_name=" Tester ")
         with self.assertRaises(ValueError, msg="Name type not checked"):
-            user = User("test@test.com", "Te ste r", "MCGee")
+            self.createInstance(first_name="Te ste r")
 
-    def test_3_10_testFirstNameSpecialCharacters(self):
-        User = self.importClass()
+    def test_3_10_first_name_SpecialCharacters(self):
         with self.assertRaises(ValueError,
-            msg="Name can only have a-z, A-z, 0-9, '-', '_'"):
-            user = User("test@test.com", "@tester", "MCGee")
+                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+            self.createInstance(first_name="@tester")
         with self.assertRaises(ValueError,
-            "Name can only have a-z, A-z, 0-9, '-', '_'"):
-            msg=user = User("test@test.com", "Hello******", "MCGee")
+                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+            self.createInstance(first_name="Hello******")
         with self.assertRaises(ValueError,
-            "Name cannot be only underscores"):
-            msg=user = User("test@test.com", "____", "MCGee")
+                               msg="Name cannot be only underscores"):
+            self.createInstance(first_name="____")
         with self.assertRaises(ValueError,
-            "Name cannot be only hyphens"):
-            msg=user = User("test@test.com", "----", "MCGee")
+                               msg="Name cannot be only hyphens"):
+            self.createInstance(first_name="----")
         with self.assertRaises(ValueError,
-            "Name cannot be only numers"):
-            msg=user = User("test@test.com", "01234567", "MCGee")
+                               msg="Name cannot be only numers"):
+            self.createInstance(first_name="01234567")
 
-    def test_3_11_testLastNameType(self):
-        User = self.importClass()
+    def test_3_11_last_name_Type(self):
         with self.assertRaises(TypeError, msg="Name type not checked"):
-            user = User("test@test.com", "Tester", None)
+            self.createInstance(last_name=None)
         with self.assertRaises(TypeError, msg="Name type not checked"):
-            user = User("test@test.com", "Tester", 69)
+            self.createInstance(last_name=69)
 
-    def test_3_12_testLastNameEmptiness(self):
-        User = self.importClass()
+    def test_3_12_last_name_Emptiness(self):
         with self.assertRaises(ValueError, msg="Name emptiness not checked"):
-            user = User("test@test.com", "Test", "")
+            self.createInstance(last_name="")
         with self.assertRaises(ValueError, msg="Name emptiness not checked"):
-            user = User("test@test.com", "  ", "    ")
+            self.createInstance(last_name="    ")
 
-    def test_3_13_testLastNameSpaces(self):
-        User = self.importClass()
-        with self.assertRaises(ValueError, "Name can't have empty spaces"):
-            user = User("test@test.com", "Tester", " MCGee ")
-        with self.assertRaises(ValueError, "Name type not checked"):
-            user = User("test@test.com", "Tester", "MC Gee")
+    def test_3_13_last_name_Spaces(self):
+        with self.assertRaises(ValueError, msg="Name can't have empty spaces"):
+            self.createInstance(last_name=" MCGee ")
+        with self.assertRaises(ValueError, msg="Name type not checked"):
+            self.createInstance(last_name="MC Gee")
 
-    def test_3_14_testLastNameSpecialCharacters(self):
-        User = self.importClass()
+    def test_3_14_last_name_SpecialCharacters(self):
         with self.assertRaises(ValueError,
-            "Name can only have a-z, A-z, 0-9, '-', '_'"):
-            user = User("test@test.com", "tester", "@MCGee")
+                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+            self.createInstance(last_name="@MCGee")
         with self.assertRaises(ValueError,
-            "Name can only have a-z, A-z, 0-9, '-', '_'"):
-            user = User("test@test.com", "Hello", "MC$Gee")
+                               msg="Name can only have a-zA-z0-9,'-', '_'"):
+            self.createInstance(last_name="MC$Gee")
         with self.assertRaises(ValueError,
-            "Name cannot be only underscores"):
-            user = User("test@test.com", "Test", "____")
+                               msg="Name cannot be only underscores"):
+            self.createInstance(last_name="____")
         with self.assertRaises(ValueError,
-            "Name cannot be only hyphens"):
-            user = User("test@test.com", "Test", "----")
+                               msg="Name cannot be only hyphens"):
+            self.createInstance(last_name="----")
         with self.assertRaises(ValueError,
-            "Name cannot be only numers"):
-            user = User("test@test.com", "Test", "012345678")
+                               msg="Name cannot be only numers"):
+            self.createInstance(last_name="012345678")
 
 
-class API_4_CountryTests(API_BaseTest):
+class API_4_Country(API_BaseTest):
     '''
         Tests the Country class.
         Country(code, name)
     '''
 
     @classmethod
-    def importClass(self):
+    def importClass(cls):
         return __import__(MODULE).Country
 
+    @classmethod
+    def createInstance(cls, code="uy", name="Uruguay"):
+        Country = cls.importClass()
+        return Country(code, name)
+
     def test_4_01_sanity(self):
-        Country = self.importClass()
-        country = Country("uy", "Uruguay")
+        self.createInstance()
         self.__class__.passedSanity = True
 
     def test_4_02_basicOperations(self):
-        Country = self.importClass()
-        country = Country("uy", "Uruguay")
+        country = self.createInstance()
         country.code
         country.name
 
+    def test_4_03_code_Type(self):
+        Country = self.importClass()
+        with self.assertRaises(TypeError, msg="Code is a 2 char string"):
+            self.createInstance(code=None)
+        with self.assertRaises(TypeError, msg="Code is a 2 char string"):
+            self.createInstance(code=69)
 
-class API_5_CityTests(API_BaseTest):
+    def test_4_04_code_Emptiness(self):
+        Country = self.importClass()
+        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+            self.createInstance(code="")
+        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+            self.createInstance(code="  ")
+
+    def test_4_05_code_InvalidLenght(self):
+        Country = self.importClass()
+        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+            self.createInstance(code="a")
+        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+            self.createInstance(code="abc")
+
+    def test_4_06_code_InvalidContent(self):
+        Country = self.importClass()
+        with self.assertRaises(ValueError, msg="Code can only be a-z"):
+            self.createInstance(code="12")
+        with self.assertRaises(ValueError, msg="Code can only be a-z"):
+            self.createInstance(code="a*")
+        with self.assertRaises(ValueError, msg="Code can only be a-z"):
+            self.createInstance(code="UY")
+
+    def test_4_07_name_Type(self):
+        Country = self.importClass()
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name=None)
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name=69)
+
+    def test_4_08_name_Emptiness(self):
+        Country = self.importClass()
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name="")
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name="    ")
+
+    def test_4_09_name_InvalidContent(self):
+        Country = self.importClass()
+        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+            self.createInstance(name="A55GHAR")
+        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+            self.createInstance(name="$Hola")
+
+
+class API_5_City(API_BaseTest):
     '''
         Tests the City class.
-        City(name, country_code)
+        country_code isn't tested
+        City(country_code, name)
     '''
 
     @classmethod
-    def importClass(self):
+    def importClass(cls):
         return __import__(MODULE).City
 
+    @classmethod
+    def createInstance(cls, country_code="uy", name="Montevideo"):
+        Country = cls.importClass()
+        return Country(country_code, name)
+
     def test_5_01_sanity(self):
-        City = self.importClass()
-        city = City("Montevideo", "uy")
+        self.createInstance()
         self.__class__.passedSanity = True
 
     def test_5_02_basicOperations(self):
-        City = self.importClass()
-        city = City("Montevideo", "uy")
+        city = self.createInstance()
         city.name
         city.country_code
 
+    def test_4_03_nameType(self):
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name=None)
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name=69)
 
-class API_6_PlaceTests(API_BaseTest):
+    def test_4_04_nameEmptiness(self):
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name="")
+        with self.assertRaises(TypeError, msg="Name needs to be a string"):
+            self.createInstance(name="    ")
+
+    def test_4_05_nameInvalidContent(self):
+        City = self.importClass()
+        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+            self.createInstance(name="A55ghar")
+        with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
+            self.createInstance(name="$Hola")
+
+
+class API_6_Place(API_BaseTest):
     '''
         Tests the Place class.
+        host id and city id are not tested
         Place(host_id, name, description, number_of_rooms,
         number_of_bathrooms, max_guests, price_per_night,
         latitude, longitude, city_id, amenity_ids)
     '''
 
     @classmethod
-    def importClass(self):
+    def importClass(cls):
         return __import__(MODULE).Place
 
     @classmethod
-    def createInstance(self, name, description, n_of_rooms, n_of_bathrooms,
-        max_guests, price_per_night, latitude, longitude, amenity_ids):
-        Place = self.importClass()
-        Country = API_4_CountryTests.importClass()
-        City = API_5_CityTests.importClass()
-        User = API_3_UserTests.importClass()
+    def createInstance(
+        cls, name="Choza de madera",
+        description="Para dormir tenes que poner un acolchado",
+        number_of_rooms=1, number_of_bathrooms=0,
+        max_guests=2, price_per_night=200,
+        latitude=-34.878084970819934,
+        longitude=-56.11451859541931,
+            amenity_ids=[uuid.uuid4(), uuid.uuid4()]):
+        Place = cls.importClass()
+        Country = API_4_Country.importClass()
+        City = API_5_City.importClass()
+        User = API_3_User.importClass()
 
         user = User("juanpedrolo@gmail.com", "juan", "pedrolo")
         country = Country("uy", "Uruguay")
         city = City("Montevideo", "uy")
 
         return [Place(user.id, name, description,
-            number_of_rooms, number_of_bathrooms, max_guests,
-            price_per_night, latitude, longitude, city.id, amenity_ids),
-            user, city, country]
+                      number_of_rooms, number_of_bathrooms, max_guests,
+                      price_per_night, latitude, longitude, city.id,
+                      amenity_ids), user, city, country]
 
     def test_6_01_sanity(self):
-        Place = self.importClass()
-        place = Place(uuid.uuid4().hex, "Testing Place", "Test", 4,
-                1, 6, 1000,
-                69.69, 69.69, uuid.uuid4().hex,
-                [uuid.uuid4().hex, uuid.uuid4().hex])
+        self.createInstance()
         self.__class__.passedSanity = True
 
     def test_6_02_basicOperations(self):
-        name = "Choza de madera"
-        desc = "Para dormir tenes que poner un acolchado"
-        number_of_rooms = 1
-        number_of_bathrooms = 0
-        max_guests = 2
-        price_per_night = 200
-        latitude = -34.878084970819934
-        longitude = -56.11451859541931
-        amenity_ids = [uuid.uuid4().hex, uuid.uuid4().hex, uuid.uuid4().hex]
-        n = self.createInstance(self, name, description, number_of_rooms,
-            number_of_bathrooms, max_guests, price_per_night, latitude,
-            longitude, amenity_ids)
+        ins = self.createInstance()
+        n = ins[0]
         n.name
         n.description
         n.number_of_rooms
@@ -335,34 +406,129 @@ class API_6_PlaceTests(API_BaseTest):
         n.price_per_night
         n.latitude
         n.longitude
-        n.amenity_ids
+        amenities = n.amenity_ids.copy()
 
         n.name = "Choza de madera de calidad"
         n.description = "Ahora con cama y todo!"
-        amenity_ids.pop(), amenity_ids.append()
-        n.ammenities = amenity_ids
+        amenities.pop(), amenities.append(uuid.uuid4())
+        n.ammenities = amenities
         n.price_per_night = 500
         n.max_guests = 4
 
+    def test_6_03_name_Type(self):
+        with self.assertRaises(TypeError, msg="name must be a string"):
+            self.createInstance(name=None)
+        with self.assertRaises(TypeError, msg="name must be a string"):
+            self.createInstance(name=69)
 
-class API_7_ReviewTests(API_BaseTest):
+    def test_6_04_name_Emptiness(self):
+        with self.assertRaises(TypeError, msg="name cannot be empty"):
+            self.createInstance(name="")
+        with self.assertRaises(TypeError, msg="name cannot be empty"):
+            self.createInstance(name="    ")
+
+    def test_6_05_decription_Type(self):
+        with self.assertRaises(TypeError,
+                               msg="description must to be a string"):
+            self.createInstance(description=None)
+        with self.assertRaises(TypeError,
+                               msg="description must be a string"):
+            self.createInstance(description=69)
+
+    def test_6_06_number_of_rooms_Type(self):
+        with self.assertRaises(TypeError,
+                               msg="number_of_rooms must be an int"):
+            self.createInstance(number_of_rooms=None)
+        with self.assertRaises(TypeError,
+                               msg="number_of_rooms must be an int"):
+            self.createInstance(number_of_rooms=69.69)
+        with self.assertRaises(TypeError,
+                               msg="number_of_rooms must be an int"):
+            self.createInstance(number_of_rooms=[69])
+
+    def test_6_07_number_of_bathrooms_Type(self):
+        with self.assertRaises(TypeError,
+                               msg="number_of_bathrooms must be an int"):
+            self.createInstance(number_of_bathrooms=None)
+        with self.assertRaises(TypeError,
+                               msg="number_of_bathrooms must be an int"):
+            self.createInstance(number_of_bathrooms=69.69)
+        with self.assertRaises(TypeError,
+                               msg="number_of_bathrooms must be an int"):
+            self.createInstance(number_of_rooms=[69])
+
+    def test_6_08_max_guests_Type(self):
+        with self.assertRaises(TypeError, msg="max_guests must be an int"):
+            self.createInstance(max_guests=None)
+        with self.assertRaises(TypeError, msg="max_guests must be an int"):
+            self.createInstance(max_guests=69.69)
+        with self.assertRaises(TypeError, msg="max_guests must be an int"):
+            self.createInstance(max_guests=[69])
+
+    def test_6_09_price_per_night_Type(self):
+        with self.assertRaises(TypeError, msg="max_guests must be a float"):
+            self.createInstance(price_per_night=None)
+        with self.assertRaises(TypeError, msg="max_guests must be a float"):
+            self.createInstance(price_per_night=69)
+        with self.assertRaises(TypeError, msg="max_guests must be a float"):
+            self.createInstance(price_per_night=[69.69])
+
+    def test_6_10_price_per_night_Value(self):
+        with self.assertRaises(TypeError, msg="max_guests must be > 0"):
+            self.createInstance(price_per_night=0)
+        with self.assertRaises(TypeError, msg="max_guests must be > 0"):
+            self.createInstance(price_per_night=-1)
+
+    def test_6_11_latitude_Type(self):
+        with self.assertRaises(TypeError, msg="latitude must be a float"):
+            self.createInstance(latitude=None)
+        with self.assertRaises(TypeError, msg="latitude must be a float"):
+            self.createInstance(latitude=69)
+        with self.assertRaises(TypeError, msg="latitude must be a float"):
+            self.createInstance(latitude=[69.69])
+
+    def test_6_12_longitude_Type(self):
+        with self.assertRaises(TypeError, msg="longitude must be a float"):
+            self.createInstance(longitude=None)
+        with self.assertRaises(TypeError, msg="longitude must be a float"):
+            self.createInstance(longitude=69)
+        with self.assertRaises(TypeError, msg="longitude must be a float"):
+            self.createInstance(longitude=[69.69])
+
+    def test_6_13_amenity_ids_Type(self):
+        with self.assertRaises(TypeError, msg="amenity_ids must be a list"):
+            self.createInstance(amenity_ids=None)
+        with self.assertRaises(TypeError, msg="amenity_ids must be a list"):
+            self.createInstance(amenity_ids=69)
+        with self.assertRaises(TypeError, msg="amenity_ids must be a list"):
+            self.createInstance(amenity_ids=uuid.uuid4())
+
+
+class API_7_Review(API_BaseTest):
     '''
         Tests the Review class.
         Review(place_id, user_id, rating, comment)
     '''
 
     @classmethod
-    def importClass(self):
+    def importClass(cls):
         return __import__(MODULE).Review
+
+    @classmethod
+    def createInstance(
+        cls, place_id=uuid.uuid4(),
+        user_id=uuid.uuid4(), rating=1,
+            comment="Peor que un basurero"):
+        Review = cls.importClass()
+        return Review(place_id, user_id, rating, comment)
 
     def test_7_01_sanity(self):
         Review = self.importClass()
-        review = Review(uuid.uuid4().hex, uuid.uuid4().hex, 1, "Test")
+        review = Review(uuid.uuid4(), uuid.uuid4(), 1, "Test")
         self.__class__.passedSanity = True
 
     def test_7_02_basicOperations(self):
-        Review = self.importClass()
-        review = Review(uuid.uuid4().hex, uuid.uuid4().hex, 1, "Test")
+        review = self.createInstance()
         review.place_id
         review.user_id
         review.rating
