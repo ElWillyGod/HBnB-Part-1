@@ -145,116 +145,107 @@ class API_3_User(API_BaseTest):
         user.last_name
 
     def test_3_03_email_Type(self):
-        with self.assertRaises(TypeError, msg="email must be a string"):
+        ERRORMESSAGE = "email must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(email=None)
-        with self.assertRaises(TypeError, msg="email must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(email=69)
 
     def test_3_04_email_Emptiness(self):
-        with self.assertRaises(ValueError, msg="email cannot be empty"):
+        ERRORMESSAGE = "email must not be empty"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(email="")
-        with self.assertRaises(ValueError, msg="email cannot be empty"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(email="    ")
-        with self.assertRaises(ValueError, msg="email cannot be empty"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(email="@")
 
     def test_3_05_email_Format(self):
-        with self.assertRaises(ValueError, msg="email must have @"):
+        ERRORMESSAGE = "email must have "
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE + "@"):
             self.createInstance(email="my_email")
-        with self.assertRaises(ValueError, msg="email must have domain"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE + "domain"):
             self.createInstance(email="my_email@")
-        with self.assertRaises(ValueError, msg="email must have name"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE + "name"):
             self.createInstance(email="@gmail.com")
 
     def test_3_06_email_Spaces(self):
-        with self.assertRaises(ValueError,
-                               msg="email cannot have spaces"):
+        ERRORMESSAGE = "email must not have spaces"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(email="    tester@gmail.com     ")
-        with self.assertRaises(ValueError,
-                               msg="email cannot have spaces"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(email="test @gmail.com")
-        with self.assertRaises(ValueError,
-                               msg="email cannot have spaces"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(email="test@g ma il.com")
 
     def test_3_07_first_name_Type(self):
-        with self.assertRaises(TypeError,
-                               msg="first_name must be a string"):
+        ERRORMESSAGE = "first_name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(first_name=None)
-        with self.assertRaises(TypeError,
-                               msg="first_name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(first_name=69)
 
     def test_3_08_first_name_Emptiness(self):
-        with self.assertRaises(ValueError,
-                               msg="first_name must not be empty"):
+        ERRORMESSAGE = "first_name must not be empty"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(first_name="")
-        with self.assertRaises(ValueError,
-                               msg="first_name must not be empty"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(first_name="  ")
 
     def test_3_09_first_name_Spaces(self):
-        with self.assertRaises(ValueError,
-                               msg="first_name cannot have spaces"):
+        ERRORMESSAGE = "first_name must not have spaces"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(first_name=" Tester ")
-        with self.assertRaises(ValueError,
-                               msg="first_name cannot have spaces"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(first_name="Te ste r")
 
     def test_3_10_first_name_SpecialCharacters(self):
-        with self.assertRaises(ValueError,
-                               msg="first_name must only contain a-zA-z0-9,-_"):
+        ERRORMESSAGE1 = "first_name must only contain a-zA-z0-9,-_"
+        ERRORMESSAGE2 = "first_name must have at least one letter"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE1):
             self.createInstance(first_name="@tester")
-        with self.assertRaises(ValueError,
-                               msg="first_name must only contain a-zA-z0-9,-_"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE1):
             self.createInstance(first_name="Hello******")
-        with self.assertRaises(ValueError,
-                               msg="first_name must have at least one letter"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE2):
             self.createInstance(first_name="____")
-        with self.assertRaises(ValueError,
-                               msg="first_name must have at least one letter"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE2):
             self.createInstance(first_name="-__-")
-        with self.assertRaises(ValueError,
-                               msg="first_name must have at least one letter"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE2):
             self.createInstance(first_name="01234567")
 
     def test_3_11_last_name_Type(self):
-        with self.assertRaises(TypeError, msg="last_name must be a string"):
+        ERRORMESSAGE = "last_name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(last_name=None)
-        with self.assertRaises(TypeError, msg="last_name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(last_name=69)
 
     def test_3_12_last_name_Emptiness(self):
-        with self.assertRaises(ValueError,
-                               msg="last_name must not be empty"):
+        ERRORMESSAGE = "last_name must not be empty"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(last_name="")
-        with self.assertRaises(ValueError,
-                               msg="last_name must not be empty"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(last_name="    ")
 
     def test_3_13_last_name_Spaces(self):
-        with self.assertRaises(ValueError,
-                               msg="last_name cannot have spaces"):
+        ERRORMESSAGE = "last_name cannot have spaces"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(last_name=" MCGee ")
-        with self.assertRaises(ValueError,
-                               msg="last_name cannot have spaces"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(last_name="MC Gee")
 
     def test_3_14_last_name_SpecialCharacters(self):
-        with self.assertRaises(ValueError,
-                               msg="last_name must only contain a-zA-z0-9,-_"):
+        ERRORMESSAGE1 = "last_name must only contain a-zA-z0-9,-_"
+        ERRORMESSAGE2 = "last_name must have at least one letter"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE1):
             self.createInstance(last_name="@MCGee")
-        with self.assertRaises(ValueError,
-                               msg="last_name must only contain a-zA-z0-9,-_"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE1):
             self.createInstance(last_name="MC$Gee")
-        with self.assertRaises(ValueError,
-                               msg="last_name must have at least one letter"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE2):
             self.createInstance(last_name="____")
-        with self.assertRaises(ValueError,
-                               msg="last_name must have at least one letter"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE2):
             self.createInstance(last_name="-__-")
-        with self.assertRaises(ValueError,
-                               msg="last_name must have at least one letter"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE2):
             self.createInstance(last_name="012345678")
 
 
@@ -282,47 +273,54 @@ class API_4_Country(API_BaseTest):
         country.name
 
     def test_4_03_code_Type(self):
-        with self.assertRaises(TypeError, msg="Code is a 2 char string"):
+        ERRORMESSAGE = "Code must be a 2 char string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(code=None)
-        with self.assertRaises(TypeError, msg="Code is a 2 char string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(code=69)
 
     def test_4_04_code_Emptiness(self):
-        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+        ERRORMESSAGE = "Code must be a 2 char string"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="")
-        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="  ")
 
     def test_4_05_code_InvalidLenght(self):
-        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+        ERRORMESSAGE = "Code must be a 2 char string"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="a")
-        with self.assertRaises(ValueError, msg="Code is a 2 char string"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="abc")
 
     def test_4_06_code_InvalidContent(self):
-        with self.assertRaises(ValueError, msg="Code can only be a-z"):
+        ERRORMESSAGE = "Code can only be a-z"
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="12")
-        with self.assertRaises(ValueError, msg="Code can only be a-z"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="a*")
-        with self.assertRaises(ValueError, msg="Code can only be a-z"):
+        with self.assertRaises(ValueError, msg=ERRORMESSAGE):
             self.createInstance(code="UY")
 
     def test_4_07_name_Type(self):
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        ERRORMESSAGE = "Name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name=None)
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name=69)
 
     def test_4_08_name_Emptiness(self):
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        ERRORMESSAGE = "Name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="")
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="    ")
 
     def test_4_09_name_InvalidContent(self):
-        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
+        ERRORMESSAGE = "Name must be a-zA-Z"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="A55GHAR")
-        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="$Hola")
 
 
@@ -351,22 +349,24 @@ class API_5_City(API_BaseTest):
         city.country_code
 
     def test_5_03_nameType(self):
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        ERRORMESSAGE = "Name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name=None)
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name=69)
 
     def test_5_04_nameEmptiness(self):
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        ERRORMESSAGE = "Name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="")
-        with self.assertRaises(TypeError, msg="Name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="    ")
 
     def test_5_05_nameInvalidContent(self):
-        City = self.importClass()
-        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
+        ERRORMESSAGE = "Name must be a-zA-Z"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="A55ghar")
-        with self.assertRaises(TypeError, msg="Name must be a-zA-Z"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="$Hola")
 
 
@@ -430,91 +430,94 @@ class API_6_Place(API_BaseTest):
         n.max_guests = 4
 
     def test_6_03_name_Type(self):
-        with self.assertRaises(TypeError, msg="name must be a string"):
+        ERRORMESSAGE = "name must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name=None)
-        with self.assertRaises(TypeError, msg="name must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name=69)
 
     def test_6_04_name_Emptiness(self):
-        with self.assertRaises(TypeError, msg="name cannot be empty"):
+        ERRORMESSAGE = "name must not be empty"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="")
-        with self.assertRaises(TypeError, msg="name cannot be empty"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(name="    ")
 
     def test_6_05_decription_Type(self):
-        with self.assertRaises(TypeError,
-                               msg="description must to be a string"):
+        ERRORMESSAGE = "description must be a string"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(description=None)
-        with self.assertRaises(TypeError,
-                               msg="description must be a string"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(description=69)
 
     def test_6_06_number_of_rooms_Type(self):
-        with self.assertRaises(TypeError,
-                               msg="number_of_rooms must be an int"):
+        ERRORMESSAGE = "number_of_rooms must be an int"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(number_of_rooms=None)
-        with self.assertRaises(TypeError,
-                               msg="number_of_rooms must be an int"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(number_of_rooms=69.69)
-        with self.assertRaises(TypeError,
-                               msg="number_of_rooms must be an int"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(number_of_rooms=[69])
 
     def test_6_07_number_of_bathrooms_Type(self):
-        with self.assertRaises(TypeError,
-                               msg="number_of_bathrooms must be an int"):
+        ERRORMESSAGE = "number_of_bathrooms must be an int"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(number_of_bathrooms=None)
-        with self.assertRaises(TypeError,
-                               msg="number_of_bathrooms must be an int"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(number_of_bathrooms=69.69)
-        with self.assertRaises(TypeError,
-                               msg="number_of_bathrooms must be an int"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(number_of_rooms=[69])
 
     def test_6_08_max_guests_Type(self):
-        with self.assertRaises(TypeError, msg="max_guests must be an int"):
+        ERRORMESSAGE = "max_guests must be an int"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(max_guests=None)
-        with self.assertRaises(TypeError, msg="max_guests must be an int"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(max_guests=69.69)
-        with self.assertRaises(TypeError, msg="max_guests must be an int"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(max_guests=[69])
 
     def test_6_09_price_per_night_Type(self):
-        with self.assertRaises(TypeError, msg="max_guests must be a float"):
+        ERRORMESSAGE = "max_guests must be a float"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(price_per_night=None)
-        with self.assertRaises(TypeError, msg="max_guests must be a float"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(price_per_night=69)
-        with self.assertRaises(TypeError, msg="max_guests must be a float"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(price_per_night=[69.69])
 
     def test_6_10_price_per_night_Value(self):
-        with self.assertRaises(TypeError, msg="max_guests must be > 0"):
+        ERRORMESSAGE = "max_guests must be > 0"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(price_per_night=0)
-        with self.assertRaises(TypeError, msg="max_guests must be > 0"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(price_per_night=-1)
 
     def test_6_11_latitude_Type(self):
-        with self.assertRaises(TypeError, msg="latitude must be a float"):
+        ERRORMESSAGE = "latitude must be a float"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(latitude=None)
-        with self.assertRaises(TypeError, msg="latitude must be a float"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(latitude=69)
-        with self.assertRaises(TypeError, msg="latitude must be a float"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(latitude=[69.69])
 
     def test_6_12_longitude_Type(self):
-        with self.assertRaises(TypeError, msg="longitude must be a float"):
+        ERRORMESSAGE = "longitude must be a float"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(longitude=None)
-        with self.assertRaises(TypeError, msg="longitude must be a float"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(longitude=69)
-        with self.assertRaises(TypeError, msg="longitude must be a float"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(longitude=[69.69])
 
     def test_6_13_amenity_ids_Type(self):
-        with self.assertRaises(TypeError, msg="amenity_ids must be a list"):
+        ERRORMESSAGE = "amenity_ids must be a list"
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(amenity_ids=None)
-        with self.assertRaises(TypeError, msg="amenity_ids must be a list"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(amenity_ids=69)
-        with self.assertRaises(TypeError, msg="amenity_ids must be a list"):
+        with self.assertRaises(TypeError, msg=ERRORMESSAGE):
             self.createInstance(amenity_ids=uuid.uuid4())
 
 
