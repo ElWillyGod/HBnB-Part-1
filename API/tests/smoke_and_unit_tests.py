@@ -22,6 +22,10 @@ import uuid
 
 
 MODULE = "willygil"
+AFTERSANITYSUCCESS = "\033[32mSanity ok\033[0m"
+AFTERSANITYFAILURE = "\033[31mSanity fail\033[0m"
+AFTERSMOKESUCCESS = "\033[32mSmoke ok\033[0m"
+AFTERSMOKEFAILURE = "\033[31m\033[5m\n   <<EXLPOSION NUCLEAR!!!>>\n\033[0m"
 
 
 class SmokePass():
@@ -49,8 +53,9 @@ class API_1_Smoke(unittest.TestCase):
                  result.errors + result.failures)
         if ok:
             SmokePass.passedSmoke = True
+            print(AFTERSMOKESUCCESS)
         else:
-            print("\033[31m\033[5m\n   <<EXLPOSION NUCLEAR!!!>>\n\033[0m")
+            print(AFTERSMOKEFAILURE)
 
     def test_1_01_smoke(self):
         __import__(MODULE)
@@ -62,15 +67,28 @@ class API_BaseTest(unittest.TestCase):
     '''
 
     passedSanity = False
-    checkedSanity = False
+    isSanity = True
 
     def setUp(self):
         if not SmokePass.passedSmoke:
             self.skipTest("Smoke Test Failed")
-        elif not self.__class__.checkedSanity:
-            self.__class__.checkedSanity = True
+        elif self.__class__.isSanity:
+            pass
         elif not self.__class__.passedSanity:
             self.skipTest("Sanity Test Failed")
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        if self.__class__.isSanity:
+            self.__class__.isSanity = False
+            if not self.__class__.passedSanity:
+                print(AFTERSANITYFAILURE)
+        return super().tearDown()
+
+    def sanityTest(self):
+        self.createInstance()
+        self.__class__.passedSanity = True
+        print(AFTERSANITYSUCCESS)
 
 
 class API_2_TrackedObject(API_BaseTest):
@@ -89,8 +107,7 @@ class API_2_TrackedObject(API_BaseTest):
         return TrackedObject()
 
     def test_2_01_sanity(self):
-        self.createInstance()
-        self.__class__.passedSanity = True
+        self.sanityTest()
 
     def test_2_02_basicOperations(self):
         to = self.createInstance()
@@ -119,8 +136,7 @@ class API_3_User(API_BaseTest):
         return User(email, first_name, last_name)
 
     def test_3_01_sanity(self):
-        self.createInstance()
-        self.__class__.passedSanity = True
+        self.sanityTest()
 
     def test_3_02_basic_Operations(self):
         user = self.createInstance()
@@ -250,8 +266,7 @@ class API_4_Country(API_BaseTest):
         return Country(code, name)
 
     def test_4_01_sanity(self):
-        self.createInstance()
-        self.__class__.passedSanity = True
+        self.sanityTest()
 
     def test_4_02_basicOperations(self):
         country = self.createInstance()
@@ -259,28 +274,24 @@ class API_4_Country(API_BaseTest):
         country.name
 
     def test_4_03_code_Type(self):
-        Country = self.importClass()
         with self.assertRaises(TypeError, msg="Code is a 2 char string"):
             self.createInstance(code=None)
         with self.assertRaises(TypeError, msg="Code is a 2 char string"):
             self.createInstance(code=69)
 
     def test_4_04_code_Emptiness(self):
-        Country = self.importClass()
         with self.assertRaises(ValueError, msg="Code is a 2 char string"):
             self.createInstance(code="")
         with self.assertRaises(ValueError, msg="Code is a 2 char string"):
             self.createInstance(code="  ")
 
     def test_4_05_code_InvalidLenght(self):
-        Country = self.importClass()
         with self.assertRaises(ValueError, msg="Code is a 2 char string"):
             self.createInstance(code="a")
         with self.assertRaises(ValueError, msg="Code is a 2 char string"):
             self.createInstance(code="abc")
 
     def test_4_06_code_InvalidContent(self):
-        Country = self.importClass()
         with self.assertRaises(ValueError, msg="Code can only be a-z"):
             self.createInstance(code="12")
         with self.assertRaises(ValueError, msg="Code can only be a-z"):
@@ -289,21 +300,18 @@ class API_4_Country(API_BaseTest):
             self.createInstance(code="UY")
 
     def test_4_07_name_Type(self):
-        Country = self.importClass()
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name=None)
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name=69)
 
     def test_4_08_name_Emptiness(self):
-        Country = self.importClass()
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name="")
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name="    ")
 
     def test_4_09_name_InvalidContent(self):
-        Country = self.importClass()
         with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
             self.createInstance(name="A55GHAR")
         with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
@@ -327,27 +335,26 @@ class API_5_City(API_BaseTest):
         return Country(country_code, name)
 
     def test_5_01_sanity(self):
-        self.createInstance()
-        self.__class__.passedSanity = True
+        self.sanityTest()
 
     def test_5_02_basicOperations(self):
         city = self.createInstance()
         city.name
         city.country_code
 
-    def test_4_03_nameType(self):
+    def test_5_03_nameType(self):
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name=None)
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name=69)
 
-    def test_4_04_nameEmptiness(self):
+    def test_5_04_nameEmptiness(self):
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name="")
         with self.assertRaises(TypeError, msg="Name needs to be a string"):
             self.createInstance(name="    ")
 
-    def test_4_05_nameInvalidContent(self):
+    def test_5_05_nameInvalidContent(self):
         City = self.importClass()
         with self.assertRaises(TypeError, msg="Name needs to be a-zA-Z"):
             self.createInstance(name="A55ghar")
@@ -392,8 +399,7 @@ class API_6_Place(API_BaseTest):
                       amenity_ids), user, city, country]
 
     def test_6_01_sanity(self):
-        self.createInstance()
-        self.__class__.passedSanity = True
+        self.sanityTest()
 
     def test_6_02_basicOperations(self):
         ins = self.createInstance()
@@ -523,9 +529,7 @@ class API_7_Review(API_BaseTest):
         return Review(place_id, user_id, rating, comment)
 
     def test_7_01_sanity(self):
-        Review = self.importClass()
-        review = Review(uuid.uuid4(), uuid.uuid4(), 1, "Test")
-        self.__class__.passedSanity = True
+        self.sanityTest()
 
     def test_7_02_basicOperations(self):
         review = self.createInstance()
