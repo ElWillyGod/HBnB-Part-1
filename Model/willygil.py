@@ -7,7 +7,6 @@
 
 from abc import ABC
 from datetime import datetime
-import re
 import uuid
 
 
