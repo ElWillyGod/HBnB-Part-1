@@ -7,6 +7,7 @@
 
 from abc import ABC
 from datetime import datetime
+import re
 import uuid
 
 
@@ -24,6 +25,18 @@ class TrackedObject(ABC):
     def update_time(self):
         self.__updated_at = datetime.now()
 
+    @property
+    def get_id(self):
+        return self.__id
+
+    @property
+    def get_created_at(self):
+        return self.__created_at
+
+    @property
+    def get_update_time(self):
+        return self.__updated_at
+
 
 class User(TrackedObject):
     '''
@@ -35,6 +48,18 @@ class User(TrackedObject):
         self.__email = email
         self.__first_name = first_name
         self.__last_name = last_name
+
+    @property
+    def get_email(self):
+        return self.__email
+
+    @property
+    def get_frist_name(self):
+        return self.__first_name
+
+    @property
+    def get_last_name(self):
+        return __last_name
 
 
 class Place(TrackedObject):
@@ -57,6 +82,18 @@ class Place(TrackedObject):
         self.__city_id = city_id
         self.__amenity_ids = amenity_ids
 
+    @property
+    def get_host_id(self):
+        return self.__host_id
+
+    @property
+    def get_name(self):
+        return self.__name
+
+    @property
+    def get_city_id(self):
+        return self.__city_id
+
 
 class City(TrackedObject):
     """City init"""
@@ -66,6 +103,14 @@ class City(TrackedObject):
         self.__name = name
         self.__country_code = country_code
 
+    @property
+    def get_name(self):
+        return self.__name
+
+    @property
+    def get_country_code(self):
+        return self.__country_code
+
 
 class Country(TrackedObject):
     """code and name"""
@@ -74,6 +119,14 @@ class Country(TrackedObject):
         self.__code = code
         # arreglar para sacar los codigos, con api o de una
         self.__name = name
+
+    @property
+    def get_code(self):
+        return self.__code
+
+    @property
+    def get_name(self):
+        return self.__name
 
 
 class Review(TrackedObject):
@@ -85,3 +138,15 @@ class Review(TrackedObject):
         self.__user_id = user_id
         self.__rating = rating
         self.__comment = comment
+
+    @property
+    def get_place_id(self):
+        return self.__place_id
+
+    @property
+    def get_user_id(self):
+        return self.__user_id
+
+    @property
+    def get_rating(self):
+        return self.__rating
