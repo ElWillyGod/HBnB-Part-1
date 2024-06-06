@@ -59,7 +59,7 @@ class User(TrackedObject):
 
     @property
     def get_last_name(self):
-        return __last_name
+        return self.__last_name
 
 
 class Place(TrackedObject):
