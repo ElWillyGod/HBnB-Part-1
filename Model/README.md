@@ -1,3 +1,4 @@
-# services layer
+# Model Layer
+#### Version 0.2
 
-This is where our API greets the world. It handles all the requests and responses.
+Logic goes here
