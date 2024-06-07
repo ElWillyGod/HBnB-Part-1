@@ -14,9 +14,9 @@ class User(TrackedObject):
 
     def __init__(self, email, first_name, last_name):
         super().__init__()
-        self.__email = email
-        self.__first_name = first_name
-        self.__last_name = last_name
+        self.email = email
+        self.first_name = first_name
+        self.last_name = last_name
 
     @property
     def email(self):
@@ -24,8 +24,8 @@ class User(TrackedObject):
 
     @email.setter
     def email(self, value):
-        if False:
-            raise NotImplementedError
+        if isUserEmailDuplicated(value):
+            raise EmailDuplicated("email already exists")
         self.__email = value
 
     @property
@@ -34,8 +34,12 @@ class User(TrackedObject):
 
     @first_name.setter
     def first_name(self, value):
+        if not isinstance(value, str):
+            raise TypeError("first_name must be a string")
         if False:
-            raise NotImplementedError
+            raise ValueError("first_name must not be empty")
+        if False:
+            raise ValueError("first_name must not have spaces")
         self.__first_name = value
 
     @property
