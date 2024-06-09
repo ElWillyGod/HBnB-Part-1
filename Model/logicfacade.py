@@ -10,6 +10,9 @@ from abc import ABC
 import json
 from validationlib import idChecksum, typeExists, idExists, isCountryValid
 from logicexceptions import *
+from ..Integration import fileDataManager, countryDataManager
+
+countries = countryDataManager.get()
 
 
 class LogicFacade(ABC):
@@ -22,16 +25,16 @@ class LogicFacade(ABC):
 
         --HTTP--
         GET:
-            getByType(cls:str) -> str
-            getByID(id:str, cls:str) -> str
-            getCountry(code:str) -> str
-            getCountryCities(code:str) -> str
+            getByType(cls: str) -> str
+            getByID(id: str, cls: str) -> str
+            getCountry(code: str) -> str
+            getCountryCities(code: str) -> str
         POST:
-            createObjetByJson(cls:str, data:str)
+            createObjetByJson(cls: str, data: str)
         PUT:
-            updateByID(id:str, cls:str, data:str)
+            updateByID(id: str, cls: str, data: str)
         DELETE:
-            deleteByID(id:str, cls:str)
+            deleteByID(id: str, cls: str)
 
         --Exceptions--
         from logicexceptions.py:
@@ -63,51 +66,47 @@ class LogicFacade(ABC):
     '''
 
     @staticmethod
-    def getByType(cls:str) -> str:
+    def getByType(cls: str) -> str:
         if not typeExists(cls):
             raise TypeError("invalid type for get")
         clsPlural = getPlural(cls)
         return fileDataManager.getAll(clsPlural)
 
     @staticmethod
-    def getByID(id:str, cls: str) -> str:
-        if not idChecksum(id)
+    def getByID(id: str, cls: str) -> str:
+        if not idChecksum(id):
             raise IDChecksumError("invalid id")
         clsPlural = getPlural(cls)
         return fileDataManager.get(id, clsPlural)
 
     @staticmethod
-    def deleteByID(id:str, cls:str) -> None:
-        if not idChecksum(id)
+    def deleteByID(id: str, cls: str) -> None:
+        if not idChecksum(id):
             raise IDChecksumError("invalid id")
         clsPlural = getPlural(cls)
         return fileDataManager.delete(id, clsPlural)
 
     @staticmethod
-    def updateByID(id:str, cls:str, data:str) -> None:
+    def updateByID(id: str, cls: str, data: str) -> None:
         for c in classes:
             # c[0]: singular str, c[1]: plural str, c[2]: class
             if cls == c[0]:
                 new = c[2].createFromJson(data, id)
                 clsPlural = c[1]
-        if not idChecksum(id)
-            raise IDChecksumError("invalid id")
         return fileDataManager.update(id, cls, data)
 
     @staticmethod
-    def createObjectByJson(cls:str, data:str) -> None:
+    def createObjectByJson(cls: str, data: str) -> None:
         for c in classes:
             # c[0]: singular str, c[1]: plural str, c[2]: class
             if cls == c[0]:
                 new = c[2].createFromJson(data)
                 clsPlural = c[1]
-        if not idChecksum(id)
-            raise IDChecksumError("invalid id")
         return fileDataManager.save(clsPlural, new)
 
     @staticmethod
-    def getCountry(code:str) -> str:
-        if not isCountryValid(code)
+    def getCountry(code: str) -> str:
+        if not isCountryValid(code):
             raise InvalidCountryCode("country code is not valid")
         for country in countries:
             if country.code == code:
@@ -115,8 +114,8 @@ class LogicFacade(ABC):
         raise CountryNotFoundError("country does not exist")
 
     @staticmethod
-    def getContryCities(code:str) -> str:
-        if not isCountryValid(code)
+    def getContryCities(code: str) -> str:
+        if not isCountryValid(code):
             raise InvalidCountryCode("country code is not valid")
         for country in countries:
             if country.code == code:
