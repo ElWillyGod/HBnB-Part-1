@@ -14,7 +14,7 @@ from validationlib import (idChecksum,
                            isCountryValid)
 from utilitieslib import classes, getPlural
 from logicexceptions import *
-from ..Persistance import fileDataManager, countryDataManager
+from persistence.persistence_manager import fileDataManager, countryDataManager
 
 countries = countryDataManager.get()
 

@@ -2,7 +2,6 @@
 
 import json
 import os
-from iPersistenceManager import IPersistenceManager # no anda
 
 """
 DataManager class that implements the iPersistenceManager interface.
