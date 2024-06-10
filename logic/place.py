@@ -9,7 +9,14 @@ from trackedobject import TrackedObject
 
 class Place(TrackedObject):
     """
-        quickdoc
+        status = WIP (75%)
+    
+        from TrackedObject:
+            id (str): UUID4 as hex.
+            created_at: datetime as string at time of creation.
+            updated_at: datetime as string at time of last update.
+            update_time() -> None: Updates the updated_at attribute.
+            toJson() -> str: Returns a JSON representation of this object.
     """
 
     def __init__(self, host_id, name, description, number_of_rooms,

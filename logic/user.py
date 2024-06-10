@@ -5,13 +5,19 @@
 '''
 
 from trackedobject import TrackedObject
-from validationlib import isUserEmailDuplicated
+from validationlib import isUserEmailDuplicated, isNameValid
 from logicexceptions import EmailDuplicated
 
 
 class User(TrackedObject):
     '''
-        quickdoc
+
+        from TrackedObject:
+            id (str): UUID4 as hex.
+            created_at: datetime as string at time of creation.
+            updated_at: datetime as string at time of last update.
+            update_time() -> None: Updates the updated_at attribute.
+            toJson() -> str: Returns a JSON representation of this object.
     '''
 
     def __init__(self, email, first_name, last_name,
@@ -39,10 +45,10 @@ class User(TrackedObject):
     def first_name(self, value):
         if not isinstance(value, str):
             raise TypeError("first_name must be a string")
-        if isNameValid:
+        if len(value) == 0:
             raise ValueError("first_name must not be empty")
-        if isUsernameValid:
-            raise ValueError("first_name must not have spaces")
+        if isNameValid(value):
+            raise ValueError("invalid first_name")
         self.__first_name = value
 
     @property
@@ -51,6 +57,10 @@ class User(TrackedObject):
 
     @last_name.setter
     def last_name(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError("last_name must be a string")
+        if len(value) == 0:
+            raise ValueError("last_name must not be empty")
+        if isNameValid(value):
+            raise ValueError("invalid last_name")
         self.__last_name = value

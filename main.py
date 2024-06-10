@@ -1,8 +1,9 @@
 
 '''
-    quickdoc
+    Aplication runner.
+    WIP
 '''
 
 import persistence
 import logic
-import API
+import api

@@ -1,24 +1,27 @@
 #!/usr/bin/python3
 
 '''
-    quickdoc
+    Defines validation functions.
+    Some make calls to the persistance layer.
 '''
 
-from string import ascii_lowercase
+from string import ascii_letters, digits
 from utilitieslib import classes
 
 
 
 def idExists(id: str, cls) -> bool: 
     '''
-        quickdoc
+        status = WIP (0%)
+
+        Calls persistance layer to see if an id within cls exists.
     '''
 
     raise NotImplementedError
 
 def idChecksum(id: str) -> bool:
     '''
-        quickdoc
+        Checks if an id's lenght is valid.
     '''
 
     return len(id) == 32
@@ -26,7 +29,9 @@ def idChecksum(id: str) -> bool:
 
 def isUserEmailDuplicated(email: str) -> bool:
     '''
-        quickdoc
+        status = WIP (0%)
+
+        Calls persistance layer to see if a user has the same email.
     '''
 
     raise NotImplementedError
@@ -34,35 +39,41 @@ def isUserEmailDuplicated(email: str) -> bool:
 
 def isCountryValid(country_code: str) -> bool:
     '''
-        quickdoc
+        Checks if a country's code is valid.
     '''
 
-    raise NotImplementedError
+    if False:
+        pass
+    return True
 
 
-def isStrValid(string, ignoreStr: str="") -> bool:
+def isStrValid(string, ignoreDigits=True, ignoreStr: str="") -> bool:
     '''
-        Returns False if:
-            is not a string,
-            is empty,
-            has any spaces,
-            has any special character aside from chars from ignoreStr
+        Checks if the string does not have any special character aside
+        from chars from ignoreStr.
     '''
 
     for char in string:
-        if char not in ascii_lowercase and char not in ignoreStr:
-            return False
+        if char not in ascii_letters and char not in ignoreStr:
+            if not ignoreDigits and char in digits:
+                return False
     return True
 
 
 def isNameValid(string: str) -> bool:
     '''
+        Checks if a name is valid.
+
         Returns false if:
-            str is not valid,
-            has any special character aside from '-', '_'
+            str is not valid having no special character aside from:
+                '-', '_', ' '.
+            starts with a special character or digit.
     '''
 
-    if not isStrValid(string, "-_"):
+    if not isStrValid(string, "-_ "):
+        return False
+
+    if string[0] not in ascii_letters:
         return False
 
     return True
@@ -70,12 +81,20 @@ def isNameValid(string: str) -> bool:
 
 def isEmailValid(string: str) -> bool:
     '''
+        status = WIP (10%)
+
         Returns false if:
-            str is not valid,
-            has any special character aside from '-', '_', '.', '@',
-            has exactly one '@',
-            not empty after '@',
-            has at least one '.' and no '-', '_' after the '@'
+            it haves a special character aside from:
+                '-', '_', '.', '@'
+            starts with a special character or digit,
+            has not exactly one '@',
+            empty before the '@',
+            has not at least one '.' and is after the '@',
+            empty between '@' and '.',
+            special characters, or digits after the '@',
+            empty after the '.'.
+
+        valid example: "user@gmail.com"
     '''
 
     if not isStrValid(string, "-_.@"):

@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 '''
-    quickdoc
+    Defines the Review class.
+    Reviews are linked with a user and a review.
 '''
 
 from trackedobject import TrackedObject
@@ -11,7 +12,19 @@ from logicexceptions import InvalidIDError, IDDoesNotExistError
 
 class Review(TrackedObject):
     """
-        quickdoc
+        status = Completed
+
+        from TrackedObject:
+            id (str): UUID4 as hex.
+            created_at: datetime as string at time of creation.
+            updated_at: datetime as string at time of last update.
+            update_time() -> None: Updates the updated_at attribute.
+            toJson() -> str: Returns a JSON representation of this object.
+
+        place_id (str): ID of place as hex
+        user_id (str): ID of user as hex.
+        rating (int): How much points it gives to the place.
+        comment (str): A comment of why the rating was chose.
     """
 
     def __init__(self, place_id, user_id, rating, comment,
@@ -23,11 +36,11 @@ class Review(TrackedObject):
         self.comment = comment
 
     @property
-    def place_id(self):
+    def place_id(self) -> str:
         return self.__place_id
 
     @place_id.setter
-    def place_id(self, value):
+    def place_id(self, value) -> None:
         if not isinstance(value, str):
             raise TypeError("place_id must be a str")
         if not idChecksum(value):
@@ -37,11 +50,11 @@ class Review(TrackedObject):
         self.__place_id = value
 
     @property
-    def user_id(self):
+    def user_id(self) -> str:
         return self.__user_id
 
     @user_id.setter
-    def user_id(self, value):
+    def user_id(self, value) -> None:
         if not isinstance(value, str):
             raise TypeError("user_id must be a str")
         if not idChecksum(value):
@@ -51,11 +64,11 @@ class Review(TrackedObject):
         self.__user_id = value
 
     @property
-    def rating(self):
+    def rating(self) -> int:
         return self.__rating
 
     @rating.setter
-    def rating(self, value):
+    def rating(self, value) -> None:
         if not isinstance(value, int):
             raise TypeError("rating must be an int")
         if value < 0 or value > 10:
@@ -63,11 +76,11 @@ class Review(TrackedObject):
         self.__rating = value
 
     @property
-    def comment(self):
+    def comment(self) -> str:
         return self.__comment
 
     @comment.setter
-    def comment(self, value):
+    def comment(self, value) -> None:
         if not isinstance(value, str):
             raise TypeError("comment must be a str")
         self.__comment = value

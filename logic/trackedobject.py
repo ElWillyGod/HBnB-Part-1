@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 
 '''
-    quickdoc
+    Defines TrackedObject class.
+    This abstract class defines common elements and passes them down to most
+    other classes.
 '''
 
 from abc import ABC
@@ -10,71 +12,69 @@ import uuid
 import json
 
 from validationlib import idChecksum, isDatetimeValid
-from logicexceptions import IDChecksumError
 
 
 class TrackedObject(ABC):
     '''
-        quickdoc
+        status = WIP (75%) needs some implementation and testing
+
+        id (str): UUID4 as hex.
+        created_at: datetime as string at time of creation.
+        updated_at: datetime as string at time of last update.
+        update_time() -> None: Updates the updated_at attribute.
+        toJson() -> str: Returns a JSON representation of this object.
     '''
 
     def __init__(self, id=None, created_at=None, updated_at=None):
-        now = datetime.now()
+        now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at
         self.id = str(uuid.uuid4()) if id is None else id
 
-    def update_time(self):
+    def update_time(self) -> None:
         self.__updated_at = str(datetime.now())
 
     def toJson(self) -> str:
         try:
             instance_vars = self.__dict__
-            converted_data = json.loads(instance_vars)
+            converted_data = json.dumps(instance_vars)
             output = self(converted_data)
         except Exception:
             raise ValueError("object conversion to json failed")
         return output
 
-    def createFromJson(self, data):
-        try:
-            converted_data = json.loads(data)
-            output = self(converted_data)
-        except TypeError:
-            raise TypeError("json conversion to object failed")
-        except Exception:
-            raise ValueError("keys do not match the object's attributes")
-        return output
-
     @property
-    def id(self):
+    def id(self) -> str:
         return self.__id
 
     @id.setter
-    def id(self, value):
+    def id(self, value) -> None:
+        if not isinstance(value, str):
+            raise TypeError("id must be a string")
         if not idChecksum(value):
-            raise IDChecksumError('invalid id')
+            raise ValueError('invalid id')
         self.__id == value
 
-    def createFromJson(self):
-        pass
-
     @property
-    def created_at(self):
+    def created_at(self) -> str:
         return self.__created_at
 
     @created_at.setter
-    def created_at(self, value):
+    def created_at(self, value) -> None:
+        if not isinstance(value, str):
+            raise TypeError("created_at must be a string")
         if not isDatetimeValid(value):
             raise ValueError('invalid creation time')
         self.__created_at == value
 
     @property
-    def updated_at(self):
+    def updated_at(self) -> str:
         return self.__updated_at
 
     @updated_at.setter
-    def updated_at(self, value):
+    def updated_at(self, value) -> None:
+        if not isinstance(value, str):
+            raise TypeError("updated_at must be a string")
         if not isDatetimeValid(value):
-            raise ValueError('invalid update time')
+            raise ValueError("invalid update time")
         self.__updated_at == value
