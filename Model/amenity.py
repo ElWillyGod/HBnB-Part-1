@@ -5,6 +5,7 @@
 '''
 
 from trackedobject import TrackedObject
+from validationlib import isAmenityNameOk
 
 
 class Amenity(TrackedObject):
@@ -22,6 +23,6 @@ class Amenity(TrackedObject):
 
     @name.setter
     def name(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError("name must be a string")
         self.__name = value
