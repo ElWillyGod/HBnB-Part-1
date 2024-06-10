@@ -18,7 +18,7 @@ class TrackedObject(ABC):
         quickdoc
     '''
 
-    def __init__(self, created_at=None, updated_at=None, id=None):
+    def __init__(self, id=None, created_at=None, updated_at=None):
         now = datetime.now()
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at
@@ -33,7 +33,7 @@ class TrackedObject(ABC):
             converted_data = json.loads(instance_vars)
             output = self(converted_data)
         except Exception:
-            raise JSONError("conversion conversion to json failed")
+            raise ValueError("object conversion to json failed")
         return output
 
     def createFromJson(self, data):
@@ -41,9 +41,9 @@ class TrackedObject(ABC):
             converted_data = json.loads(data)
             output = self(converted_data)
         except TypeError:
-            raise JSONError("json conversion to object failed")
+            raise TypeError("json conversion to object failed")
         except Exception:
-            raise InvalidKeysError("keys do not match the objects parameters")
+            raise ValueError("keys do not match the object's attributes")
         return output
 
     @property
@@ -75,6 +75,6 @@ class TrackedObject(ABC):
 
     @updated_at.setter
     def updated_at(self, value):
-        if not idDateTimeValid(value):
+        if not isDatetimeValid(value):
             raise ValueError('invalid update time')
         self.__updated_at == value

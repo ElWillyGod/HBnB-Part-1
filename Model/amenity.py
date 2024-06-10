@@ -13,7 +13,8 @@ class Amenity(TrackedObject):
         quickdoc
     '''
 
-    def __init__(self, name):
+    def __init__(self, name,
+                 *, id=None, created_at=None, updated_at=None):
         super().__init__()
         self.__name = name
 

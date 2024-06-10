@@ -18,27 +18,20 @@ class CountryNotFoundError(Exception):
     '''
     pass
 
-class Error(Exception):
+class EmailDuplicated(Exception):
     '''
         quickdoc
     '''
     pass
 
-class Error(Exception):
+class InvalidIDError(Exception):
     '''
         quickdoc
     '''
     pass
 
-class Error(Exception):
+class IDDoesNotExistError(Exception):
     '''
         quickdoc
     '''
     pass
-
-class Error(Exception):
-    '''
-        quickdoc
-    '''
-    pass
-

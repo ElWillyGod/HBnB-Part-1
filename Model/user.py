@@ -5,6 +5,8 @@
 '''
 
 from trackedobject import TrackedObject
+from validationlib import isUserEmailDuplicated
+from logicexceptions import EmailDuplicated
 
 
 class User(TrackedObject):
@@ -13,7 +15,7 @@ class User(TrackedObject):
     '''
 
     def __init__(self, email, first_name, last_name,
-                 id=None, created_at=None, upadated_at=None):
+                 *, id=None, created_at=None, updated_at=None):
         super().__init__(id, created_at, updated_at)
         self.email = email
         self.first_name = first_name
@@ -37,9 +39,9 @@ class User(TrackedObject):
     def first_name(self, value):
         if not isinstance(value, str):
             raise TypeError("first_name must be a string")
-        if False:
+        if isNameValid:
             raise ValueError("first_name must not be empty")
-        if False:
+        if isUsernameValid:
             raise ValueError("first_name must not have spaces")
         self.__first_name = value
 

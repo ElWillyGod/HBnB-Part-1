@@ -6,6 +6,7 @@
 
 from trackedobject import TrackedObject
 from validationlib import *
+from logicexceptions import InvalidIDError, IDDoesNotExistError
 
 
 class Review(TrackedObject):
@@ -13,8 +14,9 @@ class Review(TrackedObject):
         quickdoc
     """
 
-    def __init__(self, place_id, user_id, rating, comment):
-        super().__init__()
+    def __init__(self, place_id, user_id, rating, comment,
+                 *, id=None, created_at=None, updated_at=None):
+        super().__init__(id, created_at, updated_at)
         self.place_id = place_id
         self.user_id = user_id
         self.rating = rating

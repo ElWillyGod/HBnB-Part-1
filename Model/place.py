@@ -14,20 +14,20 @@ class Place(TrackedObject):
 
     def __init__(self, host_id, name, description, number_of_rooms,
                  number_of_bathrooms, max_guests, price_per_night,
-                 latitude, longitude, city_id, amenity_ids):
-
-        super().__init__()
-        self.__host_id = host_id
-        self.__name = name
-        self.__description = description
-        self.__number_of_rooms = number_of_rooms
-        self.__number_of_bathrooms = number_of_bathrooms
-        self.__max_guests = max_guests
-        self.__price_per_night = price_per_night
-        self.__latitude = latitude
-        self.__longitude = longitude
-        self.__city_id = city_id
-        self.__amenity_ids = amenity_ids
+                 latitude, longitude, city_id, amenity_ids,
+                 *, id=None, created_at=None, updated_at=None):
+        super().__init__(id, created_at, updated_at)
+        self.host_id = host_id
+        self.name = name
+        self.description = description
+        self.number_of_rooms = number_of_rooms
+        self.number_of_bathrooms = number_of_bathrooms
+        self.max_guests = max_guests
+        self.price_per_night = price_per_night
+        self.latitude = latitude
+        self.longitude = longitude
+        self.city_id = city_id
+        self.amenity_ids = amenity_ids
 
     @property
     def host_id(self):
@@ -35,8 +35,8 @@ class Place(TrackedObject):
 
     @host_id.setter
     def host_id(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError(" must be a string")
         self.__host_id = value
 
     @property
@@ -45,8 +45,8 @@ class Place(TrackedObject):
 
     @name.setter
     def name(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError("name must be a string")
         self.__name = value
 
     @property
@@ -55,8 +55,8 @@ class Place(TrackedObject):
 
     @description.setter
     def description(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError("description must be a string")
         self.__description = value
 
     @property
@@ -65,8 +65,8 @@ class Place(TrackedObject):
 
     @number_of_rooms.setter
     def number_of_rooms(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, int):
+            raise TypeError("number_of_rooms must be an int")
         self.__number_of_rooms = value
 
     @property
@@ -75,8 +75,8 @@ class Place(TrackedObject):
 
     @number_of_bathrooms.setter
     def number_of_bathrooms(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, int):
+            raise TypeError("number_of_bathrooms must be an int")
         self.__number_of_bathrooms = value
 
     @property
@@ -85,8 +85,8 @@ class Place(TrackedObject):
 
     @city_id.setter
     def city_id(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError("city_id must be a string")
         self.__city_id = value
 
     @property
@@ -95,8 +95,8 @@ class Place(TrackedObject):
 
     @price_per_night.setter
     def price_per_night(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, float):
+            raise TypeError("price_per_night must be a float")
         self.__price_per_night = value
 
     @property
@@ -105,8 +105,8 @@ class Place(TrackedObject):
 
     @latitude.setter
     def latitude(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, float):
+            raise TypeError("latitude must be a float")
         self.__latitude = value
 
     @property
@@ -115,8 +115,8 @@ class Place(TrackedObject):
 
     @longitude.setter
     def longitude(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, float):
+            raise TypeError("longitude must be a float")
         self.__longitude = value
 
     @property
@@ -125,8 +125,8 @@ class Place(TrackedObject):
 
     @city_id.setter
     def city_id(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, str):
+            raise TypeError("city_id must be a string")
         self.__city_id = value
 
     @property
@@ -135,6 +135,6 @@ class Place(TrackedObject):
 
     @amenity_ids.setter
     def amenity_ids(self, value):
-        if False:
-            raise NotImplementedError
+        if not isinstance(value, list):
+            raise TypeError("amenity_ids must be a list")
         self.__amenity_ids = value
