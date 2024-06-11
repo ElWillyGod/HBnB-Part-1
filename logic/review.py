@@ -7,7 +7,7 @@
 
 from trackedobject import TrackedObject
 from validationlib import *
-from logicexceptions import InvalidIDError, IDDoesNotExistError
+from logicexceptions import IDNotFoundError
 
 
 class Review(TrackedObject):
@@ -44,9 +44,9 @@ class Review(TrackedObject):
         if not isinstance(value, str):
             raise TypeError("place_id must be a str")
         if not idChecksum(value):
-            raise InvalidIDError("invalid place_id for review")
+            raise ValueError("invalid place_id for review")
         if not idExists(value, Review):
-            raise IDDoesNotExistError("place_id doesn't pair with a place")
+            raise IDNotFoundError("place_id doesn't pair with a place")
         self.__place_id = value
 
     @property
@@ -58,9 +58,9 @@ class Review(TrackedObject):
         if not isinstance(value, str):
             raise TypeError("user_id must be a str")
         if not idChecksum(value):
-            raise InvalidIDError("invalid user_id for review")
+            raise ValueError("invalid user_id for review")
         if not idExists(value, Review):
-            raise IDDoesNotExistError("user_id doesn't pair with a user")
+            raise IDNotFoundError("user_id doesn't pair with a user")
         self.__user_id = value
 
     @property
@@ -71,8 +71,8 @@ class Review(TrackedObject):
     def rating(self, value) -> None:
         if not isinstance(value, int):
             raise TypeError("rating must be an int")
-        if value < 0 or value > 10:
-            raise ValueError("rating must be >= 0 and <= 10")
+        if value <= 0 or value > 5:
+            raise ValueError("rating must be > 0 and <= 5")
         self.__rating = value
 
     @property

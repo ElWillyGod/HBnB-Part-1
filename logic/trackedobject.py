@@ -34,13 +34,27 @@ class TrackedObject(ABC):
     def update_time(self) -> None:
         self.__updated_at = str(datetime.now())
 
-    def toJson(self) -> str:
-        try:
-            instance_vars = self.__dict__
-            converted_data = json.dumps(instance_vars)
-            output = self(converted_data)
-        except Exception:
-            raise ValueError("object conversion to json failed")
+    def getAllInstanceAttributes(self):
+        return {key: value for key, value in vars(self)
+                if not (key[0:2] == "__" and key[-2:0] == "__")}
+
+    def toJson(self, *, update=None) -> str:
+        if update is None:
+            try:
+                instance_vars = self.getAllInstanceAttributes()
+                converted_data = json.dumps(instance_vars)
+                output = self(converted_data)
+            except Exception:
+                raise ValueError("object conversion to json failed")
+        else:
+            try:
+                instance_vars = self.getAllInstanceAttributes()
+                instance_vars.pop()
+                output.update({})
+                converted_data = json.dumps(instance_vars)
+                output = update
+            except Exception:
+                raise ValueError("object conversion to json failed")
         return output
 
     @property

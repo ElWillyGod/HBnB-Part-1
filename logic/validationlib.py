@@ -6,8 +6,11 @@
 '''
 
 from string import ascii_letters, digits
-from utilitieslib import classes
+from logic.classutilitieslib import classes
 
+from persistence.persistence_manager import countryDataManager
+
+countries = countryDataManager.get()
 
 
 def idExists(id: str, cls) -> bool: 
@@ -44,6 +47,26 @@ def isCountryValid(country_code: str) -> bool:
 
     if False:
         pass
+    return True
+
+
+def getCountry(country_code: str):
+    '''
+        GIL
+    '''
+
+    return country
+
+
+def doesCountryExist(country_code: str) -> bool:
+    '''
+        GIL
+    '''
+
+    for country in countries:
+            if country.code == code:
+                return False
+
     return True
 
 
@@ -95,9 +118,26 @@ def isEmailValid(string: str) -> bool:
             empty after the '.'.
 
         valid example: "user@gmail.com"
+        valid example: "user@ceibal.edu.uy"
     '''
 
     if not isStrValid(string, "-_.@"):
         return False
 
     return True
+
+
+def isCoordinateValid(coord):
+    '''
+        status = WIP(0%)
+    '''
+
+    pass
+
+
+def isDatetimeValid(dtt):
+    '''
+        status = WIP(0%)
+    '''
+
+    pass

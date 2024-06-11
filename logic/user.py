@@ -1,16 +1,19 @@
 #!/usr/bin/python3
 
 '''
-    quickdoc
+    Defines the User class.
+    This class is identified by either it's id or it's email,
+    as both are unique within the database.
 '''
 
 from trackedobject import TrackedObject
-from validationlib import isUserEmailDuplicated, isNameValid
+from validationlib import isUserEmailDuplicated, isNameValid, isEmailValid
 from logicexceptions import EmailDuplicated
 
 
 class User(TrackedObject):
     '''
+        status = Completed
 
         from TrackedObject:
             id (str): UUID4 as hex.
@@ -18,6 +21,10 @@ class User(TrackedObject):
             updated_at: datetime as string at time of last update.
             update_time() -> None: Updates the updated_at attribute.
             toJson() -> str: Returns a JSON representation of this object.
+
+        email (str): Email of user, unique.
+        first_name (str): First name of user.
+        last_name (str): Last name of user.
     '''
 
     def __init__(self, email, first_name, last_name,
@@ -33,6 +40,10 @@ class User(TrackedObject):
 
     @email.setter
     def email(self, value):
+        if not isinstance(value, str):
+            raise TypeError("email must be a string")
+        if not isEmailValid(value):
+            raise ValueError("invalid email")
         if isUserEmailDuplicated(value):
             raise EmailDuplicated("email already exists")
         self.__email = value
