@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 
 '''
     Defines the city class.
@@ -7,7 +6,7 @@
 '''
 
 from trackedobject import TrackedObject
-from validationlib import isNameValid, isCountryCodeValid, countryExists
+from validationlib import isNameValid, isCountryValid, doesCountryExist
 from logicexceptions import CountryNotFoundError
 
 
@@ -54,6 +53,8 @@ class City(TrackedObject):
             raise TypeError("country_code must be a string")
         if len(value) != 2:
             raise ValueError("country_code must have 2 characters")
-        if isCountryCodeValid(value):
+        if not isCountryValid(value):
             raise ValueError("invalid country_code")
+        if not doesCountryExist(value):
+            raise CountryNotFoundError("country not found")
         self.__country_code = value

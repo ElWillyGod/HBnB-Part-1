@@ -1,26 +1,26 @@
-#!/usr/bin/python3
 
 '''
     Defines validation functions.
     Some make calls to the persistance layer.
 '''
 
-from string import ascii_letters, digits
-from logic.classutilitieslib import classes
+from string import ascii_letters, digits, ascii_lowercase
+import json
 
-from persistence.persistence_manager import countryDataManager
+from persistence.persistence_manager import FileDataManager, CountryDataManager
 
-countries = countryDataManager.get()
+countries = json.loads(CountryDataManager.get())
 
 
-def idExists(id: str, cls) -> bool: 
+def idExists(id: str, cls:str) -> bool: 
     '''
-        status = WIP (0%)
-
         Calls persistance layer to see if an id within cls exists.
     '''
 
-    raise NotImplementedError
+    call = json.loads(FileDataManager.get(id, cls))
+    if len(call) == 0:
+        return False
+    return True
 
 def idChecksum(id: str) -> bool:
     '''
@@ -32,12 +32,13 @@ def idChecksum(id: str) -> bool:
 
 def isUserEmailDuplicated(email: str) -> bool:
     '''
-        status = WIP (0%)
-
         Calls persistance layer to see if a user has the same email.
     '''
 
-    raise NotImplementedError
+    call = json.loads(FileDataManager.getByAttr(email, "users"))
+    if len(call) == 0:
+        return False
+    return True
 
 
 def isCountryValid(country_code: str) -> bool:
@@ -45,26 +46,32 @@ def isCountryValid(country_code: str) -> bool:
         Checks if a country's code is valid.
     '''
 
-    if False:
-        pass
+    if len(country_code) != 2:
+        return False
+    for char in country_code:
+        if char not in ascii_lowercase:
+            return False
     return True
 
 
 def getCountry(country_code: str):
     '''
-        GIL
+        Gets a country object by code.
     '''
 
-    return country
+    for country in countries:
+        if country.code == country_code:
+            return country
+    raise Exception("country not found")
 
 
 def doesCountryExist(country_code: str) -> bool:
     '''
-        GIL
+        Checks if a country exists.
     '''
 
     for country in countries:
-            if country.code == code:
+            if country.code == country_code:
                 return False
 
     return True
@@ -127,17 +134,17 @@ def isEmailValid(string: str) -> bool:
     return True
 
 
-def isCoordinateValid(coord):
+def isCoordinateValid(coord) -> bool:
     '''
         status = WIP(0%)
     '''
 
-    pass
+    return True
 
 
-def isDatetimeValid(dtt):
+def isDatetimeValid(dtt) -> bool:
     '''
         status = WIP(0%)
     '''
 
-    pass
+    return True

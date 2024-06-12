@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 
 '''
     Defines LogicFacade and calls integration layer to get countries.
@@ -13,7 +12,7 @@ from validationlib import (
 from classutilitieslib import getPlural, typeExists, getClassByName
 from logicexceptions import CountryNotFoundError
 
-from persistence.persistence_manager import fileDataManager
+from persistence.persistence_manager import FileDataManager
 
 
 class LogicFacade(ABC):
@@ -89,21 +88,21 @@ class LogicFacade(ABC):
     def getByType(type) -> str:
         LogicFacade.__checkType(type)
         typePlural = getPlural(type)
-        return fileDataManager.getAll(typePlural)
+        return FileDataManager.getAll(typePlural)
 
     @staticmethod
     def getByID(id, type) -> str:
         LogicFacade.__checkID(id)
         LogicFacade.__checkType(type)
         typePlural = getPlural(type)
-        return fileDataManager.get(id, typePlural)
+        return FileDataManager.get(id, typePlural)
 
     @staticmethod
     def deleteByID(id, type) -> None:
         LogicFacade.__checkID(id)
         LogicFacade.__checkType(type)
         typePlural = getPlural(type)
-        fileDataManager.delete(id, typePlural)
+        FileDataManager.delete(id, typePlural)
 
     @staticmethod
     def updateByID(id, type, data: str) -> None:
@@ -111,9 +110,9 @@ class LogicFacade(ABC):
         LogicFacade.__checkType(type)
         typePlural = getPlural(type)
         new = getClassByName(type)(json.loads(data))
-        old = fileDataManager.get(id, typePlural)
+        old = FileDataManager.get(id, typePlural)
         updated = new.toJson(update=old)
-        fileDataManager.update(id, typePlural, updated)
+        FileDataManager.update(id, typePlural, updated)
 
     @staticmethod
     def createObjectByJson(type: str, data: str) -> None:
@@ -121,7 +120,7 @@ class LogicFacade(ABC):
         new = getClassByName(type)(json.loads(data))
         id = new.id
         typePlural = getPlural(type)
-        fileDataManager.save(typePlural, new.toJson())
+        FileDataManager.save(typePlural, new.toJson())
 
     @staticmethod
     def getCountry(code) -> str:
@@ -133,5 +132,5 @@ class LogicFacade(ABC):
     def getContryCities(code: str) -> str:
         LogicFacade.__checkCode(code)
         LogicFacade.__checkCountryExistance(code)
-        return fileDataManager.getAllWithProperty(
+        return FileDataManager.getAllWithProperty(
             "cities", "country_code", code)

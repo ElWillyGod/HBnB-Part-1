@@ -7,7 +7,7 @@
 '''
 
 from trackedobject import TrackedObject
-from validationlib import isCountryCodeValid, countryExists
+from validationlib import isCountryValid, doesCountryExist
 from logicexceptions import CountryNotFoundError
 
 
@@ -31,9 +31,9 @@ class Country(TrackedObject):
     def code(self, value) -> None:
         if not isinstance(value, str):
             raise TypeError("code must be a string")
-        if not isCountryCodeValid(value):
+        if not isCountryValid(value):
             raise ValueError("invalid country code")
-        if not countryExists(value):
+        if not doesCountryExist(value):
             raise CountryNotFoundError("country does not exist")
         self.__code = value
 
