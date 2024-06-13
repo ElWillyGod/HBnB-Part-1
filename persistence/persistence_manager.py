@@ -2,6 +2,8 @@
 
 import json
 import os
+import glob
+from DataManager import IPersistenceManager
 
 """
 DataManager class that implements the iPersistenceManager interface.
@@ -48,6 +50,7 @@ class DataManager(IPersistenceManager):
 
         with open(file_path, 'w') as file:
             json.dump(entity, file)
+        return entity, entity_type
 
     def get(self, entity_id, entity_type):
         """
@@ -91,3 +94,28 @@ class DataManager(IPersistenceManager):
             """
             no estoy segura del raise peeero para que no se rompa todo
             """
+    def get_all(self, entity_type):
+        """
+        Retrieves all entities of a given type
+        Attributes:
+            entity_type: the type of entities to retrieve
+        Return: a list of all entities of the given type
+        """
+        path = os.path.join(self.storage_path, f"{entity_type}_*.json")
+        files = glob(path)
+        entities = []
+        for file_path in files:
+            with open(file_path, 'r') as file:
+                entities.append(json.load(file))
+        return entities
+    def get_by_property(self, entity_type, property_name, property_value):
+        """
+        Retrieves all entities of a given type that match a specific property
+        Attributes:
+            entity_type: the type of entities to retrieve
+            property_name: the property name to match
+            property_value: the property value to match
+        Return: a list of entities that match the given property
+        """
+        all_entities = self.get_all(entity_type)
+        return [entity for entity in all_entities if entity.get(property_name) == property_value]
