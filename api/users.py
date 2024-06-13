@@ -6,8 +6,10 @@ GET /users/{user_id}: Retrieve details of a specific user.
 PUT /users/{user_id}: Update an existing user.
 DELETE /users/{user_id}: Delete a user.
 """
+from collections.abc import MutableSet
 from flask import Flask, jsonify, request
-
+from logic.logicexceptions import EmailDuplicated
+from logic.logicfacade import LogicFacade
 
 app = Flask(__name__)
 
@@ -16,31 +18,25 @@ app = Flask(__name__)
 def create_User():
     data = request.get_json()
 
-    if not data:
-        return jsonify({'error': "400 Bad Request"}), 400
+    try:
+        LogicFacade.createObjectByJson('user', data)
 
-    email = data.get('email')
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
+    except (TypeError, ValueError) as message:
+        
+        return jsonify(message), 400
+    
+    except (EmailDuplicated) as message:
 
-    if not email or not first_name or not last_name:
-        return jsonify({'error': "400 Bad Request"}), 400
+        return jsonify(message), 409
 
-    if not '@' in data['email']:
-        return jsonify({'error': "400 Format email Error"}), 400
-
-    if not isUserEmailDuplicated(email):
-        return jsonify({'error': "409 Conflict"}), 409
-
-    if createUser(data):
-        return jsonify({"201 Created"}), 201
-
-    return jsonify({'error': 'error createUser'}), 400
+    return jsonify({'message': "todo OKa"}), 201
 
 
 @app.route('/users')
 def get_Users_All():
-    users = getUsersAll()
+
+    users = LogicFacade.getByType('user')
+
     return jsonify([{'id': user['id'], 'email': user['email'], 'first name': user['first_name'], 'last name': user['last_name'], 'created at': user['created_at'], 'updated at': user['updated_at']} for user in users]), 200
 
 
