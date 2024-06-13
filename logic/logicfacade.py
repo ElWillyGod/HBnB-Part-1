@@ -7,9 +7,9 @@
 
 from abc import ABC
 import json
-from validationlib import (
+from model.validationlib import (
     idChecksum, isCountryValid, doesCountryExist, getCountry)
-from classutilitieslib import getPlural, typeExists, getClassByName
+from model.classutilitieslib import getPlural, typeExists, getClassByName
 from logicexceptions import CountryNotFoundError
 
 from persistence.persistence_manager import FileDataManager

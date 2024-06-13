@@ -22,7 +22,8 @@ def idExists(id: str, cls:str) -> bool:
         return False
     return True
 
-def idChecksum(id: str) -> bool:
+
+def idChecksum(id: str) -> bool: # TUYO
     '''
         Checks if an id's lenght is valid.
     '''
@@ -41,7 +42,7 @@ def isUserEmailDuplicated(email: str) -> bool:
     return True
 
 
-def isCountryValid(country_code: str) -> bool:
+def isCountryValid(country_code: str) -> bool: # TUYO
     '''
         Checks if a country's code is valid.
     '''
@@ -77,11 +78,17 @@ def doesCountryExist(country_code: str) -> bool:
     return True
 
 
-def isStrValid(string, ignoreDigits=True, ignoreStr: str="") -> bool:
+def isStrValid(string, ignoreStr: str="", ignoreDigits=True) -> bool: # TUYO
     '''
         Checks if the string does not have any special character aside
         from chars from ignoreStr.
     '''
+
+    if not string.isascii():
+        return False
+    
+    if not string.isprintable():
+        return False
 
     for char in string:
         if char not in ascii_letters and char not in ignoreStr:
@@ -90,7 +97,7 @@ def isStrValid(string, ignoreDigits=True, ignoreStr: str="") -> bool:
     return True
 
 
-def isNameValid(string: str) -> bool:
+def isNameValid(string: str) -> bool: # TUYO
     '''
         Checks if a name is valid.
 
@@ -109,9 +116,9 @@ def isNameValid(string: str) -> bool:
     return True
 
 
-def isEmailValid(string: str) -> bool:
+def isEmailValid(email: str) -> bool: # TUYO
     '''
-        status = WIP (10%)
+        Checks if an email is valid
 
         Returns false if:
             it haves a special character aside from:
@@ -128,23 +135,74 @@ def isEmailValid(string: str) -> bool:
         valid example: "user@ceibal.edu.uy"
     '''
 
-    if not isStrValid(string, "-_.@"):
+    if not isStrValid(email, "-_.@"):
+        return False
+
+    if email.count("@") != 1:
+        return False
+
+    if email.count(".") == 0:
+        return False
+
+    flag = 0
+    name = ""
+    # 0: bef @, 1: after @, 2: '.', 3: after '.'
+    for char in email:
+        if flag == 0:
+            if not char.isalnum():
+                return False
+        elif flag == 1:
+            if not False:
+                return False
+        elif flag == 2:
+            if not False:
+                return False
+        else:
+            if not False:
+                return False
         return False
 
     return True
 
 
-def isCoordinateValid(coord) -> bool:
+def isLatitudeValid(latitude) -> bool: # TUYO
     '''
-        status = WIP(0%)
+        Check if the latitude is valid.
     '''
 
-    return True
+    return latitude >= -90 and latitude <= 90
 
 
-def isDatetimeValid(dtt) -> bool:
+def isLongitudeValid(longitude) -> bool: # TUYO
     '''
-        status = WIP(0%)
+        Checks if the longitude is valid.
     '''
+
+    return longitude >= -180 and longitude <= 180
+
+
+def isDatetimeValid(dtt: str) -> bool: # TUYO?????
+    '''
+        Checks if the datetime is correct
+    '''
+
+    if len(dtt) != 26:
+        return False
+
+    if dtt.count("-") != 3:
+        return False
+
+    if dtt.count(":") != 2:
+        return False
+
+    if dtt.count(".") != 1:
+        return False
+
+    if dtt.count(" ") != 1:
+        return False
+
+    for char in dtt:
+        if not (char in digits or char in " .:-"):
+            return False
 
     return True

@@ -5,14 +5,14 @@
 '''
 
 
-class CountryNotFoundError(Exception):
+class CountryNotFoundError(Exception): #404
     '''
         Called when a country code does not correspond to a country.
     '''
 
     pass
 
-class EmailDuplicated(Exception):
+class EmailDuplicated(Exception): #409
     '''
         Called when trying to set an email and there's a different user with
         the same email.
@@ -20,7 +20,15 @@ class EmailDuplicated(Exception):
 
     pass
 
-class IDNotFoundError(Exception):
+class AmenityNameDuplicated(Exception): #409
+    '''
+        Called when trying to set an email and there's a different user with
+        the same email.
+    '''
+
+    pass
+
+class IDNotFoundError(Exception): #404
     '''
         Called when trying to get, delete or update by id and the id does
         not correspond to an existing object.
