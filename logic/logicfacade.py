@@ -7,41 +7,36 @@
 
 from abc import ABC
 import json
-from model.validationlib import (
-    idChecksum, isCountryValid, doesCountryExist, getCountry)
-from model.classutilitieslib import getPlural, typeExists, getClassByName
-from logicexceptions import CountryNotFoundError
+
+from model import getPlural, getClassByName
+from model.validationlib import getCountry
 
 from persistence.persistence_manager import FileDataManager
 
 
 class LogicFacade(ABC):
     '''
-        status = WIP
-
         Static class that defines static methods meant to be called from API.
 
         Each method handles a particular HTTP request.
-        The get methods return a json string.
-        Data arguments should also be json strings.
+        The get methods return dictionaries.
+        Data arguments should also be dictionaries.
 
         --HTTP--
         GET:
-            getByType(cls: str) -> str
-            getByID(id: str, cls: str) -> str
-            getCountry(code: str) -> str
-            getCountryCities(code: str) -> str
+            getByType(cls: str) -> dict
+            getByID(id: str, cls: str) -> dict
+            getCountry(code: str) -> dict
+            getCountryCities(code: str) -> dict
         POST:
-            createObjetByJson(cls: str, data: str)
+            createObjetByJson(cls: str, data: dict) -> None
         PUT:
-            updateByID(id: str, cls: str, data: str)
+            updateByID(id: str, cls: str, data: dict) -> None
         DELETE:
-            deleteByID(id: str, cls: str)
+            deleteByID(id: str, cls: str) -> Node
 
         --Exceptions--
         from logicexceptions.py:
-        TypeError, ValueError:
-            --all--
         CountryNotFoundError:
             updateByID()
             createObjectByJson()
@@ -59,55 +54,22 @@ class LogicFacade(ABC):
     '''
 
     @staticmethod
-    def __checkID(id) -> None:
-        if not isinstance(id, str):
-            raise TypeError("id must be a string")
-        if not idChecksum(id):
-            raise ValueError("invalid id")
-
-    @staticmethod
-    def __checkType(type) -> None:
-        if not isinstance(type, str):
-            raise TypeError("class must be a string")
-        if not typeExists(type):
-            raise ValueError("invalid class")
-
-    @staticmethod
-    def __checkCode(code) -> None:
-        if not isinstance(code, str):
-            raise TypeError("country code must be a string")
-        if not isCountryValid(code):
-            raise ValueError("country code is not valid")
-
-    @staticmethod
-    def __checkCountryExistance(code):
-        if not doesCountryExist(code):
-            raise CountryNotFoundError("country does not exist")
-
-    @staticmethod
-    def getByType(type) -> str:
-        LogicFacade.__checkType(type)
+    def getByType(type: str) -> dict:
         typePlural = getPlural(type)
         return FileDataManager.getAll(typePlural)
 
     @staticmethod
-    def getByID(id, type) -> str:
-        LogicFacade.__checkID(id)
-        LogicFacade.__checkType(type)
+    def getByID(id: str, type: str) -> dict:
         typePlural = getPlural(type)
         return FileDataManager.get(id, typePlural)
 
     @staticmethod
-    def deleteByID(id, type) -> None:
-        LogicFacade.__checkID(id)
-        LogicFacade.__checkType(type)
+    def deleteByID(id: str, type: str) -> None:
         typePlural = getPlural(type)
         FileDataManager.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id, type, data: str) -> None:
-        LogicFacade.__checkID(id)
-        LogicFacade.__checkType(type)
+    def updateByID(id: str, type: str, data: dict) -> None:
         typePlural = getPlural(type)
         new = getClassByName(type)(json.loads(data))
         old = FileDataManager.get(id, typePlural)
@@ -115,22 +77,17 @@ class LogicFacade(ABC):
         FileDataManager.update(id, typePlural, updated)
 
     @staticmethod
-    def createObjectByJson(type: str, data: str) -> None:
-        LogicFacade.__checkType(type)
+    def createObjectByJson(type: str, data: dict) -> None:
         new = getClassByName(type)(json.loads(data))
         id = new.id
         typePlural = getPlural(type)
         FileDataManager.save(typePlural, new.toJson())
 
     @staticmethod
-    def getCountry(code) -> str:
-        LogicFacade.__checkCode(code)
-        LogicFacade.__checkCode(code)
+    def getCountry(code: str) -> dict:
         return getCountry(code)
 
     @staticmethod
-    def getContryCities(code: str) -> str:
-        LogicFacade.__checkCode(code)
-        LogicFacade.__checkCountryExistance(code)
+    def getContryCities(code: str) -> dict:
         return FileDataManager.getAllWithProperty(
             "cities", "country_code", code)

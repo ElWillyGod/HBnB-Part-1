@@ -6,13 +6,13 @@
 '''
 
 from trackedobject import TrackedObject
-from validationlib import isNameValid, isCountryValid, doesCountryExist
+from validationlib import doesCountryExist
 from logicexceptions import CountryNotFoundError
 
 
 class City(TrackedObject):
     """
-        status = Completed
+        City Class
 
         from TrackedObject:
             id (str): UUID4 as hex.
@@ -29,32 +29,6 @@ class City(TrackedObject):
                  *, id=None, created_at=None, updated_at=None):
         super().__init__(id, created_at, updated_at)
         self.name = name
-        self.country_code = country_code
-
-    @property
-    def name(self) -> str:
-        return self.__name
-
-    @name.setter
-    def name(self, value) -> None:
-        if not isinstance(value, str):
-            raise TypeError("name must be a string")
-        elif not isNameValid(value):
-            raise ValueError("invalid name")
-        self.__name = value
-
-    @property
-    def country_code(self) -> str:
-        return self.__country_code
-
-    @country_code.setter
-    def country_code(self, value) -> None:
-        if not isinstance(value, str):
-            raise TypeError("country_code must be a string")
-        if len(value) != 2:
-            raise ValueError("country_code must have 2 characters")
-        if not isCountryValid(value):
-            raise ValueError("invalid country_code")
-        if not doesCountryExist(value):
+        if not doesCountryExist(country_code):
             raise CountryNotFoundError("country not found")
-        self.__country_code = value
+        self.country_code = country_code

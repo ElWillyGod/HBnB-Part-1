@@ -1,8 +1,10 @@
 
 '''
-    Defines utilities to be used later in the code.
-    Most notably class type utilites.
+    Defines this folder as a package
+
+    Also makes classes accesable through the package.
 '''
+
 
 from user import User
 from city import City
@@ -20,16 +22,6 @@ classes = [
            ["place", "places", Place],
            ["review", "reviews", Review]
           ]
-
-def typeExists(type_of_data: str) -> bool:
-    '''
-        Checks if the parameter corresponds with an existing class.
-    '''
-
-    for cls in classes:
-        if cls[0] == type_of_data:
-            return True
-    return False
 
 def getPlural(name: str) -> str:
     '''

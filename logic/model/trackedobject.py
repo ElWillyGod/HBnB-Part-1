@@ -10,8 +10,6 @@ from datetime import datetime
 import uuid
 import json
 
-from validationlib import idChecksum, isDatetimeValid
-
 
 class TrackedObject(ABC):
     '''
@@ -55,39 +53,3 @@ class TrackedObject(ABC):
             except Exception:
                 raise ValueError("object conversion to json failed")
         return output
-
-    @property
-    def id(self) -> str:
-        return self.__id
-
-    @id.setter
-    def id(self, value) -> None:
-        if not isinstance(value, str):
-            raise TypeError("id must be a string")
-        if not idChecksum(value):
-            raise ValueError('invalid id')
-        self.__id == value
-
-    @property
-    def created_at(self) -> str:
-        return self.__created_at
-
-    @created_at.setter
-    def created_at(self, value) -> None:
-        if not isinstance(value, str):
-            raise TypeError("created_at must be a string")
-        if not isDatetimeValid(value):
-            raise ValueError('invalid creation time')
-        self.__created_at == value
-
-    @property
-    def updated_at(self) -> str:
-        return self.__updated_at
-
-    @updated_at.setter
-    def updated_at(self, value) -> None:
-        if not isinstance(value, str):
-            raise TypeError("updated_at must be a string")
-        if not isDatetimeValid(value):
-            raise ValueError("invalid update time")
-        self.__updated_at == value

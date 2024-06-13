@@ -5,11 +5,13 @@
 '''
 
 from trackedobject import TrackedObject
+from validationlib import doesAmenityExist
+from logicexceptions import AmenityNameDuplicated
 
 
 class Amenity(TrackedObject):
     '''
-        status = Complete
+        Amenity Class
 
         from TrackedObject:
             id (str): UUID4 as hex.
@@ -24,14 +26,6 @@ class Amenity(TrackedObject):
     def __init__(self, name,
                  *, id=None, created_at=None, updated_at=None):
         super().__init__(id, created_at, updated_at)
+        if not doesAmenityExist(name):
+            raise AmenityNameDuplicated("amenity already exists")
         self.name = name
-
-    @property
-    def name(self) -> str:
-        return self.__name
-
-    @name.setter
-    def name(self, value) -> None:
-        if not isinstance(value, str):
-            raise TypeError("name must be a string")
-        self.__name = value
