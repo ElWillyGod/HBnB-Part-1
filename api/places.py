@@ -6,8 +6,9 @@ GET /places/{place_id}: Retrieve detailed information about a specific place.
 PUT /places/{place_id}: Update an existing place’s information.
 DELETE /places/{place_id}: Delete a specific place.
 """
+from os import sched_setparam
+from sys import exception
 from flask import Flask, jsonify, request
-from  logic import logicexceptions, logicfacade, validationlib
 
 
 app = Flask(__name__)
@@ -16,15 +17,34 @@ app = Flask(__name__)
 @app.route('/places', methods=["POST"])
 def create_Place():
     data = request.get_json()
-    
-    try:
-        logicfacade.LogicFacade.createObjectByJson('place', data)
 
-    except (ValueError, TypeError) as message:
+    if not data:
+        return jsonify({'error': "no data"}), 400
 
-        return jsonify(message), 400
+    if not validCamp(data):
+        return jsonify({'error': "not validCamp"}), 400
 
-    return jsonify({'message': "todo OKa"}), 201
+    if not (-90 <= data['latitude'] <= 90) or not (-180 <= data['longitude'] <= 180):
+        return jsonify({'error': "ubicacion invalida"}), 400
+
+    if not (isinstance(data['number_of_rooms'], int) and (data['number_of_rooms'] > 0) and
+            isinstance(data['number_of_bathrooms'], int) and
+            (data['number_of_bathrooms'] >= 0) and isinstance(data['max_guests'], int) and
+            data['max_guests'] > 0 and
+            isinstance(data['price_per_night'], (int, float)) and data['price_per_night'] > 0):
+        return jsonify({'error': "datos de rooms invalidos"}), 400
+
+    if not getCityId(data['city_id']):
+        return jsonify({'error': "el codigo de la city esta mal"}), 400
+
+    for amenity_id in data['amenity_ids']:
+        amenity = getAmenity(amenity_id)
+        if not amenity:
+            return jsonify({'error': 'Invalid amenity_id'}), 400
+
+    createPlace(data)
+
+    return jsonify({'OKa'}), 201
 
 
 @app.route('/places')
