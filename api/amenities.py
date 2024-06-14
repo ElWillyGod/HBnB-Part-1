@@ -18,35 +18,39 @@ app = Flask(__name__)
 def create_Amenities():
     data = request.get_json()
 
-    if not data or not data['name']:
+    if not data or not val.isNameValid(data['name']):
         return jsonify({'error': "No date"}), 400
 
-    if not ValidNameAmenities(data):
-        return jsonify({'error': "amenities duplicated"}), 409
+    try:
+        LogicFacade.createObjectByJson('amenity', data)
 
-    amenities = createAmenities(data)
+    except (logicexceptions.AmenityNameDuplicated) as message:
+        return jsonify(message), 409
 
-    if amenities:
-        return jsonify({"id": amenities['id'], "name": amenities['name'],
-                        "created_at": amenities['created_at'],
-                        "updated_at": amenities['updated_at']}), 201
+    return jsonify({'message': "tod OKa"}), 201
 
-    return jsonify({'error': "error al crear"}), 400
 
 @app.route('/amenities')
 def ger_all_amenities():
-    amenities = getAllAmenities()
+    amenities = LogicFacade.getByType('amenity')
 
-    return jsonify([{"id": ameni['id'], "name": ameni['name'],
-                     "created_at": ameni['created_at'],
-                     "updated_at": ameni['updated_at']} for ameni in amenities]), 200
+    if amenities:
+        return jsonify([{"id": ameni['id'], "name": ameni['name'],
+                         "created_at": ameni['created_at'],
+                         "updated_at": ameni['updated_at']} for ameni in amenities]), 200
+
+    return jsonify({'message': "no hay amenities"}), 200
 
 @app.route('/amenities/<amenity_id>')
 def get_amenities(amenity_id):
-    amenities = getAmenities(amenity_id)
+    if not val.idChecksum(amenity_id):
+        return jsonify({'error': "el id esta cagado"}), 400
 
-    if not amenities:
-        return jsonify({'error': "amenitie not fund"}), 404
+    try:
+        amenities = LogicFacade.getByID(amenity_id, 'amenity')
+
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
 
     return jsonify({"id": amenities['id'], "name": amenities["name"],
                     "created_at": amenities['created_at'],
@@ -57,34 +61,33 @@ def get_amenities(amenity_id):
 def update_Amenities(amenity_id):
     data = request.get_json()
 
-    if not data or data['name']:
+    if not data or not val.isNameValid(data['name']):
         return jsonify({'error': "data Null"}), 400
 
-    amenity = getAmenities(amenity_id)
+    if not val.idChecksum(amenity_id):
+        return jsonify({'error': 'la id esta mal'}), 400
 
-    if not amenity:
-        return jsonify({'error': "no se encontro la amenity"}), 404
+    try:
+        LogicFacade.updateByID(amenity_id, 'amenity', data)
 
-    if getAmenitiesName(amenity['name']) and data['name'] != amenity['name']:
-        return jsonify({'error': "amenity not exists"}), 409
+    except (logicexceptions.AmenityNameDuplicated) as message:
+        return jsonify(message), 409
 
-    amenity = updateAmenities(amenity_id, data)
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
 
-    if amenity:
-        return jsonify({"id": amenity['id'], "name": amenity["name"],
-                        "created_at": amenity['created_at'],
-                        "updated_at": amenity['updated_at']}), 200
+    return jsonify({'message': "todo OKa"}), 200
     
-    return jsonify({'error': "no se pudo updatear"}), 400
-
 
 @app.route('/amenities/<amenity_id>', methods=["DELETE"])
 def delete_Amenities(amenity_id):
-    amenity = getAmenities(amenity_id)
+    if not val.idChecksum(amenity_id):
+        return jsonify({'message': "id type error"}), 400
 
-    if not amenity:
-        return jsonify({'error': "error al eliminar"}), 404
+    try:
+        LogicFacade.deleteByID(amenity_id, 'amenity')
 
-    deleteAmenities(amenity_id)
-    
-    return jsonify({'message': "se borro la amenity"}), 204
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
+
+    return jsonify({'message': 'Todo OKa'}), 204

@@ -26,8 +26,8 @@ def create_User():
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
-    if (not val.isStrValid(email) or not val.isStrValid(first_name) or
-        not val.isStrValid(last_name)):
+    if (not val.isStrValid(email) or not val.isNameValid(first_name) or
+        not val.isNameValid(last_name)):
 
         return jsonify({'error': "400 Bad Request"}), 400
 
@@ -89,8 +89,8 @@ def updata_User(user_id):
     first_name = data.get('first_name')
     last_name = data.get('last_name')
 
-    if (not val.isStrValid(email) or not val.isStrValid(first_name) or
-        not val.isStrValid(last_name)):
+    if (not val.isStrValid(email) or not val.isNameValid(first_name) or
+        not val.isNameValid(last_name)):
 
         return jsonify({'error': "400 Bad Request"}), 400
 

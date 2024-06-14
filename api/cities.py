@@ -43,11 +43,8 @@ def cereate_Cities():
     name = data['name']
     code = data['country_code']
 
-    if not val.isStrValid(name) or not val.isStrValid(code):
+    if not val.isNameValid(name) or not val.isCountryValid(code):
         return jsonify({'error': "400 Bad Request"}), 400
-
-    if not val.isCountryValid(code):
-        return jsonify({'error': "el codigo no es valido"}), 400
 
     try:
         LogicFacade.createObjectByJson("city", data)
@@ -94,13 +91,11 @@ def get_Cities(city_id):
 def update_Cities(city_id):
     data = request.get_json()
 
-    if not data:
-        return jsonify({'error': "400 Bad Request"}), 400
-
     if not val.idChecksum(city_id):
         return jsonify({'error': "tiraste cualquiera en el id, mira bien capo"}), 400
 
-    if not val.isStrValid(data['name']) or not val.isCountryValid(data['country_code']):
+    if (not data or not val.isNameValid(data['name']) or 
+        not val.isCountryValid(data['country_code'])):
         return jsonify({'error': "faltan campos en la data o hay cosas raras"}), 400
 
     try:
@@ -117,7 +112,7 @@ def update_Cities(city_id):
 @app.route('/cities/<city_id>', methods=["DELETE"])
 def delete_Cities(city_id):
 
-    if not val.isStrValid(city_id):
+    if not val.idChecksum(city_id):
         return jsonify({'error': 'ta raro tu id'}), 400
 
     try:
