@@ -43,6 +43,8 @@ class DataManager(IPersistenceManager):
         Save an entity to a JSON file
         Attributes:
             entity: the entity to save to a JSON file.
+        Returns:
+            The entity and entity type in a JSON file
         """
         entity_type = type(entity).__name__
         entity_id = entity.get('id')
@@ -50,7 +52,12 @@ class DataManager(IPersistenceManager):
 
         with open(file_path, 'w') as file:
             json.dump(entity, file)
-        return entity, entity_type
+        
+        result = {
+            'entity': entity,
+            'entity_type': entity_type
+        }
+        return json.dumps(result)
 
     def get(self, entity_id, entity_type):
         """
@@ -62,19 +69,27 @@ class DataManager(IPersistenceManager):
         """
 
         file_path = self._file_path(entity_type, entity_id)
-        if not file_path.exists:
-            return None
+        if not os.path.exists(file_path):
+            return json.dumps(None)
         else:
             with open(file_path, 'r') as file:
-                return json.load(file)
+                entity = json.load(file)
+            return json.dumps(entity)
 
     def update(self, entity):
         """
         Update an entity by saving it again to the JSON file
         Attributes:
             entity: the entity to update
+        Returns:
+            The entity and entity type to update
         """
-        self.save(entity)
+        entity, entity_type = self.save(entity)
+        result = {
+            'entity': json.loads(entity),
+            'entity_type': entity_type
+        }
+        return json.dumps(result)
 
     def delete(self, entity_id, entity_type):
         """
@@ -84,30 +99,34 @@ class DataManager(IPersistenceManager):
             entity_type: the type of the identity
         Raises:
             FileNotFoundError: No such entity {entity_type} with {entity_id}
+        Returns:
+            The entity deleted
         """
-        file_path = self._file_path(entity_id, entity_type)
-
-        if file_path.exists():
-            file_path.unlink()
+        file_path = self._file_path(entity_type, entity_id)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            return json.dumps({f'Entity {entity_id} of type {entity_type} deleted'})
         else:
             raise FileNotFoundError(f"No such entity: {entity_type} with {entity_id}")
             """
             no estoy segura del raise peeero para que no se rompa todo
             """
+
     def get_all(self, entity_type):
         """
         Retrieves all entities of a given type
         Attributes:
             entity_type: the type of entities to retrieve
-        Return: a list of all entities of the given type
+        Return: a list of all entities of the given type in JSON
         """
         path = os.path.join(self.storage_path, f"{entity_type}_*.json")
-        files = glob(path)
+        files = glob.glob(path)
         entities = []
         for file_path in files:
             with open(file_path, 'r') as file:
                 entities.append(json.load(file))
-        return entities
+        return json.dumps(entities)
+
     def get_by_property(self, entity_type, property_name, property_value):
         """
         Retrieves all entities of a given type that match a specific property
@@ -115,7 +134,19 @@ class DataManager(IPersistenceManager):
             entity_type: the type of entities to retrieve
             property_name: the property name to match
             property_value: the property value to match
-        Return: a list of entities that match the given property
+        Return: a list of entities that match the given property in JSON
         """
-        all_entities = self.get_all(entity_type)
-        return [entity for entity in all_entities if entity.get(property_name) == property_value]
+        all_entities = json.loads(self.get_all(entity_type))
+        matched_entities = [entity for entity in all_entities if entity.get(property_name) == property_value]
+        return json.dumps(matched_entities)
+    
+    def get_countries(self, code):
+        """
+        Calls the method get_by_property
+        Attributes:
+            code: as name of property
+            country: as type of entity
+        Returns:
+            All countries that matches with a specific code in JSON
+        """
+        return self.get_by_property("Country", "code", code)
