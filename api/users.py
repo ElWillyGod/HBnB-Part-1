@@ -10,7 +10,7 @@ from flask import Flask, jsonify, request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 from logic.model import user
-import validation as val
+import api.validation as val
 
 app = Flask(__name__)
 
@@ -31,7 +31,7 @@ def create_User():
 
         return jsonify({'error': "400 Bad Request"}), 400
 
-    if val.isEmailValid(email):
+    if not val.isEmailValid(email):
         return jsonify({'error': "400 Format email Error"}), 400
 
     try:
@@ -94,7 +94,7 @@ def updata_User(user_id):
 
         return jsonify({'error': "400 Bad Request"}), 400
 
-    if val.isEmailValid(email):
+    if not val.isEmailValid(email):
         return jsonify({'error': "400 Format email Error"}), 400
 
     try:

@@ -9,7 +9,7 @@ def idChecksum(id: str) -> bool:
         Checks if an id's lenght is valid.
     '''
 
-    return len(id) == 32
+    return len(id) == 36
 
 
 
