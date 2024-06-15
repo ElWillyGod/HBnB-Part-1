@@ -36,7 +36,7 @@ def create_Review(place_id):
 
         return jsonify(message), 400
 
-    return jsonify({'OKa'}), 201
+    return jsonify({"message": 'OKa'}), 201
 
 
 @app.route('/users/<user_id>/reviews')

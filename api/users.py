@@ -41,7 +41,7 @@ def create_User():
 
         return jsonify(message), 409
 
-    return jsonify({"201 Created"}), 201
+    return jsonify({'message':"201 Created"}), 201
 
 
 @app.route('/users')

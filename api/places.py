@@ -45,7 +45,7 @@ def create_Place():
         return jsonify(message), 404
 
 
-    return jsonify({'OKa'}), 201
+    return jsonify({'message':'OKa'}), 201
 
 
 @app.route('/places')
@@ -138,7 +138,7 @@ def update_Place(place_id):
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify(message), 404
 
-    return jsonify({'OKa'}), 200
+    return jsonify({"message": 'OKa'}), 200
 
 
 @app.route('/places/<place_id>', methods=['DELETE'])
