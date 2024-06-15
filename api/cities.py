@@ -7,13 +7,11 @@ GET /cities/{city_id}: Retrieve details of a specific city.
 PUT /cities/{city_id}: Update an existing city’s information.
 DELETE /cities/{city_id}: Delete a specific city.
 """
-from flask import Flask, jsonify, request
+from api import app
+from flask import jsonify, request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import validation as val
-
-
-app = Flask(__name__)
+import api.validation as val
 
 
 @app.route('/countries/<country_code>/cities')
@@ -61,11 +59,8 @@ def cereate_Cities():
 def get_All_Cities():
     cities = LogicFacade.getByType("city")
 
-    if cities:
-        return jsonify([{"id": city['id'], "name": city['name'],
-                    "country_code": city['country_code'],
-                    "created_at": city['created_at'],
-                    "updated_at": city['updated_at']} for city in cities]), 200
+    if cities is not None:
+        return jsonify(cities), 200
 
     return jsonify({'message': "empy"}), 200
 

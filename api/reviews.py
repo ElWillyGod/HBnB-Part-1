@@ -7,12 +7,11 @@ GET /reviews/{review_id}: Retrieve detailed information about a specific review.
 PUT /reviews/{review_id}: Update an existing review.
 DELETE /reviews/{review_id}: Delete a specific review.
 """
-from flask import Flask, jsonify, request
+from api import app
+from flask import jsonify, request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import validation as val
-
-app = Flask(__name__)
+import api.validation as val
 
 
 @app.route('/places/<place_id>/reviews', methods=['POST'])

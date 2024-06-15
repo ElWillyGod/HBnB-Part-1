@@ -6,13 +6,12 @@ GET /users/{user_id}: Retrieve details of a specific user.
 PUT /users/{user_id}: Update an existing user.
 DELETE /users/{user_id}: Delete a user.
 """
-from flask import Flask, jsonify, request
+from api import app
+from flask import jsonify, request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 from logic.model import user
 import api.validation as val
-
-app = Flask(__name__)
 
 
 @app.route("/users", methods=["POST"])

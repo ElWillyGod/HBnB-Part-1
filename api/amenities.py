@@ -5,13 +5,11 @@ GET /amenities: Retrieve a list of all amenities.
 GET /amenities/{amenity_id}: Retrieve detailed information about a specific amenity.
 PUT /amenities/{amenity_id}: Update an existing amenity’s information.
 DELETE /amenities/{amenity_id}: Delete a specific amenity."""
-
-from flask import Flask, jsonify, request
+from api import app
+from flask import request, jsonify
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import validation as val
-
-app = Flask(__name__)
+import api.validation as val
 
 
 @app.route('/amenities', methods=["POST"])
@@ -34,10 +32,8 @@ def create_Amenities():
 def ger_all_amenities():
     amenities = LogicFacade.getByType('amenity')
 
-    if amenities:
-        return jsonify([{"id": ameni['id'], "name": ameni['name'],
-                         "created_at": ameni['created_at'],
-                         "updated_at": ameni['updated_at']} for ameni in amenities]), 200
+    if amenities is not None:
+        return jsonify(amenities), 200
 
     return jsonify({'message': "no hay amenities"}), 200
 
@@ -52,9 +48,7 @@ def get_amenities(amenity_id):
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify(message), 404
 
-    return jsonify({"id": amenities['id'], "name": amenities["name"],
-                    "created_at": amenities['created_at'],
-                    "updated_at": amenities['updated_at']}), 200
+    return jsonify(amenities), 200
 
 
 @app.route('/amenities/<amenity_id>', methods=["PUT"])
@@ -90,4 +84,4 @@ def delete_Amenities(amenity_id):
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify(message), 404
 
-    return jsonify({'message': 'Todo OKa'}), 204
+    return jsonify({'message': "Todo OKa"}), 204

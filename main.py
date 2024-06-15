@@ -5,8 +5,8 @@
     WIP
 '''
 
-from api import users
+from api import app
 #import api
 
 if __name__ == '__main__':
-    users.app.run()
+    app.run()

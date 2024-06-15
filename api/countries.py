@@ -3,29 +3,26 @@
 GET /countries: Retrieve all pre-loaded countries.
 GET /countries/{country_code}: Retrieve details of a specific country by its code.
 """
-from flask import Flask, jsonify
+from api import app
+from flask import jsonify
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-import validation as val
+import api.validation as val
 
-
-app = Flask(__name__)
 
 @app.route('/countries')
 def get_All_Countries():
 
     countries = LogicFacade.getByType("country")
 
-    if countries:
-        return jsonify([{'name': country['name'], 'code': country['code']}
-                        for country in countries]), 200
+    if countries is not None:
+        return jsonify(countries), 200
 
     return jsonify({'message': "empy"}), 200
 
 
 @app.route('/countries/<country_code>')
 def get_Countries(country_code):
-
 
     if not val.isCountryValid(country_code):
         return jsonify({'error': '404 Not Found'}), 404
