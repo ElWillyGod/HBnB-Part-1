@@ -5,9 +5,7 @@
 '''
 
 from logic import DM
-from logic import CountryManager
-
-countries = CountryManager.get()
+from logic.model.countrieslib import getCountries
 
 
 def idExists(id: str, cls: str) -> bool:
@@ -74,24 +72,12 @@ def isOwnerIDTheSame(place_id: str, user_id: str) -> bool:
     return call["host_id"] == user_id
 
 
-def getCountry(country_code: str):
-    '''
-        Gets a country object by code.
-    '''
-
-    for country in countries:
-        if country["code"] == country_code:
-            return country
-
-    raise Exception("country not found")
-
-
 def doesCountryExist(country_code: str) -> bool:
     '''
         Checks if a country exists.
     '''
 
-    for country in countries:
+    for country in getCountries():
         if country["code"] == country_code:
             return False
 

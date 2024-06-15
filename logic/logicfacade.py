@@ -6,10 +6,9 @@
 '''
 
 from abc import ABC
-import json
 
 from logic.model.classes import getPlural, getClassByName
-from logic.model.validationlib import getCountry
+from logic.model.countrieslib import getCountry, getCountries
 
 from logic import DM as Persistence
 
@@ -27,30 +26,15 @@ class LogicFacade(ABC):
             getByType(cls: str) -> dict
             getByID(id: str, cls: str) -> dict
             getCountry(code: str) -> dict
+            getAllCountries() -> dict
             getCountryCities(code: str) -> dict
+            getReviewsOfPlace(id: str) -> dict
         POST:
             createObjetByJson(cls: str, data: dict) -> None
         PUT:
             updateByID(id: str, cls: str, data: dict) -> None
         DELETE:
             deleteByID(id: str, cls: str) -> Node
-
-        --Exceptions--
-        from logicexceptions.py:
-        CountryNotFoundError:
-            updateByID()
-            createObjectByJson()
-            getCountry()
-            getCountryCities()
-        EmailDuplicated:
-            updateByID()
-            createObjectByJson()
-        from db.dbexceptions.py:
-        IDNotFoundError:
-            getByID()
-            deleteByID()
-            updateByID()
-            createObjectByJson()
     '''
 
     @staticmethod
@@ -70,20 +54,22 @@ class LogicFacade(ABC):
 
     @staticmethod
     def updateByID(id: str, type: str, data: str) -> None:
-        data = json.loads(data)
-        typePlural = getPlural(type)
-        new = getClassByName(type)(data)
-        old = Persistence.get(id, typePlural)
-        updated = old.toJson(update=new)
+        typePlural: str = getPlural(type)
+        old_data: dict = Persistence.get(id, typePlural)
+        old = getClassByName(type)(**old_data)
+        updated = old.toJson(update=data)
         Persistence.update(id, typePlural, updated)
 
     @staticmethod
     def createObjectByJson(type: str, data: str) -> None:
-        # data = json.loads(data)
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
         Persistence.save(id, typePlural, new.toJson())
+
+    @staticmethod
+    def getAllCountries(code: str) -> dict:
+        return getCountries()
 
     @staticmethod
     def getCountry(code: str) -> dict:
@@ -91,5 +77,12 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getContryCities(code: str) -> dict:
-        return Persistence.getAllWithProperty(
-            "cities", "country_code", code)
+        return Persistence.get_by_property(
+            "cities", "country_code", code
+        )
+
+    @staticmethod
+    def getReviewsOfPlace(id: str) -> dict:
+        return Persistence.get_by_property(
+            "places", "id", id
+        )

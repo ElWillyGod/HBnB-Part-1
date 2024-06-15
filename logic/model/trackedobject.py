@@ -43,18 +43,10 @@ class TrackedObject(ABC):
                 and not key == "_abc_impl"}
 
     def toJson(self, *, update=None) -> str:
+        instance_vars = self.getAllInstanceAttributes()
+
         if update is None:
-            try:
-                instance_vars = self.getAllInstanceAttributes()
-                return json.dumps(instance_vars)
-            except Exception:
-                raise ValueError("object conversion to json failed")
-        else:
-            try:
-                instance_vars = self.getAllInstanceAttributes()
-                instance_vars.pop()
-                #output.update({})
-                converted_data = json.dumps(instance_vars)
-                return update
-            except Exception:
-                raise ValueError("object conversion to json failed")
+            return json.dumps(instance_vars)
+
+        instance_vars.update(update)
+        return json.dumps(instance_vars)
