@@ -127,15 +127,9 @@ class DataManager(IPersistenceManager):
         files = glob.glob(path)
         entities = []
         for file_path in files:
-            try:
                 with open(file_path, 'r') as file:
                     data = json.load(file)
-                    if isinstance(data, dict):  # asegurarse de que sea un diccionario
-                        entities.append(data)
-                    else:
-                        logging.error(f"Invalid data in file {file_path}: {data}")
-            except (FileNotFoundError, json.JSONDecodeError) as e:
-                logging.error(f"Error reading file {file_path}: {e}")
+                    entities.append(data)
         return entities
 
     def get_by_property(self, entity_type, property_name, property_value):

@@ -49,10 +49,7 @@ def get_Users_All():
     users = LogicFacade.getByType("user")
 
     if user:
-        return jsonify([{'id': user['id'], 'email': user['email'],
-                     'first name': user['first_name'],
-                     'last name': user['last_name'], 'created at': user['created_at'],
-                     'updated at': user['updated_at']} for user in users]), 200
+        return jsonify(users), 200
 
     return jsonify({'message': "empy"}), 200
 
