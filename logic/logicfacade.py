@@ -70,7 +70,7 @@ class LogicFacade(ABC):
 
     @staticmethod
     def updateByID(id: str, type: str, data: str) -> None:
-        data = json.load(data)
+        data = json.loads(data)
         typePlural = getPlural(type)
         new = getClassByName(type)(data)
         old = Persistence.get(id, typePlural)
@@ -79,7 +79,7 @@ class LogicFacade(ABC):
 
     @staticmethod
     def createObjectByJson(type: str, data: str) -> None:
-        data = json.load(data)
+        data = json.loads(data)
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id

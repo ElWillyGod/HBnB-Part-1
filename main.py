@@ -5,11 +5,8 @@
     WIP
 '''
 
-import logic.logicfacade
+from api import users
 #import api
 
-test = logic.logicfacade.LogicFacade
-test.createObjectByJson("user",
-                        {"first_name": "Matias",
-                         "last_name": "Davezac",
-                         "email": "matiasdavezac@gmail.com"})
+if __name__ == '__main__':
+    users.app.run()
