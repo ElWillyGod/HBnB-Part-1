@@ -65,7 +65,7 @@ def get_User(user_id):
 
     try:
 
-        data = LogicFacade.getByID('user', user_id)
+        data = LogicFacade.getByID(user_id, 'user')
 
     except (logicexceptions.IDNotFoundError) as message:
         
