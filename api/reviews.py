@@ -8,7 +8,9 @@ PUT /reviews/{review_id}: Update an existing review.
 DELETE /reviews/{review_id}: Delete a specific review.
 """
 from flask import Flask, jsonify, request
-
+from logic import logicexceptions
+from logic.logicfacade import LogicFacade
+import validation as val
 
 app = Flask(__name__)
 
@@ -17,114 +19,134 @@ app = Flask(__name__)
 def create_Review(place_id):
     data = request.get_json()
 
-    if not data:
+    if not data or not val.idChecksum(place_id) or not val.isStrValid('comment'):
         return jsonify({'error': 'data no valid'}), 400
-
-    if validCamp(data):
-        return jsonify({'error': 'Missing required fields'}), 400
 
     if not (1 <= data['rating'] <= 5):
         return jsonify({'error': 'invalid rating'}), 400
 
-    user = getUser(data['user_id'])
+    try:
+        LogicFacade.createReview(place_id, data)
 
-    if not user:
-        return jsonify({'error': 'no user_id'}), 400
+    except (logicexceptions.IDNotFoundError) as message:
 
-    place = getPlace(place_id)
+        return jsonify(message), 404
 
-    if not place:
-        return jsonify({'error': 'invalid place_id'}), 400
+    except (TypeError) as message:
 
-    if user['id'] == place['host_id']:
-        return jsonify({'error': 'pendejo quiere hacer review de su place'}), 400
+        return jsonify(message), 400
 
-    review_id = createReview(place_id, data)
     return jsonify({'OKa'}), 201
 
 
 @app.route('/users/<user_id>/reviews')
 def get_User_Reviews(user_id):
-    user = getUser(user_id)
+    if not val.idChecksum(user_id):
+        return jsonify({'error': "fomat id "}), 400
 
-    if not user:
-        return jsonify({'error': 'no user'}), 404
+    try:
+        reviews = LogicFacade.getByID(user_id, "reviewUser")
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
 
-    reviews = getUser(user_id)
+    if reviews is not None:
+        return jsonify([{
+            'id': review['id'],
+            'place_id': review['place_id'],
+            'user_id': review['user_id'],
+            'rating': review['rating'],
+            'comment': review['comment'],
+            'created_at': review['created_at'],
+            'updated_at': review['updated_at']
+            } for review in reviews]), 200
 
-    return jsonify([{
-        'id': review['id'],
-        'place_id': review['place_id'],
-        'user_id': review['user_id'],
-        'rating': review['rating'],
-        'comment': review['comment'],
-        'created_at': review['created_at'],
-        'updated_at': review['updated_at']
-        } for review in reviews]), 200
+    return jsonify({'message': "empy reviews for user"}), 200
 
 
 @app.route('/places/<place_id>/reviews')
 def get_Place_Reviews(place_id):
-    place = getPlace(place_id)
+    if not val.idChecksum(place_id):
+        return jsonify({'error': "la id no tiene el formato"}), 400
 
-    if not place:
-        return jsonify({'error': 'ya se me gasto el ingles'}), 404
+    try:
 
-    reviews = getReviewsPlace(place_id)
-    return jsonify([{
-        'id': review['id'],
-        'place_id': review['place_i d'],
-        'user_id': review['user_id'],
-        'rating': review['rating'],
-        'comment': review['comment'],
-        'created_at': review['created_at'],
-        'updated_at': review['updated_at']
-        } for review in reviews]), 200
+        reviews = LogicFacade.getByID(place_id, 'reviewPlace')
+    
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
+
+    if reviews is not None:
+        return jsonify([{
+            'id': review['id'],
+            'place_id': review['place_i d'],
+            'user_id': review['user_id'],
+            'rating': review['rating'],
+            'comment': review['comment'],
+            'created_at': review['created_at'],
+            'updated_at': review['updated_at']
+            } for review in reviews]), 200
+
+    return jsonify({'message': "empy reviews"}), 200
 
 
 @app.route('/reviews/<review_id>')
 def get_review(review_id):
-    review = getReview(review_id)
+    if not val.idChecksum(review_id):
+        return jsonify({'error': "la id no tiene el formato"}), 400
 
-    if not review:
-        return jsonify({'error': 'no se encontro la review'}), 404
+    try:
 
-    return jsonify({
-        'id': review['id'],
-        'place_id': review['place_id'],
-        'user_id': review['user_id'],
-        'rating': review['rating'],
-        'comment': review['comment'],
-        'created_at': review['created_at'],
-        'updated_at': review['updated_at']
-        }), 200
+        review = LogicFacade.getByID(review_id, 'review')
+    
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
+
+    if review is not None:
+        return jsonify({
+            'id': review['id'],
+            'place_id': review['place_i d'],
+            'user_id': review['user_id'],
+            'rating': review['rating'],
+            'comment': review['comment'],
+            'created_at': review['created_at'],
+            'updated_at': review['updated_at']
+            }), 200
+
+    return jsonify({'message': "empy reviews"}), 200
 
 
 @app.route('/reviews/<review_id>', methods=['PUT'])
 def update_review(review_id):
-    review = getReview(review_id)
-
-    if not review:
-        return jsonify({'error': 'not found'}), 404
-
     data = request.get_json()
 
-    if not data:
-        return jsonify({'error': 'invalid request'}), 400
+    if not data or not val.idChecksum(review_id) or not val.isStrValid('comment'):
+        return jsonify({'error': 'data no valid'}), 400
 
-    if 'rating' in data and not (1 <= data['rating'] <= 5):
-        return jsonify({'error': 'le quiere poner -1 a la review'}), 400
+    if not (1 <= data['rating'] <= 5):
+        return jsonify({'error': 'invalid rating'}), 400
 
-    updateReview(review_id, data)
-    return jsonify({'Oka'}), 200
+    try:
+        LogicFacade.updateByID(review_id, 'review', data)
+
+    except (logicexceptions.IDNotFoundError) as message:
+
+        return jsonify(message), 404
+
+    except (TypeError) as message:
+
+        return jsonify(message), 400
+
+    return jsonify({'OKa'}), 200
 
 
 @app.route('/reviews/<review_id>', methods=['DELETE'])
 def delete_review(review_id):
-    review = getReview(review_id)
+    if not val.idChecksum(review_id):
+        return jsonify({'error': "el id es cualquiera"})
+    try:
+        LogicFacade.deleteByID(review_id, 'review')
 
-    if not review:
-        return jsonify({'error': 'review not found'}), 404
+    except (logicexceptions.IDNotFoundError) as message:
+        return jsonify(message), 404
 
-    deleteReview(review_id)
-    return jsonify({'OKa delete'}), 204
+    return jsonify({'message': 'review deleted successfully'}), 204

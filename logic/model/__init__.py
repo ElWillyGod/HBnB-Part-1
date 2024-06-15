@@ -23,6 +23,7 @@ classes = [
            ["review", "reviews", Review]
           ]
 
+
 def getPlural(name: str) -> str:
     '''
         Gets the plural string of a class.
@@ -32,6 +33,7 @@ def getPlural(name: str) -> str:
         if name == clas[0]:
             return clas[1]
     raise ValueError("class not found")
+
 
 def getClassByName(name):
     '''
