@@ -56,7 +56,7 @@ class LogicFacade(ABC):
     @staticmethod
     def getByType(type: str) -> dict:
         typePlural = getPlural(type)
-        return Persistence.getAll(typePlural)
+        return Persistence.get_all(typePlural)
 
     @staticmethod
     def getByID(id: str, type: str) -> dict:
@@ -79,7 +79,7 @@ class LogicFacade(ABC):
 
     @staticmethod
     def createObjectByJson(type: str, data: str) -> None:
-        data = json.loads(data)
+        # data = json.loads(data)
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
