@@ -39,7 +39,7 @@ def isAmenityDuplicated(name: str) -> bool:
         Calls persistance layer to see if a user has the same email.
     '''
 
-    call = DM.getByAttr(name, "amenities")
+    call = DM.get_by_property("amenities", "name", name)
 
     if call is None or len(call) == 0:
         return False
@@ -52,7 +52,7 @@ def isCityNameDuplicated(name: str, code: str) -> bool:
         Calls persistance layer to see if a city has the same name.
     '''
 
-    call = DM.getAllWithProperty("cities", "country_code", code)
+    call = DM.get_by_property("cities", "country_code", code)
 
     for city in call:
         if city["name"] == name:
