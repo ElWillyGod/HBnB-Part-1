@@ -6,6 +6,7 @@
 '''
 
 from abc import ABC
+import json
 
 from logic.model.classes import getPlural, getClassByName
 from logic.model.validationlib import getCountry
@@ -68,7 +69,8 @@ class LogicFacade(ABC):
         Persistence.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id: str, type: str, data: dict) -> None:
+    def updateByID(id: str, type: str, data: str) -> None:
+        data = json.load(data)
         typePlural = getPlural(type)
         new = getClassByName(type)(data)
         old = Persistence.get(id, typePlural)
@@ -76,7 +78,8 @@ class LogicFacade(ABC):
         Persistence.update(id, typePlural, updated)
 
     @staticmethod
-    def createObjectByJson(type: str, data: dict) -> None:
+    def createObjectByJson(type: str, data: str) -> None:
+        data = json.load(data)
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
