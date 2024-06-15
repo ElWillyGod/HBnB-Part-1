@@ -18,6 +18,8 @@ class TryingToReviewOwnPlace(Exception):  # 400
         Called when the reviewer id and the host id of the place match.
     '''
 
+    pass
+
 
 class CountryNotFoundError(Exception):  # 404
     '''

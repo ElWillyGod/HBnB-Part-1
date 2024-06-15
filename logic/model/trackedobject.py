@@ -9,6 +9,7 @@ from abc import ABC
 from datetime import datetime
 import uuid
 import json
+import inspect
 
 
 class TrackedObject(ABC):
@@ -35,24 +36,25 @@ class TrackedObject(ABC):
         self.updated_at = str(datetime.now())
 
     def getAllInstanceAttributes(self):
-        return {key: value for key, value in vars(self)
-                if not (key[0:2] == "__" and key[-2:0] == "__")}
+        attributes = inspect.getmembers(self,
+                                        lambda a: not inspect.isroutine(a))
+        return {key: value for key, value in attributes
+                if not (key[0:2] == "__" and key[-2:] == "__")
+                and not key == "_abc_impl"}
 
     def toJson(self, *, update=None) -> str:
         if update is None:
             try:
                 instance_vars = self.getAllInstanceAttributes()
-                converted_data = json.dumps(instance_vars)
-                output = self(converted_data)
+                return json.dumps(instance_vars)
             except Exception:
                 raise ValueError("object conversion to json failed")
         else:
             try:
                 instance_vars = self.getAllInstanceAttributes()
                 instance_vars.pop()
-                output.update({})
+                #output.update({})
                 converted_data = json.dumps(instance_vars)
-                output = update
+                return update
             except Exception:
                 raise ValueError("object conversion to json failed")
-        return output

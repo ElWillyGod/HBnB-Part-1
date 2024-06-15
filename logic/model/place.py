@@ -3,8 +3,8 @@
     Defines the Place Class.
 '''
 
-from trackedobject import TrackedObject
-from validationlib import idExists
+from logic.model.trackedobject import TrackedObject
+from logic.model.validationlib import idExists
 from logic.logicexceptions import IDNotFoundError
 
 

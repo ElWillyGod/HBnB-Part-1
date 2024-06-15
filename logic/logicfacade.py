@@ -6,12 +6,11 @@
 '''
 
 from abc import ABC
-import json
 
-from model import getPlural, getClassByName
-from model.validationlib import getCountry
+from logic.model.classes import getPlural, getClassByName
+from logic.model.validationlib import getCountry
 
-from persistence.persistence_manager import FileDataManager
+from logic import DM as Persistence
 
 
 class LogicFacade(ABC):
@@ -56,32 +55,32 @@ class LogicFacade(ABC):
     @staticmethod
     def getByType(type: str) -> dict:
         typePlural = getPlural(type)
-        return FileDataManager.getAll(typePlural)
+        return Persistence.getAll(typePlural)
 
     @staticmethod
     def getByID(id: str, type: str) -> dict:
         typePlural = getPlural(type)
-        return FileDataManager.get(id, typePlural)
+        return Persistence.get(id, typePlural)
 
     @staticmethod
     def deleteByID(id: str, type: str) -> None:
         typePlural = getPlural(type)
-        FileDataManager.delete(id, typePlural)
+        Persistence.delete(id, typePlural)
 
     @staticmethod
     def updateByID(id: str, type: str, data: dict) -> None:
         typePlural = getPlural(type)
-        new = getClassByName(type)(json.loads(data))
-        old = FileDataManager.get(id, typePlural)
-        updated = new.toJson(update=old)
-        FileDataManager.update(id, typePlural, updated)
+        new = getClassByName(type)(data)
+        old = Persistence.get(id, typePlural)
+        updated = old.toJson(update=new)
+        Persistence.update(id, typePlural, updated)
 
     @staticmethod
     def createObjectByJson(type: str, data: dict) -> None:
-        new = getClassByName(type)(json.loads(data))
-        id = new.id
         typePlural = getPlural(type)
-        FileDataManager.save(typePlural, new.toJson())
+        new = getClassByName(type)(**data)
+        id = new.id
+        Persistence.save(id, typePlural, new.toJson())
 
     @staticmethod
     def getCountry(code: str) -> dict:
@@ -89,5 +88,5 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getContryCities(code: str) -> dict:
-        return FileDataManager.getAllWithProperty(
+        return Persistence.getAllWithProperty(
             "cities", "country_code", code)

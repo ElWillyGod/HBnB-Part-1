@@ -5,9 +5,9 @@
     as both are unique within the database.
 '''
 
-from trackedobject import TrackedObject
-from validationlib import isUserEmailDuplicated
-from logicexceptions import EmailDuplicated
+from logic.model.trackedobject import TrackedObject
+from logic.model.validationlib import isUserEmailDuplicated
+from logic.logicexceptions import EmailDuplicated
 
 
 class User(TrackedObject):

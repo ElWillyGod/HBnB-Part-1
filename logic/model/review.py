@@ -4,9 +4,9 @@
     Reviews are linked with a user and a review.
 '''
 
-from trackedobject import TrackedObject
-from validationlib import idExists, isOwnerIDTheSame
-from logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
+from logic.model.trackedobject import TrackedObject
+from logic.model.validationlib import idExists, isOwnerIDTheSame
+from logic.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
 
 
 class Review(TrackedObject):

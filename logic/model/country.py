@@ -6,9 +6,9 @@
     They also lack creation datetime and update datetime.
 '''
 
-from trackedobject import TrackedObject
-from validationlib import doesCountryExist
-from logicexceptions import CountryNotFoundError
+from logic.model.trackedobject import TrackedObject
+from logic.model.validationlib import doesCountryExist
+from logic.logicexceptions import CountryNotFoundError
 
 
 class Country(TrackedObject):

@@ -4,9 +4,9 @@
     An amenity is something that places have.
 '''
 
-from trackedobject import TrackedObject
-from validationlib import isAmenityDuplicated
-from logicexceptions import AmenityNameDuplicated
+from logic.model.trackedobject import TrackedObject
+from logic.model.validationlib import isAmenityDuplicated
+from logic.logicexceptions import AmenityNameDuplicated
 
 
 class Amenity(TrackedObject):

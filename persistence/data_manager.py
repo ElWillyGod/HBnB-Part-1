@@ -1,14 +1,13 @@
-#!/usr/bin/python3
+
+"""
+    DataManager class that implements the iPersistenceManager interface.
+    Handles data persistence using JSON files.
+"""
 
 import json
 import os
 import glob
-from DataManager import IPersistenceManager
-
-"""
-DataManager class that implements the iPersistenceManager interface.
-Handles data persistence using JSON files.
-"""
+from persistence.data_manager_interface import IPersistenceManager
 
 
 class DataManager(IPersistenceManager):
@@ -38,16 +37,20 @@ class DataManager(IPersistenceManager):
         else:
             return os.path.join(self.storage_path, f"{entity_type}.json")
         
-    def save(self, entity):
+    def save(self, id, type, entity):
         """
+            --REVISAR--
+            añadí cosas para guardarlo bien
+
         Save an entity to a JSON file
         Attributes:
             entity: the entity to save to a JSON file.
         Returns:
             The entity and entity type in a JSON file
         """
-        entity_type = type(entity).__name__
-        entity_id = entity.get('id')
+
+        entity_type = type
+        entity_id = id
         file_path = self._file_path(entity_type, entity_id)
 
         with open(file_path, 'w') as file:
@@ -57,7 +60,7 @@ class DataManager(IPersistenceManager):
             'entity': entity,
             'entity_type': entity_type
         }
-        return json.dumps(result)
+        return result
 
     def get(self, entity_id, entity_type):
         """
@@ -70,11 +73,11 @@ class DataManager(IPersistenceManager):
 
         file_path = self._file_path(entity_type, entity_id)
         if not os.path.exists(file_path):
-            return json.dumps(None)
+            return None
         else:
             with open(file_path, 'r') as file:
                 entity = json.load(file)
-            return json.dumps(entity)
+            return entity
 
     def update(self, entity):
         """
@@ -89,7 +92,7 @@ class DataManager(IPersistenceManager):
             'entity': json.loads(entity),
             'entity_type': entity_type
         }
-        return json.dumps(result)
+        return result
 
     def delete(self, entity_id, entity_type):
         """
@@ -105,7 +108,7 @@ class DataManager(IPersistenceManager):
         file_path = self._file_path(entity_type, entity_id)
         if os.path.exists(file_path):
             os.remove(file_path)
-            return json.dumps({f'Entity {entity_id} of type {entity_type} deleted'})
+            return {f'Entity {entity_id} of type {entity_type} deleted'}
         else:
             raise FileNotFoundError(f"No such entity: {entity_type} with {entity_id}")
             """
@@ -125,7 +128,7 @@ class DataManager(IPersistenceManager):
         for file_path in files:
             with open(file_path, 'r') as file:
                 entities.append(json.load(file))
-        return json.dumps(entities)
+        return entities
 
     def get_by_property(self, entity_type, property_name, property_value):
         """
@@ -136,9 +139,9 @@ class DataManager(IPersistenceManager):
             property_value: the property value to match
         Return: a list of entities that match the given property in JSON
         """
-        all_entities = json.loads(self.get_all(entity_type))
+        all_entities = self.get_all(entity_type)
         matched_entities = [entity for entity in all_entities if entity.get(property_name) == property_value]
-        return json.dumps(matched_entities)
+        return matched_entities
     
     def get_countries(self, code):
         """

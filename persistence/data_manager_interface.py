@@ -1,17 +1,17 @@
-#!/usr/bin/python3
+
+"""
+    Data manager
+    Handles:
+        Save
+        Get
+        Update
+        Delete
+        Get all
+        Get by property
+        Get countries
+"""
 
 from abc import ABC, abstractmethod
-"""
-Data manager
-Handles:
-    Save
-    Get
-    Update
-    Delete
-    Get all
-    Get by property
-    Get countries
-"""
 
 
 class IPersistenceManager:

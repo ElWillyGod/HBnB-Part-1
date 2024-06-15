@@ -5,9 +5,9 @@
     The name must also be unique in the same country.
 '''
 
-from trackedobject import TrackedObject
-from validationlib import doesCountryExist, isCityNameDuplicated
-from logicexceptions import CountryNotFoundError, CityNameDuplicated
+from logic.model.trackedobject import TrackedObject
+from logic.model.validationlib import doesCountryExist, isCityNameDuplicated
+from logic.logicexceptions import CountryNotFoundError, CityNameDuplicated
 
 
 class City(TrackedObject):

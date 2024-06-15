@@ -4,9 +4,10 @@
     Makes calls to the persistance layer.
 '''
 
-from persistence.persistence_manager import FileDataManager, CountryDataManager
+from logic import DM
+from logic import CountryManager
 
-countries = CountryDataManager.get()
+countries = CountryManager.get()
 
 
 def idExists(id: str, cls: str) -> bool:
@@ -14,9 +15,9 @@ def idExists(id: str, cls: str) -> bool:
         Calls persistance layer to see if an id of type cls exists.
     '''
 
-    call = FileDataManager.get(id, cls)
+    call = DM.get(id, cls)
 
-    if len(call) == 0:
+    if call is None or len(call) == 0:
         return False
 
     return True
@@ -27,9 +28,9 @@ def isUserEmailDuplicated(email: str) -> bool:
         Calls persistance layer to see if a user has the same email.
     '''
 
-    call = FileDataManager.getByAttr(email, "users")
+    call = DM.get_by_property("users", "email", email)
 
-    if len(call) == 0:
+    if call is None or len(call) == 0:
         return False
 
     return True
@@ -40,9 +41,9 @@ def isAmenityDuplicated(name: str) -> bool:
         Calls persistance layer to see if a user has the same email.
     '''
 
-    call = FileDataManager.getByAttr(name, "amenities")
+    call = DM.getByAttr(name, "amenities")
 
-    if len(call) == 0:
+    if call is None or len(call) == 0:
         return False
 
     return True
@@ -53,7 +54,7 @@ def isCityNameDuplicated(name: str, code: str) -> bool:
         Calls persistance layer to see if a city has the same name.
     '''
 
-    call = FileDataManager.getAllWithProperty("cities", "country_code", code)
+    call = DM.getAllWithProperty("cities", "country_code", code)
 
     for city in call:
         if city["name"] == name:
@@ -68,7 +69,7 @@ def isOwnerIDTheSame(place_id: str, user_id: str) -> bool:
         given id.
     '''
 
-    call = FileDataManager.get(place_id)
+    call = DM.get(place_id)
 
     return call["host_id"] == user_id
 
