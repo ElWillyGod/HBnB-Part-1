@@ -55,10 +55,11 @@ class LogicFacade(ABC):
     @staticmethod
     def updateByID(id: str, type: str, data: str) -> None:
         typePlural: str = getPlural(type)
-        old_data: dict = Persistence.get(id, typePlural)
-        old = getClassByName(type)(**old_data)
-        updated = old.toJson(update=data)
-        Persistence.update(id, typePlural, updated)
+        old_data = Persistence.get(id, typePlural)
+        data["id"] = id
+        data["created_at"] = old_data["created_at"]
+        updated = getClassByName(type)(**data)
+        Persistence.update(id, typePlural, updated.toJson())
 
     @staticmethod
     def createObjectByJson(type: str, data: str) -> None:

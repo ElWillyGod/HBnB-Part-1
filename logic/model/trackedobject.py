@@ -29,11 +29,7 @@ class TrackedObject(ABC):
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at
-
         self.id = str(uuid.uuid4()) if id is None else id
-
-    def update_time(self) -> None:
-        self.updated_at = str(datetime.now())
 
     def getAllInstanceAttributes(self):
         attributes = inspect.getmembers(self,
@@ -42,11 +38,6 @@ class TrackedObject(ABC):
                 if not (key[0:2] == "__" and key[-2:] == "__")
                 and not key == "_abc_impl"}
 
-    def toJson(self, *, update=None) -> str:
+    def toJson(self) -> str:
         instance_vars = self.getAllInstanceAttributes()
-
-        if update is None:
-            return json.dumps(instance_vars)
-
-        instance_vars.update(update)
         return json.dumps(instance_vars)
