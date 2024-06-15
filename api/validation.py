@@ -1,9 +1,10 @@
-#!/usr/bin/python3
-"""validaciones de los endpoint"""
-from string import ascii_letters, digits, ascii_lowercase
+
+"""
+    Endpoint validation library.
+"""
 
 
-def idChecksum(id: str) -> bool: # TUYO
+def idChecksum(id: str) -> bool:
     '''
         Checks if an id's lenght is valid.
     '''
@@ -12,21 +13,23 @@ def idChecksum(id: str) -> bool: # TUYO
 
 
 
-def isCountryValid(country_code: str) -> bool: # TUYO
+def isCountryValid(country_code: str) -> bool:
     '''
         Checks if a country's code is valid.
     '''
 
     if len(country_code) != 2:
         return False
+
     for char in country_code:
-        if char not in ascii_lowercase:
+        if not char.islower():
             return False
+
     return True
 
 
 
-def isStrValid(string, ignoreStr: str="", ignoreDigits=True) -> bool: # TUYO
+def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
     '''
         Checks if the string does not have any special character aside
         from chars from ignoreStr.
@@ -39,13 +42,13 @@ def isStrValid(string, ignoreStr: str="", ignoreDigits=True) -> bool: # TUYO
         return False
 
     for char in string:
-        if char not in ascii_letters and char not in ignoreStr:
-            if not ignoreDigits and char in digits:
+        if not char.isalpha() and char not in ignoreStr:
+            if not ignoreDigits and char.isdigit():
                 return False
     return True
 
 
-def isLatitudeValid(latitude) -> bool: # TUYO
+def isLatitudeValid(latitude: float) -> bool:
     '''
         Check if the latitude is valid.
     '''
@@ -53,7 +56,7 @@ def isLatitudeValid(latitude) -> bool: # TUYO
     return latitude >= -90 and latitude <= 90
 
 
-def isLongitudeValid(longitude) -> bool: # TUYO
+def isLongitudeValid(longitude: float) -> bool:
     '''
         Checks if the longitude is valid.
     '''
@@ -61,7 +64,7 @@ def isLongitudeValid(longitude) -> bool: # TUYO
     return longitude >= -180 and longitude <= 180
 
 
-def isNameValid(string: str) -> bool: # TUYO
+def isNameValid(string: str) -> bool:
     '''
         Checks if a name is valid.
 
@@ -74,12 +77,68 @@ def isNameValid(string: str) -> bool: # TUYO
     if not isStrValid(string, "-_ "):
         return False
 
-    if string[0] not in ascii_letters:
+    if not string[0].isalpha():
         return False
 
     return True
 
 
-def isEmailValid(email: str) -> bool: # TUYO
-    
-    return isStrValid(email)
+def isEmailValid(email: str) -> bool:
+    '''
+        Checks if an email is valid
+
+        Returns false if:
+            it has a restrained special character,
+            it has spaces,
+            has not exactly one '@',
+            empty before the '@',
+            has not at least one '.' that is after the '@',
+            empty between '@' and '.',
+            has special characters, or digits after the '@',
+            empty after any '.'.
+
+        valid example: "user@gmail.com"
+        valid example: "user@ceibal.edu.uy"
+    '''
+
+    if not isStrValid(email, "@.!#$%&/*+-_?'^`~{}"):
+        return False
+
+    if email.count("@") != 1:
+        return False
+
+    if email.count(".") == 0:
+        return False
+
+    last_index = 0
+
+    # checks name
+    empty_flag = True
+    for i, char in enumerate(email):
+        if char == "@":
+            if empty_flag:
+                return False
+            else:
+                last_index = i
+                break
+        else:
+            empty_flag = False
+
+    # checks domain
+    empty_flag = True
+    encountered_dot = False
+    for i, char in enumerate(email[last_index + 1:]):
+        if char == ".":
+            encountered_dot = True
+            if empty_flag:
+                return False
+            else:
+                empty_flag = True
+        elif not char.isalpha():
+            return False
+        else:
+            empty_flag = False
+    if empty_flag or not encountered_dot:
+        return False
+
+    return True
