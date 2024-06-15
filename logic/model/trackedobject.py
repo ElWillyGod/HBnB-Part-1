@@ -39,5 +39,4 @@ class TrackedObject(ABC):
                 and not key == "_abc_impl"}
 
     def toJson(self) -> str:
-        instance_vars = self.getAllInstanceAttributes()
-        return json.dumps(instance_vars)
+        return self.getAllInstanceAttributes()
