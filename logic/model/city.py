@@ -6,29 +6,29 @@
 '''
 
 from trackedobject import TrackedObject
-from validationlib import doesCountryExist
-from logicexceptions import CountryNotFoundError
+from validationlib import doesCountryExist, isCityNameDuplicated
+from logicexceptions import CountryNotFoundError, CityNameDuplicated
 
 
 class City(TrackedObject):
     """
-        City Class
-
-        from TrackedObject:
-            id (str): UUID4 as hex.
-            created_at: datetime as string at time of creation.
-            updated_at: datetime as string at time of last update.
-            update_time() -> None: Updates the updated_at attribute.
-            toJson() -> str: Returns a JSON representation of this object.
-
-        name (str): Name of city.
-        country_code (str): Code that corresponds to a country. Similar to ID.
+        City Class.
     """
 
-    def __init__(self, name, country_code,
-                 *, id=None, created_at=None, updated_at=None):
+    def __init__(self,
+                 name: str,
+                 country_code: str,
+                 *,
+                 id: str = None,
+                 created_at: str = None,
+                 updated_at: str = None):
         super().__init__(id, created_at, updated_at)
-        self.name = name
+
         if not doesCountryExist(country_code):
-            raise CountryNotFoundError("country not found")
+            raise CountryNotFoundError(f"country '{country_code}' not found")
         self.country_code = country_code
+
+        if isCityNameDuplicated(name, country_code):
+            raise CityNameDuplicated(
+                f"{name} already exists in {country_code}")
+        self.name = name

@@ -13,8 +13,6 @@ import json
 
 class TrackedObject(ABC):
     '''
-        status = WIP (75%) needs some implementation and testing
-
         id (str): UUID4 as hex.
         created_at: datetime as string at time of creation.
         updated_at: datetime as string at time of last update.
@@ -22,14 +20,19 @@ class TrackedObject(ABC):
         toJson() -> str: Returns a JSON representation of this object.
     '''
 
-    def __init__(self, id=None, created_at=None, updated_at=None):
+    def __init__(self,
+                 id: str = None,
+                 created_at: str = None,
+                 updated_at: str = None):
+
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at
+
         self.id = str(uuid.uuid4()) if id is None else id
 
     def update_time(self) -> None:
-        self.__updated_at = str(datetime.now())
+        self.updated_at = str(datetime.now())
 
     def getAllInstanceAttributes(self):
         return {key: value for key, value in vars(self)
