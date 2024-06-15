@@ -22,7 +22,7 @@ def isCountryValid(country_code: str) -> bool:
         return False
 
     for char in country_code:
-        if not char.islower():
+        if not char.isupper():
             return False
 
     return True
@@ -134,7 +134,7 @@ def isEmailValid(email: str) -> bool:
                 return False
             else:
                 empty_flag = True
-        elif not char.isalpha():
+        elif not char.isalnum():
             return False
         else:
             empty_flag = False
