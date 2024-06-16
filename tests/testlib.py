@@ -51,13 +51,13 @@ class HTTPTestClass:
 
     @classmethod
     def _ASSERTION_FAILURE(cls,
-                           msg: str | None = None
+                           errormsg: str | None = None
                            ) -> None:
 
-        if msg is None:
-            msg = "Assertion Failed"
-        print(f"{cls.prefix}{RED}{msg}{cls.suffix}")
+        if errormsg is None:
+            errormsg = "Assertion Failed"
         cls.assertionsFailed += 1
+        raise AssertionError(errormsg)
 
     @classmethod
     def _ASSERT(cls,
@@ -137,23 +137,48 @@ class HTTPTestClass:
         return cls.json[key]
 
     @classmethod
-    def GET_VALUE(cls, key: str):
+    def GET_VALUE_WITH(cls,
+                       key: str,
+                       value: str,
+                       key_target: str
+                       ) -> Any:
         '''
-            Gets value from key of last response.
+            Gets value from key_target from object with
+            key and value of last response.
         '''
-        if isinstance(cls.lastResponse, dict):
-            return cls.lastResponse[key]
+        data = cls.lastResponse.json()
+        if isinstance(data, dict):
+            if key not in data:
+                raise KeyError(f"object does not present {key}")
+            if data[key] != value:
+                raise AssertionError(f"object's value does not match")
+            if key_target not in data:
+                raise KeyError(f"object does not have '{key_target}'")
+            return data[key_target]
         else:
-            for dic in cls.lastResponse:
-                if key in dic:
-                    return dic[key]
-            raise KeyError(f"key not found for test: {key}")
+            for dic in data:
+                if key not in dic:
+                    continue
+                if dic[key] != value:
+                    continue
+                if key_target not in dic:
+                    raise KeyError(f"object does not have '{key_target}'")
+                return dic[key_target]
+            raise KeyError(f"object not found: {key}")
 
     @classmethod
     def GET(cls, endpoint: str) -> dict:
         response = requests.get(f"{HTTPTestClass.URL}{endpoint}")
         cls.lastResponse = response
         return response
+
+    @classmethod
+    def PRINT_RESPONSE(cls):
+        print(f"{cls.prefix}{cls.lastResponse.json()}{cls.suffix}")
+
+    @classmethod
+    def PRINT_JSON(cls):
+        print(f"{cls.prefix}{cls.json}{cls.suffix}")
 
     @classmethod
     def POST(cls, endpoint: str) -> dict:
@@ -205,10 +230,10 @@ class HTTPTestClass:
                       f"{RESET}\n\t{e}{cls.suffix}")
                 cls.testsFailed += 1
 
-        if cls.assertionsFailed == 0:
+        if cls.testsFailed == 0:
             print(f"{cls.prefix}{GREEN}All tests from " +
                   f"{cls.__name__} passed: ", end="")
-        elif cls.assertionsPassed == 0:
+        elif cls.testsPassed == 0:
             print(f"{cls.prefix}{RED}All tests from " +
                   f"{cls.__name__} failed: ", end="")
         else:
