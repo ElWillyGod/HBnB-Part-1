@@ -174,7 +174,15 @@ class HTTPTestClass:
 
     @classmethod
     def PRINT_RESPONSE(cls):
-        print(f"{cls.prefix}{cls.lastResponse.json()}{cls.suffix}")
+        headers = cls.lastResponse.headers
+        text = cls.lastResponse.text
+        try:
+            json = cls.lastResponse.json()
+        except Exception:
+            json = ""
+        if json is None:
+            json = ""
+        print(f"{cls.prefix}{headers=}\n{json=}\n{text=}{cls.suffix}")
 
     @classmethod
     def PRINT_JSON(cls):

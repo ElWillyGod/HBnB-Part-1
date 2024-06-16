@@ -69,6 +69,11 @@ class TestUsers(HTTPTestClass):
         for i in range (1, 4):
             c.valid_DELETE(f"users/valid_user_{i}.json")
 
+    @classmethod
+    def test_6_empty_id_GET(c):
+        c.GET("/users/")
+        c.CODE_ASSERT(404)
+        c.PRINT_RESPONSE()
 
 def run():
     TestUsers.run()

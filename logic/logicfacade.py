@@ -10,6 +10,7 @@ from abc import ABC
 from logic.model.classes import getPlural, getClassByName
 from logic.model.countrieslib import getCountry, getCountries
 from logic.logicexceptions import IDNotFoundError
+from logic.model.validationlib import idExists
 from logic import DM as Persistence
 
 
@@ -47,18 +48,22 @@ class LogicFacade(ABC):
         typePlural = getPlural(type)
         call = Persistence.get(id, typePlural)
         if call is None or len(call) == 0:
-            raise IDNotFoundError("ID was not found")
+            raise IDNotFoundError("id not found")
         return call
 
     @staticmethod
     def deleteByID(id: str, type: str) -> None:
         typePlural = getPlural(type)
+        if not idExists(id):
+            raise IDNotFoundError("id not found")
         Persistence.delete(id, typePlural)
 
     @staticmethod
     def updateByID(id: str, type: str, data: str) -> None:
         typePlural: str = getPlural(type)
         old_data = Persistence.get(id, typePlural)
+        if old_data is None or len(old_data) == 0:
+            raise IDNotFoundError("id not found")
         data["id"] = id
         data["created_at"] = old_data["created_at"]
         updated = getClassByName(type)(**data)
@@ -87,6 +92,8 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getReviewsOfPlace(id: str) -> dict:
+        if not idExists(id):
+            raise IDNotFoundError("id not found")
         return Persistence.get_by_property(
             "places", "id", id
         )
