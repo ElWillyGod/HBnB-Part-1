@@ -80,20 +80,27 @@ class DataManager(IPersistenceManager):
                 entity = json.load(file)
             return entity
 
-    def update(self, entity):
+    def update(self, entity_id, entity_type, data):
         """
         Update an entity by saving it again to the JSON file
         Attributes:
-            entity: the entity to update
+            entity_id: the id entity
+            entity_type: type to entity
+            data: new data fo entity
         Returns:
             The entity and entity type to update
         """
-        entity, entity_type = self.save(entity)
-        result = {
-            'entity': json.loads(entity),
-            'entity_type': entity_type
-        }
-        return result
+        file_path = self._file_path(entity_type, entity_id)
+
+        with open(file_path, 'r') as file:
+            entiy = json.load(file)
+
+            entiy.update(data)
+
+        with open(file_path, 'w') as file:
+            json.dump(entiy, file)
+
+        return data
 
     def delete(self, entity_id, entity_type):
         """

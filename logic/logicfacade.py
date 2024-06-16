@@ -54,7 +54,7 @@ class LogicFacade(ABC):
     @staticmethod
     def deleteByID(id: str, type: str) -> None:
         typePlural = getPlural(type)
-        if not idExists(id):
+        if not idExists(id, typePlural):
             raise IDNotFoundError("id not found")
         Persistence.delete(id, typePlural)
 
@@ -92,7 +92,7 @@ class LogicFacade(ABC):
 
     @staticmethod
     def getReviewsOfPlace(id: str) -> dict:
-        if not idExists(id):
+        if not idExists(id, 'places'):
             raise IDNotFoundError("id not found")
         return Persistence.get_by_property(
             "places", "id", id

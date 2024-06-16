@@ -46,7 +46,7 @@ def create_User():
 def get_Users_All():
     users = LogicFacade.getByType("user")
 
-    if users is not None:
+    if not (users is None or len(users) == 0):
         return jsonify(users), 200
 
     return jsonify({'message': "empy"}), 200
