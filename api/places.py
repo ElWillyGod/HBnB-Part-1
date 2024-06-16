@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """places endpoint
 POST /places: Create a new place.
 GET /places: Retrieve a list of all places.

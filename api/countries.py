@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """Countries end point
 GET /countries: Retrieve all pre-loaded countries.
 GET /countries/{country_code}: Retrieve details of a specific country by its code.

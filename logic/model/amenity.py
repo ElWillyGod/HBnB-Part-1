@@ -19,9 +19,11 @@ class Amenity(TrackedObject):
                  *,
                  id: str = None,
                  created_at: str = None,
-                 updated_at: str = None):
+                 updated_at: str = None,
+                 update: bool = False
+                 ) -> None:
         super().__init__(id, created_at, updated_at)
-
-        if isAmenityDuplicated(name):
-            raise AmenityNameDuplicated("amenity already exists")
+        if not update:
+            if isAmenityDuplicated(name):
+                raise AmenityNameDuplicated("amenity already exists")
         self.name = name

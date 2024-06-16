@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """amenities endpoint
 POST /amenities: Create a new amenity.
 GET /amenities: Retrieve a list of all amenities.

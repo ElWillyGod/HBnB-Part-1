@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """cities endpoint
 GET /countries/{country_code}/cities: Retrieve all cities belonging to a specific country.
 POST /cities: Create a new city.

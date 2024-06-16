@@ -22,9 +22,7 @@ class Country(TrackedObject):
     def __init__(self,
                  code: str,
                  name: str):
-
         if not doesCountryExist(code):
             raise CountryNotFoundError("country does not exist")
         self.code = code
-
         self.name = name

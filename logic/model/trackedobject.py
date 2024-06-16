@@ -25,7 +25,6 @@ class TrackedObject(ABC):
                  id: str = None,
                  created_at: str = None,
                  updated_at: str = None):
-
         now = str(datetime.now())
         self.created_at = now if created_at is None else created_at
         self.updated_at = now if updated_at is None else updated_at

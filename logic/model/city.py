@@ -21,14 +21,17 @@ class City(TrackedObject):
                  *,
                  id: str = None,
                  created_at: str = None,
-                 updated_at: str = None):
+                 updated_at: str = None,
+                 update: bool = False
+                 ) -> None:
         super().__init__(id, created_at, updated_at)
-
-        if not doesCountryExist(country_code):
-            raise CountryNotFoundError(f"country '{country_code}' not found")
+        if not update:
+            if not doesCountryExist(country_code):
+                raise CountryNotFoundError(
+                    f"country '{country_code}' not found")
         self.country_code = country_code
-
-        if isCityNameDuplicated(name, country_code):
-            raise CityNameDuplicated(
-                f"{name} already exists in {country_code}")
+        if not update:
+            if isCityNameDuplicated(name, country_code):
+                raise CityNameDuplicated(
+                    f"{name} already exists in {country_code}")
         self.name = name

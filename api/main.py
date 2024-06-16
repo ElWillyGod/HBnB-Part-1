@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """main de los endpoint"""
 
 import api.amenities

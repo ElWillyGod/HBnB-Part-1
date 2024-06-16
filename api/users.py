@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """users endpoint
 POST /users: Create a new user.
 GET /users: Retrieve a list of all users.

@@ -59,18 +59,22 @@ class LogicFacade(ABC):
         Persistence.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id: str, type: str, data: str) -> None:
+    def updateByID(id: str, type: str, data: dict) -> None:
         typePlural: str = getPlural(type)
         old_data = Persistence.get(id, typePlural)
         if old_data is None or len(old_data) == 0:
             raise IDNotFoundError("id not found")
+        for key in data:
+            if data[key] == old_data[key]:
+                data[key] = None
         data["id"] = id
         data["created_at"] = old_data["created_at"]
-        updated = getClassByName(type)(**data)
+        data["updated_at"] = None
+        updated = getClassByName(type)(**data, update=True)
         Persistence.update(id, typePlural, updated.toJson())
 
     @staticmethod
-    def createObjectByJson(type: str, data: str) -> None:
+    def createObjectByJson(type: str, data: dict) -> None:
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id

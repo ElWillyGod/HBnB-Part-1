@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 """reviews endpoint
 POST /places/{place_id}/reviews: Create a new review for a specified place.
 GET /users/{user_id}/reviews: Retrieve all reviews written by a specific user.
