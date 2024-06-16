@@ -43,7 +43,6 @@ class TestUsers(HTTPTestClass):
         c.CODE_ASSERT(204)
 
         c.GET(f"/users/{id}")
-        c.PRINT_RESPONSE()
         c.CODE_ASSERT(404)
 
     @classmethod

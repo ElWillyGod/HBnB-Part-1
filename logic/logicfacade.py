@@ -47,7 +47,7 @@ class LogicFacade(ABC):
         typePlural = getPlural(type)
         call = Persistence.get(id, typePlural)
         if call is None or len(call) == 0:
-            raise IDNotFoundError
+            raise IDNotFoundError("ID was not found")
         return call
 
     @staticmethod
