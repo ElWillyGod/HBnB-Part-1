@@ -56,7 +56,7 @@ def cereate_Cities():
 def get_All_Cities():
     cities = LogicFacade.getByType("city")
 
-    if cities is not None:
+    if cities is not None and len(cities) > 0:
         return jsonify(cities), 200
 
     return jsonify({'message': "empy"}), 200

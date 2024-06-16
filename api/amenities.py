@@ -32,7 +32,7 @@ def create_Amenities():
 def ger_all_amenities():
     amenities = LogicFacade.getByType('amenity')
 
-    if amenities is not None:
+    if amenities is not None and len(amenities) >0:
         return jsonify(amenities), 200
 
     return jsonify({'message': "no hay amenities"}), 200

@@ -13,12 +13,9 @@ import api.validation as val
 @app.route('/countries')
 def get_All_Countries():
 
-    countries = LogicFacade.getByType("country")
+    countries = LogicFacade.getAllCountries()
 
-    if countries is not None:
-        return jsonify(countries), 200
-
-    return jsonify({'message': "empy"}), 200
+    return jsonify(countries), 200
 
 
 @app.route('/countries/<country_code>')

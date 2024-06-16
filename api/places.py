@@ -50,7 +50,7 @@ def create_Place():
 def get_All_Places():
     places = LogicFacade.getByType('place')
 
-    if not places:
+    if not (places is None or len(places) == 0):
         return jsonify({'message': 'None places'}), 200
 
     return jsonify(places), 200

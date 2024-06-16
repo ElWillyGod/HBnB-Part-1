@@ -77,7 +77,7 @@ class LogicFacade(ABC):
         Persistence.save(id, typePlural, new.toJson())
 
     @staticmethod
-    def getAllCountries(code: str) -> dict:
+    def getAllCountries() -> dict:
         return getCountries()
 
     @staticmethod
