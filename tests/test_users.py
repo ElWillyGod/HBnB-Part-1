@@ -13,8 +13,8 @@ class TestUsers(HTTPTestClass):
     '''
 
     @classmethod
-    def test_1(c):
-        c.FROM("users/valid_user_1.json")
+    def postGet(c, path):
+        c.FROM(path)
         c.POST("/users")
         c.CODE_ASSERT(201)
         email = c.SAVE_VALUE("email")
@@ -22,6 +22,11 @@ class TestUsers(HTTPTestClass):
         c.GET("/users")
         c.CODE_ASSERT(200)
         c.VALUE_ASSERT("email", email)
+
+    @classmethod
+    def test_postGets(c):
+        for i in range (1, 4):
+            c.postGet(f"users/valid_user_{i}.json")
 
 
 def run():

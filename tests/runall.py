@@ -18,3 +18,6 @@ def run():
     test_cities.run()
     test_places.run()
     test_reviews.run()
+
+if __name__ == "__main__":
+    run()

@@ -9,37 +9,79 @@ import requests
 import json
 from pathlib import Path
 
+RED = "\033[31m"
+GREEN = "\033[32m"
+YELLOW = "\033[33m"
+BLUE = "\033[34m"
+RESET = "\033[0m"
+
 
 class HTTPTestClass:
     '''
         Test Base Class for testing the API.
         Test Classes inherit from this class to get all methods.
         Flask Server must be running for tests to work.
+        If debug == True it shows the result of all passed assertions.
     '''
 
-    URL = "http://127.0.0.1:5000/"
+    URL: str = "http://127.0.0.1:5000/"
 
-    testPassed = 0
-    lastResponse = None
-    json = {}
-    headers = {'Content-type': 'application/json',
-               'Accept': 'application/json'}
+    assertionsPassed: int = 0
+    assertionsFailed: int = 0
+    testsPassed: int = 0
+    testsFailed: int = 0
+    lastResponse: requests.Response | None = None
+    json: dict = {}
+    headers: dict = {'Content-type': 'application/json',
+                     'Accept': 'application/json'}
+    prefix: str = f">>> "
+    suffix: str = f"{RESET}"
+    debug: bool = False
+
+    @classmethod
+    def _ASSERTION_SUCCESS(cls,
+                           msg: str | None = None
+                           ) -> None:
+
+        if msg is None:
+            msg = "Assertion Passed"
+        if cls.debug:
+            print(f"{cls.prefix}{GREEN}{msg}{cls.suffix}")
+        cls.assertionsPassed += 1
+
+    @classmethod
+    def _ASSERTION_FAILURE(cls,
+                           msg: str | None = None
+                           ) -> None:
+
+        if msg is None:
+            msg = "Assertion Failed"
+        print(f"{cls.prefix}{RED}{msg}{cls.suffix}")
+        cls.assertionsFailed += 1
+
+    @classmethod
+    def _ASSERT(cls,
+                value: Any,
+                expected_value: Any,
+                errormsg: str | None = None
+                ) -> None:
+        if value == expected_value:
+            errormsg = f"{value} == {expected_value}" if errormsg is None\
+                else errormsg
+            cls._ASSERTION_SUCCESS(errormsg)
+        else:
+            errormsg = f"{value} != {expected_value}" if errormsg is None\
+                else errormsg
+            cls._ASSERTION_FAILURE(errormsg)
 
     @classmethod
     def CODE_ASSERT(cls,
-        code_expected: int,
-        errormsg: str | None = None
-        ) -> None:
+                    code_expected: int,
+                    errormsg: str | None = None
+                    ) -> None:
 
         code = cls.lastResponse.status_code
-
-        if errormsg is None:
-            errormsg = f"Code was not expected:\
-            {code} != {code_expected}"
-
-        assert code == code_expected, errormsg
-
-        cls.testPassed += 1
+        cls._ASSERT(code, code_expected, errormsg)
 
     @classmethod
     def VALUE_ASSERT(cls,
@@ -52,34 +94,24 @@ class HTTPTestClass:
         if isinstance(data, list):
             found_one = False
             for dic in data:
-                try:
+                if key in dic:
                     value = dic[key]
                     found_one = True
-                    if errormsg is None:
-                        errormsg = f"Code was not expected:\
-                        {value} != {value_expected}"
-                    try:
-                        assert value == value_expected, errormsg
-                        cls.testPassed += 1
+                    if value == value_expected:
+                        cls._ASSERT(value, value_expected, errormsg)
                         return
-                    except AssertionError:
-                        pass
-                except KeyError:
-                    pass
             if found_one:
+                if errormsg is None:
+                    errormsg = (f"No key with expected value found " +
+                    f"{key}: {value_expected}")
                 raise AssertionError(errormsg)
-            raise KeyError(f"key not found for test: {key}")
+            else:
+                raise KeyError(f"key not found for test: {key}")
 
-        try:
-            value = data[key]
-        except KeyError:
+        if key not in data:
             raise KeyError(f"key not found for test: {key}")
-        if errormsg is None:
-            errormsg = f"Code was not expected:\
-            {value} != {value_expected}"
-        assert value == value_expected, errormsg
-
-        cls.testPassed += 1
+        value = data[key]
+        cls._ASSERT(value, value_expected, errormsg)
 
     @classmethod
     def FROM(cls, filename: str) -> None:
@@ -99,7 +131,23 @@ class HTTPTestClass:
 
     @classmethod
     def SAVE_VALUE(cls, key: str):
+        '''
+            Gets value from key of sent json.
+        '''
         return cls.json[key]
+
+    @classmethod
+    def GET_VALUE(cls, key: str):
+        '''
+            Gets value from key of last response.
+        '''
+        if isinstance(cls.lastResponse, dict):
+            return cls.lastResponse[key]
+        else:
+            for dic in cls.lastResponse:
+                if key in dic:
+                    return dic[key]
+            raise KeyError(f"key not found for test: {key}")
 
     @classmethod
     def GET(cls, endpoint: str) -> dict:
@@ -141,6 +189,33 @@ class HTTPTestClass:
                  not (attr[0:2] == "__" and attr[-2:] == "__") and
                  attr.find("test") != -1
                 }
+
+        print(f"{cls.prefix}{BLUE}Running {cls.__name__}...{cls.suffix}")
         for name in tests:
-            print(f"Running {name}...")
-            tests[name]()
+            print(f"{cls.prefix}{YELLOW}Running {name}...{cls.suffix}")
+            try:
+                tests[name]()
+                cls.testsPassed += 1
+            except AssertionError as e:
+                print(f"{cls.prefix}{RED}Check failed on {name}:{RESET}\n" +
+                      f"\t{e}{cls.suffix}")
+                cls.testsFailed += 1
+            except KeyError as e:
+                print(f"{cls.prefix}{RED}{name} did not find key to check:" +
+                      f"{RESET}\n\t{e}{cls.suffix}")
+                cls.testsFailed += 1
+
+        if cls.assertionsFailed == 0:
+            print(f"{cls.prefix}{GREEN}All tests from " +
+                  f"{cls.__name__} passed: ", end="")
+        elif cls.assertionsPassed == 0:
+            print(f"{cls.prefix}{RED}All tests from " +
+                  f"{cls.__name__} failed: ", end="")
+        else:
+            print(f"{cls.prefix}{YELLOW}Some tests from " +
+                  f"{cls.__name__} failed: ", end="")
+        tests_total = cls.testsPassed + cls.testsFailed
+        assertions_total = cls.assertionsFailed + cls.assertionsPassed
+        print(f"{RESET}{cls.testsPassed}/{tests_total} - " +
+              f"{cls.assertionsPassed}/{assertions_total}" +
+              f"{cls.suffix}\n")
