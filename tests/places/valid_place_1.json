@@ -1,0 +1,13 @@
+{
+    "host_id": "",
+    "name": "El Rancho de Don Juan",
+    "description": "Pues acá con el pajarito levantamos un galponsito para dejar que la gente viva, pero al no usarlo lo queremos rentar.",
+    "number_of_rooms": 1,
+    "number_of_bathrooms": 0,
+    "max_guests": 2,
+    "price_per_night": 21.2,
+    "latitude": -34.71790553921428,
+    "longitude": -55.986608401614646,
+    "city_id": "Pando",
+    "amenity_ids": []
+}

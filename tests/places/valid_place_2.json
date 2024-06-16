@@ -1,0 +1,13 @@
+{
+    "host_id": "",
+    "name": "Apartamento Loringud",
+    "description": "Arriba la patria!",
+    "number_of_rooms": 3,
+    "number_of_bathrooms": 1,
+    "max_guests": 12,
+    "price_per_night": 124.99,
+    "latitude": -34.885878748896936,
+    "longitude": -56.182315503925714,
+    "city_id": "Montevideo",
+    "amenity_ids": []
+}

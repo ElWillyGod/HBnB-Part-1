@@ -1,0 +1,13 @@
+{
+    "host_id": "",
+    "name": "Mansion Pequenio Placer",
+    "description": "Disfruta de un lugar inigualable con secretos inigualables. Explora este castillo reconvertido en una inmoviliaria de lujo.",
+    "number_of_rooms": 53,
+    "number_of_bathrooms": 23,
+    "max_guests": 151,
+    "price_per_night": 3499.99,
+    "latitude": -34.63991514360339,
+    "longitude": -56.06578259632316,
+    "city_id": "Madrid",
+    "amenity_ids": []
+}
