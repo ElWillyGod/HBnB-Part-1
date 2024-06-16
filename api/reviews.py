@@ -33,7 +33,7 @@ def create_Review(place_id):
 
         return jsonify({'error': str(message)}), 404
 
-    except (TypeError) as message:
+    except (logicexceptions.TryingToReviewOwnPlace) as message:
 
         return jsonify({'error': str(message)}), 400
 
@@ -109,7 +109,7 @@ def update_review(review_id):
 
         return jsonify({'error': str(message)}), 404
 
-    except (TypeError) as message:
+    except (logicexceptions.TryingToReviewOwnPlace) as message:
 
         return jsonify({'error': str(message)}), 400
 

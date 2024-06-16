@@ -44,7 +44,7 @@ def cereate_Cities():
     try:
         LogicFacade.createObjectByJson("city", data)
 
-    except (TypeError) as message:
+    except (logicexceptions.CityNameDuplicated) as message:
 
         return jsonify({'error': str(message)}), 409
 
@@ -92,7 +92,7 @@ def update_Cities(city_id):
 
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify({'error': str(message)}), 404
-    except (TypeError) as message2:
+    except (logicexceptions.CityNameDuplicated) as message2:
         return jsonify({'error': str(message2)}), 409
 
     return jsonify({"message": "todo OKa"}), 200
