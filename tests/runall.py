@@ -4,10 +4,17 @@
     Run all tests.
 '''
 
-import sys
+import test_amenities
+import test_countries
+import test_users
+import test_cities
+import test_places
+import test_reviews
 
-import test_smoke
-
-
-if test_smoke.result == False:
-    sys.exit(1)
+def run():
+    test_amenities.run()
+    test_countries.run()
+    test_users.run()
+    test_cities.run()
+    test_places.run()
+    test_reviews.run()

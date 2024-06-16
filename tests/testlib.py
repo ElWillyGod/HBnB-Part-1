@@ -12,54 +12,72 @@ from pathlib import Path
 
 class HTTPTestClass:
     '''
-        a
+        Test Base Class for testing the API.
+        Test Classes inherit from this class to get all methods.
+        Flask Server must be running for tests to work.
     '''
 
     URL = "http://127.0.0.1:5000/"
 
     testPassed = 0
-    lastResult = None
+    lastResponse = None
     json = {}
+    headers = {'Content-type': 'application/json',
+               'Accept': 'application/json'}
 
     @classmethod
     def CODE_ASSERT(cls,
-        response: requests.Response,
         code_expected: int,
         errormsg: str | None = None
         ) -> None:
 
-        code = response.status_code
+        code = cls.lastResponse.status_code
 
         if errormsg is None:
             errormsg = f"Code was not expected:\
-            {code}!={code_expected}"
+            {code} != {code_expected}"
 
-        assert response.code != code_expected, errormsg
+        assert code == code_expected, errormsg
 
         cls.testPassed += 1
 
     @classmethod
     def VALUE_ASSERT(cls,
-            response: requests.Response,
             key: str,
             value_expected: Any,
             errormsg: str | None = None
             ) -> None:
 
-        data = response.json()
-        head = data["head"]
-        body = data["body"]
+        data = cls.lastResponse.json()
+        if isinstance(data, list):
+            found_one = False
+            for dic in data:
+                try:
+                    value = dic[key]
+                    found_one = True
+                    if errormsg is None:
+                        errormsg = f"Code was not expected:\
+                        {value} != {value_expected}"
+                    try:
+                        assert value == value_expected, errormsg
+                        cls.testPassed += 1
+                        return
+                    except AssertionError:
+                        pass
+                except KeyError:
+                    pass
+            if found_one:
+                raise AssertionError(errormsg)
+            raise KeyError(f"key not found for test: {key}")
 
         try:
-            value = body[key]
-        except KeyError as e:
-            raise KeyError(f"key not found for test: {e}")
-
+            value = data[key]
+        except KeyError:
+            raise KeyError(f"key not found for test: {key}")
         if errormsg is None:
             errormsg = f"Code was not expected:\
-            {value}!={value_expected}"
-
-        assert value != value_expected, errormsg
+            {value} != {value_expected}"
+        assert value == value_expected, errormsg
 
         cls.testPassed += 1
 
@@ -80,29 +98,35 @@ class HTTPTestClass:
         cls.json[key] = value
 
     @classmethod
+    def SAVE_VALUE(cls, key: str):
+        return cls.json[key]
+
+    @classmethod
     def GET(cls, endpoint: str) -> dict:
         response = requests.get(f"{HTTPTestClass.URL}{endpoint}")
-        cls.lastResult = response
+        cls.lastResponse = response
         return response
 
     @classmethod
     def POST(cls, endpoint: str) -> dict:
         response = requests.post(f"{HTTPTestClass.URL}{endpoint}",
-                             json.dumps(cls.json))
-        cls.lastResult = response
+                                 json=cls.json,
+                                 headers=cls.headers)
+        cls.lastResponse = response
         return response
 
     @classmethod
     def PUT(cls, endpoint: str) -> dict:
         response = requests.put(f"{HTTPTestClass.URL}{endpoint}",
-                            json.dumps(cls.json))
-        cls.lastResult = response
+                                 json=cls.json,
+                                 headers=cls.headers)
+        cls.lastResponse = response
         return response
 
     @classmethod
     def DELETE(cls, endpoint: str) -> dict:
         response = requests.delete(f"{HTTPTestClass.URL}{endpoint}")
-        cls.lastResult = response
+        cls.lastResponse = response
         return response
 
     @classmethod
