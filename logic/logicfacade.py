@@ -9,7 +9,7 @@ from abc import ABC
 
 from logic.model.classes import getPlural, getClassByName
 from logic.model.countrieslib import getCountry, getCountries
-
+from logic.logicexceptions import IDNotFoundError
 from logic import DM as Persistence
 
 
@@ -45,7 +45,10 @@ class LogicFacade(ABC):
     @staticmethod
     def getByID(id: str, type: str) -> dict:
         typePlural = getPlural(type)
-        return Persistence.get(id, typePlural)
+        call = Persistence.get(id, typePlural)
+        if call is None or len(call) == 0:
+            raise IDNotFoundError
+        return call
 
     @staticmethod
     def deleteByID(id: str, type: str) -> None:
