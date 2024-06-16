@@ -24,16 +24,18 @@ def create_Review(place_id):
     if not (1 <= data['rating'] <= 5):
         return jsonify({'error': 'invalid rating'}), 400
 
+    data['place_id'] = place_id
+
     try:
-        LogicFacade.createReview(place_id, data)
+        LogicFacade.createObjectByJson('review', data)
 
     except (logicexceptions.IDNotFoundError) as message:
 
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     except (TypeError) as message:
 
-        return jsonify(message), 400
+        return jsonify({'error': str(message)}), 400
 
     return jsonify({"message": 'OKa'}), 201
 
@@ -46,18 +48,10 @@ def get_User_Reviews(user_id):
     try:
         reviews = LogicFacade.getByID(user_id, "reviewUser")
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     if reviews is not None:
-        return jsonify([{
-            'id': review['id'],
-            'place_id': review['place_id'],
-            'user_id': review['user_id'],
-            'rating': review['rating'],
-            'comment': review['comment'],
-            'created_at': review['created_at'],
-            'updated_at': review['updated_at']
-            } for review in reviews]), 200
+        return jsonify(reviews), 200
 
     return jsonify({'message': "empy reviews for user"}), 200
 
@@ -72,18 +66,10 @@ def get_Place_Reviews(place_id):
         reviews = LogicFacade.getByID(place_id, 'reviewPlace')
     
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     if reviews is not None:
-        return jsonify([{
-            'id': review['id'],
-            'place_id': review['place_i d'],
-            'user_id': review['user_id'],
-            'rating': review['rating'],
-            'comment': review['comment'],
-            'created_at': review['created_at'],
-            'updated_at': review['updated_at']
-            } for review in reviews]), 200
+        return jsonify(reviews), 200
 
     return jsonify({'message': "empy reviews"}), 200
 
@@ -98,18 +84,10 @@ def get_review(review_id):
         review = LogicFacade.getByID(review_id, 'review')
     
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     if review is not None:
-        return jsonify({
-            'id': review['id'],
-            'place_id': review['place_i d'],
-            'user_id': review['user_id'],
-            'rating': review['rating'],
-            'comment': review['comment'],
-            'created_at': review['created_at'],
-            'updated_at': review['updated_at']
-            }), 200
+        return jsonify(review), 200
 
     return jsonify({'message': "empy reviews"}), 200
 
@@ -129,11 +107,11 @@ def update_review(review_id):
 
     except (logicexceptions.IDNotFoundError) as message:
 
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     except (TypeError) as message:
 
-        return jsonify(message), 400
+        return jsonify({'error': str(message)}), 400
 
     return jsonify({'OKa'}), 200
 
@@ -146,6 +124,6 @@ def delete_review(review_id):
         LogicFacade.deleteByID(review_id, 'review')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({'message': 'review deleted successfully'}), 204

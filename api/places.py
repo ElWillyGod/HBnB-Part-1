@@ -40,7 +40,7 @@ def create_Place():
     try:
         LogicFacade.createObjectByJson('place', data)
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
 
     return jsonify({'message':'OKa'}), 201
@@ -64,7 +64,7 @@ def get_Place(place_id):
         place = LogicFacade.getByID(place_id, 'place')
 
     except (logicexceptions.IDNotFoundError) as message:
-         return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify(place), 200
 
@@ -99,7 +99,7 @@ def update_Place(place_id):
     try:
         LogicFacade.updateByID(place_id, 'place', data)
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({"message": 'OKa'}), 200
 
@@ -112,11 +112,9 @@ def delete_Place(place_id):
         LogicFacade.deleteByID(place_id, 'place')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({'message': 'Place deleted successfully'}), 204
-
-
 
 
 '''     

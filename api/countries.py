@@ -32,6 +32,6 @@ def get_Countries(country_code):
 
     except (logicexceptions.IDNotFoundError) as message:
         
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
-    return jsonify({'name': countrys['name'], 'code': countrys['code']}), 200
+    return jsonify(countrys), 200

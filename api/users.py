@@ -10,7 +10,6 @@ from api import app
 from flask import jsonify, request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
-from logic.model import user
 import api.validation as val
 
 
@@ -38,7 +37,7 @@ def create_User():
 
     except (logicexceptions.EmailDuplicated) as message:
 
-        return jsonify(message), 409
+        return jsonify({'error': str(message)}), 409
 
     return jsonify({'message':"201 Created"}), 201
 
@@ -47,7 +46,7 @@ def create_User():
 def get_Users_All():
     users = LogicFacade.getByType("user")
 
-    if user:
+    if users is not None:
         return jsonify(users), 200
 
     return jsonify({'message': "empy"}), 200
@@ -65,7 +64,7 @@ def get_User(user_id):
 
     except (logicexceptions.IDNotFoundError) as message:
         
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify(data), 200
 
@@ -98,10 +97,10 @@ def updata_User(user_id):
 
     except (logicexceptions.EmailDuplicated) as message:
 
-        return jsonify(message), 409
+        return jsonify({'error': str(message)}), 409
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({'message': "OKa"}), 201
 
@@ -114,6 +113,6 @@ def delete_user(user_id):
         LogicFacade.deleteByID(user_id, "user")
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({'message': 'todo OKa'}), 204

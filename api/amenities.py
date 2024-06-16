@@ -23,7 +23,7 @@ def create_Amenities():
         LogicFacade.createObjectByJson('amenity', data)
 
     except (logicexceptions.AmenityNameDuplicated) as message:
-        return jsonify(message), 409
+        return jsonify({'error': str(message)}), 409
 
     return jsonify({'message': "tod OKa"}), 201
 
@@ -46,7 +46,7 @@ def get_amenities(amenity_id):
         amenities = LogicFacade.getByID(amenity_id, 'amenity')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify(amenities), 200
 
@@ -65,10 +65,10 @@ def update_Amenities(amenity_id):
         LogicFacade.updateByID(amenity_id, 'amenity', data)
 
     except (logicexceptions.AmenityNameDuplicated) as message:
-        return jsonify(message), 409
+        return jsonify({'error': str(message)}), 409
 
-    except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+    except (logicexceptions.IDNotFoundError) as message2:
+        return jsonify({'error': str(message2)}), 404
 
     return jsonify({'message': "todo OKa"}), 200
     
@@ -82,6 +82,6 @@ def delete_Amenities(amenity_id):
         LogicFacade.deleteByID(amenity_id, 'amenity')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({'message': "Todo OKa"}), 204

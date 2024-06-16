@@ -23,12 +23,9 @@ def get_Cities_For_Contr(country_code):
         cities = LogicFacade.getContryCities(country_code)
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
-    return jsonify([{'id': city['id'], 'name': city['name'],
-                    'country_code': city['country_code'],
-                    'created_at': city['created_at'],
-                    'updated_at': city['updated_at']} for city in cities]), 200
+    return jsonify(cities), 200
 
 
 @app.route('/cities', methods=["POST"])
@@ -49,7 +46,7 @@ def cereate_Cities():
 
     except (TypeError) as message:
 
-        return jsonify(message), 409
+        return jsonify({'error': str(message)}), 409
 
     return jsonify({'message': "todo OKa"}), 201
 
@@ -74,12 +71,9 @@ def get_Cities(city_id):
     try:
         city = LogicFacade.getByID(city_id, "city")
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
-    return jsonify({"id": city['id'], "name": city['name'],
-                    "country_code": city['country_code'],
-                    "created_at": city['created_at'],
-                    "updated_at": city['updated_at']}), 200
+    return jsonify(city), 200
 
 
 @app.route('/cities/<city_id>', methods=["PUT"])
@@ -97,9 +91,9 @@ def update_Cities(city_id):
         LogicFacade.updateByID(city_id, "city", data)
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
     except (TypeError) as message2:
-        return jsonify(message2), 409
+        return jsonify({'error': str(message2)}), 409
 
     return jsonify({"message": "todo OKa"}), 200
 
@@ -114,6 +108,6 @@ def delete_Cities(city_id):
         LogicFacade.deleteByID(city_id, "city")
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify(message), 404
+        return jsonify({'error': str(message)}), 404
 
     return jsonify({'message': "todo OKa"}), 204
