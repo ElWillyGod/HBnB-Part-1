@@ -104,7 +104,7 @@ def isEmailValid(email: str) -> bool:
         valid example: "user@ceibal.edu.uy"
     '''
     
-    if not email.isspace():
+    if " " in email:
         return False
 
     if not isStrValid(email, "@.!#$%&/*+-_?'^`~{}"):
