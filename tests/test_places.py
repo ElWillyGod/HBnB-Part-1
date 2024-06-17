@@ -14,6 +14,10 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def createCity(cls, num: int) -> str:
+        '''
+            Creates city to create place.
+        '''
+
         cls.FROM(f"cities/valid_city_{num}.json")
         name = cls.SAVE_VALUE("name")
         cls.POST("/cities")
@@ -24,6 +28,10 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def createAmenity(cls, num: int) -> str:
+        '''
+            Creates amenity to create place.
+        '''
+
         cls.FROM(f"amenities/valid_amenity_{num}.json")
         name = cls.SAVE_VALUE("name")
         cls.POST("/amenities")
@@ -34,6 +42,10 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def createUser(cls, num: int) -> str:
+        '''
+            Creates user to host place.
+        '''
+
         cls.FROM(f"users/valid_user_{num}.json")
         name = cls.SAVE_VALUE("name")
         cls.POST("/users")
@@ -43,33 +55,81 @@ class TestPlaces(HTTPTestClass):
         return cls.GET_VALUE_WITH("name", name, "id")
 
     @classmethod
-    def createPostGet(cls, num: int) -> tuple[str, str]:
-        host_id = cls.create_User(num)
-        city_id = cls.create_City(num)
-        amenity_id = cls.createAmenity(num)
+    def createPlace(cls,
+                    num: int,
+                    dic: dict | None = None,
+                    *,
+                    expectAtPOST: int = 201,
+                    overrideNone: bool = False
+                    ) -> dict:
+        '''
+            Creates a place:
+                -> Creates all the necessary objects to create a place.
+                -> Creates place using POST.
+                -> GETs all places.
+                -> Takes created place via name.
+                -> Asserts that attributes were assigned successfully.
+                -> Returns place w/o created_at or updated_at
+        '''
 
+        # Create external objects
+        host_id = cls.createUser(num)
+        city_id = cls.createCity(num)
+        amenity_id = cls.createAmenity(num)
+        amenity_ids = [amenity_id]
+
+        # Take dict from json number num
         cls.FROM(f"places/valid_place_{num}.json")
-        name: str = cls.SAVE_VALUE("name")
+
+        # Assign ids to place json
         cls.CHANGE_VALUE("host_id", host_id)
         cls.CHANGE_VALUE("city_id", city_id)
         cls.CHANGE_VALUE("amenity_ids", [amenity_id])
-        cls.POST("/places")
-        cls.CODE_ASSERT(201)
 
+        # If dic is passed then override attributes.
+        if dic is not None:
+            for key in dic:
+                if dic[key] is None or overrideNone:
+                    cls.REMOVE_VALUE(key)
+                else:
+                    cls.CHANGE_VALUE(key, dic[key])
+
+        # If expected to fail at POST don't continue
+        if expectAtPOST != 201:
+            cls.POST("/places")
+            cls.CODE_ASSERT(expectAtPOST)
+            cls.deleteAll(cls.json)
+            return {}
+
+        # POST Place
+        cls.POST("/places")
+        cls.CODE_ASSERT(201)  # 201
+
+        # GET all places
         cls.GET(f"/places")
         cls.CODE_ASSERT(200)
 
-        id: str = cls.GET_VALUE_WITH("name", name, "id")
-        return {
-            "host_id": host_id,
-            "city_id": city_id,
-            "amenity_ids": [amenity_id],
-            "id": id,
-            "name": name
-            }
+        # Search in result for a place with this name and get the id
+        id = cls.GET_VALUE_WITH("name", cls.json["name"], "id")
+
+        # Assert that all values are correct
+        for key in cls.json:
+            cls.VALUE_ASSERT(key, cls.json[key])
+
+        # Return dictionary of place + id
+        output = cls.json.copy()
+        output["amenity_ids"] = amenity_ids.copy()  # Deep copy
+        output["id"] = id
+        return output
 
     @classmethod
-    def deleteAll(cls, host_id, city_id, amenity_ids, id, name):
+    def deleteAll(cls, **kwargs):
+        '''
+            Deletes a place given it's dict.
+        '''
+        host_id = kwargs["host_id"]
+        amenity_ids = kwargs["amenity_ids"]
+        city_id = kwargs["city_id"]
         cls.DELETE(f"/users/{host_id}")
         cls.CODE_ASSERT(204)
         for amenity_id in amenity_ids:
@@ -86,24 +146,10 @@ class TestPlaces(HTTPTestClass):
         cls.CODE_ASSERT(200)
 
     @classmethod
-    def test_02_valid_POST_GET(cls):  # linked
+    def test_02_valid_POST_GET_DELETE(cls):
         for i in range(1, 4):
-            cls.FROM(f"users/valid_user_{i}.json")
-            cls.POST("/places")
-            cls.CODE_ASSERT(201)
-            name = cls.SAVE_VALUE("name")
-            first_name = cls.SAVE_VALUE("first_name")
-            last_name = cls.SAVE_VALUE("last_name")
-
-            cls.GET("/places")
-            cls.CODE_ASSERT(200)
-            id = cls.GET_VALUE_WITH("name", name, "id")
-
-            cls.GET(f"/places/{id}")
-            cls.CODE_ASSERT(200)
-            cls.VALUE_ASSERT("name", name)
-            cls.VALUE_ASSERT("first_name", first_name)
-            cls.VALUE_ASSERT("last_name", last_name)
+            place = cls.createPlace(i)
+            cls.deleteAll(**place)
 
     @classmethod
     def test_03_another_general_GET(cls):
@@ -111,285 +157,236 @@ class TestPlaces(HTTPTestClass):
         cls.CODE_ASSERT(200)
 
     @classmethod
-    def test_04_valid_PUT(cls):  # linked
-        for i in range(1, 4):
-            id = cls.getIDAndJson(f"users/valid_user_{i}.json")
-            name = cls.SAVE_VALUE("name")
-            first_name = "Vanessa"
-            cls.CHANGE_VALUE("first_name", first_name)
-            last_name = cls.SAVE_VALUE("last_name")
-
-            cls.PUT(f"/places/{id}")
-            cls.CODE_ASSERT(201)
-
-            cls.GET(f"/places/{id}")
-            cls.CODE_ASSERT(200)
-            cls.VALUE_ASSERT("name", name)
-            cls.VALUE_ASSERT("first_name", first_name)
-            cls.VALUE_ASSERT("last_name", last_name)
-
-    @classmethod
-    def test_05_valid_DELETE(cls):  # linked
-        for i in range(1, 4):
-            id = cls.getIDAndJson(f"users/valid_user_{i}.json")
-
-            cls.DELETE(f"/places/{id}")
-            cls.CODE_ASSERT(204)
-
-            cls.GET(f"/places/{id}")
-            cls.CODE_ASSERT(404)
-
-    @classmethod
-    def test_06_valid_name_PUT(cls):
-        name, id = cls.createPostGet("users/valid_user_2.json")
-        name = "alisonalvez@duckduckgo.com"
-        cls.CHANGE_VALUE("name", name)
-
-        cls.PUT(f"/places/{id}")
+    def test_04_description_PUT(cls):
+        place = cls.createPlace(1)
+        id = place["id"]
+        description = "UPDATED"
+        cls.CHANGE_VALUE("description", description)
+        cls.PUT(f"/place/{id}")
         cls.CODE_ASSERT(201)
 
-        cls.GET(f"/places/{id}")
+        cls.GET(f"/place/{id}")
         cls.CODE_ASSERT(200)
-        cls.VALUE_ASSERT("name", name)
-
-        cls.DELETE(f"/places/{id}")
-        cls.CODE_ASSERT(204)
+        cls.VALUE_ASSERT("description", description)
+        cls.deleteAll(**place)
 
     @classmethod
-    def test_07_existing_name_PUT(cls):
-        name1, id1 = cls.createPostGet("users/valid_user_2.json")
-        name2, id2 = cls.createPostGet("users/valid_user_3.json")
-        cls.CHANGE_VALUE("name", name1)
-
-        cls.PUT(f"/places/{id2}")
-        cls.CODE_ASSERT(409)
-
-        cls.DELETE(f"/places/{id1}")
-        cls.CODE_ASSERT(204)
-        cls.DELETE(f"/places/{id2}")
-        cls.CODE_ASSERT(204)
-
-    @classmethod
-    def test_08_empty_id_GET(cls):
+    def test_05_empty_id_GET(cls):
         cls.GET("/places/")
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_09_empty_id_DELETE(cls):
+    def test_06_empty_id_DELETE(cls):
         cls.DELETE("/places/")
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_10_empty_id_PUT(cls):
-        cls.FROM("users/valid_user_2.json")
+    def test_07_empty_id_PUT(cls):
+        place = cls.createPlace(2)
         cls.PUT("/places/")
         cls.CODE_ASSERT(404)
+        cls.deleteAll(place)
 
     @classmethod
-    def test_11_less_attributes_POST(cls):
-        cls.FROM("users/valid_user_2.json")
-        cls.REMOVE_VALUE("last_name")
-        cls.POST("/places")
+    def test_08_less_attributes_POST(cls):
+        cls.createPlace(1, {"name": None}, expectAtPOST=400)
+        cls.createPlace(2, {"description": None}, expectAtPOST=400)
+        cls.createPlace(3, {"latitude": None, "longitude": None}, expectAtPOST=400)
+        cls.createPlace(1, {"host_id": None, "city_id": None}, expectAtPOST=400)
+        cls.createPlace(2, {"amenity_ids": None}, expectAtPOST=400)
+
+    @classmethod
+    def test_09_more_attributes_POST(cls):
+        cls.createPlace(1, {"rating": 100}, expectAtPOST=400)
+
+    @classmethod
+    def test_10_different_attributes_POST(cls):
+        cls.createPlace(1, {"description": None, "rating": 100}, expectAtPOST=400)
+        cls.createPlace(2, {"name": None, "favorite_fruit": "banana"}, expectAtPOST=400)
+        cls.createPlace(3, {"host_id": None, "explosive_type": "C4"}, expectAtPOST=400)
+        cls.createPlace(1, {"city_id": None, "car": "Toyota"}, expectAtPOST=400)
+        cls.createPlace(2, {"host_id": None, "explosive_type": "C4",
+                            "city_id": None, "car": "Toyota"}, expectAtPOST=400)
+
+    @classmethod
+    def test_11_less_attributes_PUT(cls):
+        place = cls.createPlace(1)
+        id = place["id"]
+        cls.REMOVE_VALUE("name")
+        cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("name", place["name"])
+
+        cls.REMOVE_VALUE("host_id")
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("host_id", place["host_id"])
+
+        cls.REMOVE_VALUE("city_id")
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("city_id", place["city_id"])
+
+        cls.REMOVE_VALUE("host_id")
+        cls.REMOVE_VALUE("city_id")
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("host_id", place["host_id"])
+        cls.CHANGE_VALUE("city_id", place["city_id"])
+
+        cls.deleteAll(**place)
 
     @classmethod
-    def test_12_more_attributes_POST(cls):
-        cls.FROM("users/valid_user_3.json")
+    def test_12_more_attributes_PUT(cls):
+        place = cls.createPlace(2)
+        id = place["id"]
         cls.CHANGE_VALUE("rating", 100)
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-    @classmethod
-    def test_13_different_attributes_POST(cls):
-        cls.FROM("users/valid_user_1.json")
-        cls.REMOVE_VALUE("first_name")
-        cls.REMOVE_VALUE("last_name")
-        cls.CHANGE_VALUE("rating", 1)
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-    @classmethod
-    def test_14_less_attributes_PUT(cls):
-        name, id = cls.createPostGet("users/valid_user_2.json")
-        cls.REMOVE_VALUE("last_name")
         cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(400)
-
-        cls.DELETE(f"/places/{id}")
-        cls.CODE_ASSERT(204)
+        cls.deleteAll(**place)
 
     @classmethod
-    def test_15_more_attributes_PUT(cls):
-        name, id = cls.createPostGet("users/valid_user_2.json")
+    def test_13_different_attributes_PUT(cls):
+        place = cls.createPlace(3)
+        id = place["id"]
+        cls.REMOVE_VALUE("description")
         cls.CHANGE_VALUE("rating", 100)
         cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("description", place["description"])
+        cls.REMOVE_VALUE("rating")
 
-        cls.DELETE(f"/places/{id}")
-        cls.CODE_ASSERT(204)
-
-    @classmethod
-    def test_16_different_attributes_PUT(cls):
-        name, id = cls.createPostGet("users/valid_user_2.json")
-        cls.REMOVE_VALUE("first_name")
-        cls.REMOVE_VALUE("last_name")
-        cls.CHANGE_VALUE("rating", 1)
+        cls.REMOVE_VALUE("name")
         cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("name", place["name"])
+        cls.REMOVE_VALUE("rating")
 
-        cls.DELETE(f"/places/{id}")
-        cls.CODE_ASSERT(204)
+        cls.REMOVE_VALUE("host_id")
+        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("host_id", place["host_id"])
+        cls.REMOVE_VALUE("explosive_type")
+
+        cls.REMOVE_VALUE("city_id")
+        cls.CHANGE_VALUE("car", "Toyota")
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("city_id", place["city_id"])
+        cls.REMOVE_VALUE("car")
+
+        cls.REMOVE_VALUE("host_id")
+        cls.REMOVE_VALUE("city_id")
+        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.CHANGE_VALUE("car", "Toyota")
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("host_id", place["host_id"])
+        cls.CHANGE_VALUE("city_id", place["city_id"])
+        cls.REMOVE_VALUE("explosive_type")
+        cls.REMOVE_VALUE("car")
+
+        cls.deleteAll(**place)
 
     @classmethod
-    def test_17_duplicate_entry_POST(cls):
-        name, id = cls.createPostGet("users/valid_user_1.json")
-        cls.POST("/places")
-        cls.CODE_ASSERT(409)
-
-        cls.DELETE(f"/places/{id}")
-        cls.CODE_ASSERT(204)
-
-    @classmethod
-    def test_18_id_that_doesnt_exist_GET(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
-        cls.GET(f"/places/{id}")
-        cls.CODE_ASSERT(404)
-
-    @classmethod
-    def test_19_id_that_doesnt_exist_PUT(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+    def test_14_id_that_doesnt_exist_GET(cls):
+        place = cls.createPlace(1)
+        id = place["id"]
+        cls.deleteAll(**place)
         cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_20_id_that_doesnt_exist_DELETE(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
-        cls.GET(f"/places/{id}")
+    def test_15_id_that_doesnt_exist_PUT(cls):
+        place = cls.createPlace(2)
+        id = place["id"]
+        cls.deleteAll(**place)
+        cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_21_empty_first_name_POST(cls):
-        cls.FROM("users/valid_user_1.json")
-        cls.CHANGE_VALUE("first_name", "")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("first_name", "     ")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+    def test_16_id_that_doesnt_exist_DELETE(cls):
+        place = cls.createPlace(3)
+        id = place["id"]
+        cls.deleteAll(**place)
+        cls.PUT(f"/places/{id}")
+        cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_22_empty_last_name_POST(cls):
-        cls.FROM("users/valid_user_1.json")
-        cls.CHANGE_VALUE("last_name", "")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+    def test_17_empty_strings_POST(cls):
+        def checkIfEmpty(key):
+            cls.createPlace(2, {key: ""}, expectAtPOST=400)
+            cls.createPlace(3, {key: "    "}, expectAtPOST=400)
 
-        cls.CHANGE_VALUE("last_name", "    ")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+        checkIfEmpty("host_id")
+        checkIfEmpty("city_id")
+        checkIfEmpty("name")
+        checkIfEmpty("description")
 
-    @classmethod
-    def test_23_empty_name_POST(cls):
-        cls.FROM("users/valid_user_1.json")
-        cls.CHANGE_VALUE("name", "")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "     ")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+        cls.createPlace(2, {"amenity_ids": [""]}, expectAtPOST=400)
+        cls.createPlace(3, {"amenity_ids": ["    "]}, expectAtPOST=400)
 
     @classmethod
-    def test_24_invalid_name_POST(cls):
-        cls.FROM("users/valid_user_1.json")
-        cls.CHANGE_VALUE("name", "example")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", " example@gmail.com")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@gmail.com ")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example.com")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@com@com.uy")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@com..uy")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@.com")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@gmail.com.")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "@gmail.com")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "example@")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "Hola😀@gmail.com")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "Hola@gm😀ail.com")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "Hola@gmail.co😀m")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+    def test_18_invalid_ints_POST(cls):
+        cls.createPlace(1, {"number_of_rooms": -1}, expectAtPOST=400)
+        cls.createPlace(2, {"number_of_bathrooms": -1}, expectAtPOST=400)
+        cls.createPlace(3, {"max_guests": -1}, expectAtPOST=400)
 
     @classmethod
-    def test_25_invalid_first_name_POST(cls):
-        cls.FROM("users/valid_user_2.json")
-        cls.CHANGE_VALUE("first_name", "ex*mple")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("first_name", "prr😀m")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("first_name", "777")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+    def test_19_invalid_floats_POST(cls):
+        cls.createPlace(1, {"price_per_night": -1}, expectAtPOST=400)
+        cls.createPlace(2, {"price_per_night": 0}, expectAtPOST=400)
+        cls.createPlace(1, {"latitude": 50}, expectAtPOST=400)
+        cls.createPlace(2, {"latitude": 120.0}, expectAtPOST=400)
+        cls.createPlace(3, {"latitude": -120.0}, expectAtPOST=400)
+        cls.createPlace(1, {"longitude": 50}, expectAtPOST=400)
+        cls.createPlace(2, {"longitude": 200.0}, expectAtPOST=400)
+        cls.createPlace(3, {"longitude": -200.0}, expectAtPOST=400)
 
     @classmethod
-    def test_26_invalid_first_name_POST(cls):
-        cls.FROM("users/valid_user_3.json")
-        cls.CHANGE_VALUE("last_name", "ex*mple")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+    def test_20_invalid_strings_POST(cls):
+        def testStr(key):
+            cls.createPlace(1, {key: "\n"}, expectAtPOST=400)
+            cls.createPlace(2, {key: "Ex\nmple"}, expectAtPOST=400)
+            cls.createPlace(3, {key: "🤔"}, expectAtPOST=400)
+            cls.createPlace(1, {key: "Ex🤔mple"}, expectAtPOST=400)
 
-        cls.CHANGE_VALUE("last_name", "prr😀m")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+        testStr("host_id")
+        testStr("name")
+        testStr("description")
+        testStr("city_id")
+        cls.createPlace(2, {"host_id": "Fish"}, expectAtPOST=400)
+        cls.createPlace(3, {"city_id": "Fish"}, expectAtPOST=400)
+        cls.createPlace(1, {"amenity_ids": ["Fish"]}, expectAtPOST=400)
+        cls.createPlace(2, {"amenity_ids": ["\n"]}, expectAtPOST=400)
+        cls.createPlace(3, {"amenity_ids": ["Ex\nmple"]}, expectAtPOST=400)
+        cls.createPlace(1, {"amenity_ids": ["🤔"]}, expectAtPOST=400)
+        cls.createPlace(2, {"amenity_ids": ["Ex🤔mple"]}, expectAtPOST=400)
 
-        cls.CHANGE_VALUE("last_name", "777")
-        cls.POST("/places")
-        cls.CODE_ASSERT(400)
+    @classmethod
+    def test_21_amenity_ids_can_be_empty_POST(cls):
+        place = cls.createPlace(1, {"amenity_ids": []})
+        cls.deleteAll(**place)
+
+    @classmethod
+    def test_22_cannot_be_null_POST(cls):
+        def testNone(key):
+            cls.createPlace(1, {"amenity_ids": None},
+                            expectAtPOST=400, overrideNone=True)
+
+        testNone("host_id")
+        testNone("name")
+        testNone("description")
+        testNone("number_of_rooms")
+        testNone("number_of_bathrooms")
+        testNone("max_guests")
+        testNone("price_per_night")
+        testNone("latitude")
+        testNone("longitude")
+        testNone("city_id")
+        testNone("amenities_ids")
 
 
 def run():
