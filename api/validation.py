@@ -4,8 +4,6 @@
 """
 
 
-from typing import List
-
 
 def idChecksum(id: str) -> bool:
     '''
@@ -105,6 +103,9 @@ def isEmailValid(email: str) -> bool:
         valid example: "user@gmail.com"
         valid example: "user@ceibal.edu.uy"
     '''
+    
+    if not email.isspace():
+        return False
 
     if not isStrValid(email, "@.!#$%&/*+-_?'^`~{}"):
         return False
