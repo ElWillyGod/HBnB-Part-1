@@ -82,13 +82,13 @@ def create_Cities():
     data = request.get_json()
 
     if not data:
-        return jsonify({'error': "400 Bad Request"}), 400
+        return jsonify({'error': "Invalid data"}), 400
 
     name = data['name']
     code = data['country_code']
 
     if not val.isNameValid(name) or not val.isCountryValid(code):
-        return jsonify({'error': "400 Bad Request"}), 400
+        return jsonify({'error': "Invalid data"}), 400
 
     try:
         LogicFacade.createObjectByJson("city", data)
@@ -97,7 +97,7 @@ def create_Cities():
 
         return jsonify({'error': str(message)}), 409
 
-    return jsonify({'message': "todo OKa"}), 201
+    return jsonify({'message': "City created successfully"}), 201
 
 
 
@@ -128,7 +128,7 @@ def get_All_Cities():
     if cities is not None and len(cities) > 0:
         return jsonify(cities), 200
 
-    return jsonify({'message': "empy"}), 200
+    return jsonify({'message': "A list of all cities"}), 200
 
 
 @app.route('/cities/<city_id>')
@@ -163,7 +163,7 @@ def get_Cities(city_id):
     """
 
     if not val.idChecksum(city_id):
-        return jsonify({'error': "404 Not Fund"}), 400
+        return jsonify({'error': "Invalid ID format"}), 400
 
     try:
         city = LogicFacade.getByID(city_id, "city")
@@ -215,11 +215,11 @@ def update_Cities(city_id):
     data = request.get_json()
 
     if not val.idChecksum(city_id):
-        return jsonify({'error': "tiraste cualquiera en el id, mira bien capo"}), 400
+        return jsonify({'error': "Invalid ID format"}), 400
 
     if (not data or not val.isNameValid(data['name']) or 
         not val.isCountryValid(data['country_code'])):
-        return jsonify({'error': "faltan campos en la data o hay cosas raras"}), 400
+        return jsonify({'error': "Invalid data"}), 400
 
     try:
         LogicFacade.updateByID(city_id, "city", data)
@@ -229,7 +229,7 @@ def update_Cities(city_id):
     except (logicexceptions.CityNameDuplicated) as message2:
         return jsonify({'error': str(message2)}), 409
 
-    return jsonify({"message": "todo OKa"}), 200
+    return jsonify({"message": "City updated successfully"}), 200
 
 
 @app.route('/cities/<city_id>', methods=["DELETE"])
@@ -254,7 +254,7 @@ def delete_Cities(city_id):
         description: City not found
     """
     if not val.idChecksum(city_id):
-        return jsonify({'error': 'ta raro tu id'}), 400
+        return jsonify({'error': 'Invalid ID'}), 400
 
     try:
         LogicFacade.deleteByID(city_id, "city")
@@ -262,4 +262,4 @@ def delete_Cities(city_id):
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify({'error': str(message)}), 404
 
-    return jsonify({'message': "todo OKa"}), 204
+    return jsonify({'message': "City deleted successfully"}), 204
