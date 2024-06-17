@@ -4,6 +4,9 @@
 """
 
 
+from typing import List
+
+
 def idChecksum(id: str) -> bool:
     '''
         Checks if an id's lenght is valid.
@@ -166,6 +169,9 @@ def isNoneFields(enty: str, data: dict) -> bool:
                            'amenity_ids']
     if enty == 'review':
         required_fields = ['user_id', 'rating', 'comment']
+
+    if len(data) != len(required_fields):
+        return True
 
     for field in required_fields:
 
