@@ -86,7 +86,7 @@ class TestUsers(HTTPTestClass):
             id = cls.getIDAndJson(f"users/valid_user_{i}.json")
             email = cls.SAVE_VALUE("email")
             first_name = "Vanessa"
-            cls.CHANGE("first_name", first_name)
+            cls.CHANGE_VALUE("first_name", first_name)
             last_name = cls.SAVE_VALUE("last_name")
 
             cls.PUT(f"/users/{id}")
@@ -113,7 +113,7 @@ class TestUsers(HTTPTestClass):
     def test_06_valid_email_PUT(cls):
         email, id = cls.createPostGet("users/valid_user_2.json")
         email = "alisonalvez@duckduckgo.com"
-        cls.CHANGE("email", email)
+        cls.CHANGE_VALUE("email", email)
 
         cls.PUT(f"/users/{id}")
         cls.CODE_ASSERT(201)
@@ -129,7 +129,7 @@ class TestUsers(HTTPTestClass):
     def test_07_existing_email_PUT(cls):
         email1, id1 = cls.createPostGet("users/valid_user_2.json")
         email2, id2 = cls.createPostGet("users/valid_user_3.json")
-        cls.CHANGE("email", email1)
+        cls.CHANGE_VALUE("email", email1)
 
         cls.PUT(f"/users/{id2}")
         cls.CODE_ASSERT(409)
@@ -165,7 +165,7 @@ class TestUsers(HTTPTestClass):
     @classmethod
     def test_12_more_attributes_POST(cls):
         cls.FROM("users/valid_user_3.json")
-        cls.CHANGE("rating", 100)
+        cls.CHANGE_VALUE("rating", 100)
         cls.POST("/users")
         cls.CODE_ASSERT(400)
 
@@ -174,8 +174,8 @@ class TestUsers(HTTPTestClass):
         cls.FROM("users/valid_user_1.json")
         cls.REMOVE_VALUE("first_name")
         cls.REMOVE_VALUE("last_name")
-        cls.CHANGE("rating", 1)
-        cls.CHANGE("favorite_fruit", "banana")
+        cls.CHANGE_VALUE("rating", 1)
+        cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.POST("/users")
         cls.CODE_ASSERT(400)
 
@@ -192,7 +192,7 @@ class TestUsers(HTTPTestClass):
     @classmethod
     def test_15_more_attributes_PUT(cls):
         email, id = cls.createPostGet("users/valid_user_2.json")
-        cls.CHANGE("rating", 100)
+        cls.CHANGE_VALUE("rating", 100)
         cls.PUT(f"/users/{id}")
         cls.CODE_ASSERT(400)
 
@@ -204,16 +204,120 @@ class TestUsers(HTTPTestClass):
         email, id = cls.createPostGet("users/valid_user_2.json")
         cls.REMOVE_VALUE("first_name")
         cls.REMOVE_VALUE("last_name")
-        cls.CHANGE("rating", 1)
-        cls.CHANGE("favorite_fruit", "banana")
+        cls.CHANGE_VALUE("rating", 1)
+        cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.PUT(f"/users/{id}")
         cls.CODE_ASSERT(400)
+
+        cls.DELETE(f"/users/{id}")
+        cls.CODE_ASSERT(204)
 
     @classmethod
     def test_17_duplicate_entry_POST(cls):
         email, id = cls.createPostGet("users/valid_user_1.json")
         cls.POST("/users")
         cls.CODE_ASSERT(409)
+
+        cls.DELETE(f"/users/{id}")
+        cls.CODE_ASSERT(204)
+
+    @classmethod
+    def test_18_id_that_doesnt_exist_GET(cls):
+        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+        cls.GET(f"/users/{id}")
+        cls.CODE_ASSERT(404)
+
+    @classmethod
+    def test_19_id_that_doesnt_exist_PUT(cls):
+        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+        cls.PUT(f"/users/{id}")
+        cls.CODE_ASSERT(404)
+
+    @classmethod
+    def test_20_id_that_doesnt_exist_DELETE(cls):
+        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+        cls.GET(f"/users/{id}")
+        cls.CODE_ASSERT(404)
+
+    @classmethod
+    def test_21_empty_first_name_POST(cls):
+        cls.FROM("users/valid_user_1.json")
+        cls.CHANGE_VALUE("first_name", "")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("first_name", "     ")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+    @classmethod
+    def test_22_empty_last_name_POST(cls):
+        cls.FROM("users/valid_user_1.json")
+        cls.CHANGE_VALUE("last_name", "")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("last_name", "    ")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+    @classmethod
+    def test_23_empty_email_POST(cls):
+        cls.FROM("users/valid_user_1.json")
+        cls.CHANGE_VALUE("email", "")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "     ")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+    @classmethod
+    def test_24_invalid_email_POST(cls):
+        cls.FROM("users/valid_user_1.json")
+        cls.CHANGE_VALUE("email", "example")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", " example@gmail.com")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@gmail.com ")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example.com")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@com@com.uy")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@com..uy")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@.com")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@gmail.com.")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "@gmail.com")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "example@gmail")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
 
 
 def run():

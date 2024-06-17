@@ -65,13 +65,11 @@ class HTTPTestClass:
                 expected_value: Any,
                 errormsg: str | None = None
                 ) -> None:
+        msg = f"\tExpected: {expected_value}\n\tGiven: {value}"
+        errormsg = msg if errormsg is None else errormsg
         if value == expected_value:
-            errormsg = f"{value} == {expected_value}" if errormsg is None\
-                else errormsg
             cls._ASSERTION_SUCCESS(errormsg)
         else:
-            errormsg = f"{value} != {expected_value}" if errormsg is None\
-                else errormsg
             cls._ASSERTION_FAILURE(errormsg)
 
     @classmethod
@@ -126,7 +124,7 @@ class HTTPTestClass:
         cls.json = {}
 
     @classmethod
-    def CHANGE(cls, key: str, value: Any):
+    def CHANGE_VALUE(cls, key: str, value: Any):
         cls.json[key] = value
 
     @classmethod
@@ -233,7 +231,10 @@ class HTTPTestClass:
                 cls.testsPassed += 1
             except AssertionError as e:
                 print(f"{cls.prefix}{RED}Check failed on {name}:{RESET}\n" +
-                      f"\t{e}{cls.suffix}")
+                      f"{e}{cls.suffix}")
+                cls.PRINT_JSON()
+                print(f"\t{cls.lastResponse.reason}")
+                print(f"\t{cls.lastResponse.text}")
                 cls.testsFailed += 1
             except KeyError as e:
                 print(f"{cls.prefix}{RED}{name} did not find key to check:" +
