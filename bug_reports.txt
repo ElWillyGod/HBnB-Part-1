@@ -1,4 +1,4 @@
-De test #10 de users:
+De tests #11-#16 de users:
     Si se un hace post con un json con menos variables, las que faltan se guardan como None.
     Esto tira error cuando se llama None.isascii() en validaciones.
 
