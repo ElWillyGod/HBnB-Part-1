@@ -1,13 +1,28 @@
 
 """
-    quickdoc
+    Defines countries getter
 """
+
+import csv
+from pathlib import Path
+
+current_dir = Path(__file__).parent.resolve()
+
+filename = f"{current_dir}/countries.csv"
+
 
 class CountryManager():
     """
-        Needs implementation
+        Get gets list of countries as dict.
     """
 
     @staticmethod
     def get() -> list[dict]:
-        return [{"name": "uruguay", "code": "uy"}]
+        output = []
+
+        with open(filename, "r", newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                output.append(row)
+
+        return output

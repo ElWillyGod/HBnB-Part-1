@@ -18,7 +18,7 @@ def getCountry(country_code: str):
     raise Exception("country not found")
 
 
-def getCountries(country_code: str):
+def getCountries():
     '''
         Gets the list of countries.
     '''
