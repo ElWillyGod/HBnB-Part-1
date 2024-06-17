@@ -275,66 +275,29 @@ class TestUsers(HTTPTestClass):
     @classmethod
     def test_24_invalid_email_POST(cls):
         cls.FROM("users/valid_user_1.json")
-        cls.CHANGE_VALUE("email", "example")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
+        def checkEmailPUT(email):
+            cls.CHANGE_VALUE("email", email)
+            cls.POST("/users")
+            cls.CODE_ASSERT(400)
 
-        cls.CHANGE_VALUE("email", " example@gmail.com")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@gmail.com ")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example.com")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@com@com.uy")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@com..uy")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@.com")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@gmail.com.")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "@gmail.com")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "example@")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "Hola😀@gmail.com")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "Hola@gm😀ail.com")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("email", "Hola@gmail.co😀m")
-        cls.POST("/users")
-        cls.CODE_ASSERT(400)
+        checkEmailPUT(" example@gmail.com")
+        checkEmailPUT("example@gmail.com ")
+        checkEmailPUT("example.com")
+        checkEmailPUT("example@com@com.uy")
+        checkEmailPUT("example@com..uy")
+        checkEmailPUT("example@.com")
+        checkEmailPUT("example@gmail.com.")
+        checkEmailPUT("@gmail.com")
+        checkEmailPUT("example@")
+        checkEmailPUT("example@")
+        checkEmailPUT("Hola😀@gmail.com")
+        checkEmailPUT("Hola@gm😀ail.com")
+        checkEmailPUT("Hola@gmail.co😀m")
 
     @classmethod
     def test_25_invalid_first_name_POST(cls):
         cls.FROM("users/valid_user_2.json")
-        cls.CHANGE_VALUE("first_name", "ex*mple")
+        cls.CHANGE_VALUE("first_name", "ex\nmple")
         cls.POST("/users")
         cls.CODE_ASSERT(400)
 
@@ -349,7 +312,7 @@ class TestUsers(HTTPTestClass):
     @classmethod
     def test_26_invalid_first_name_POST(cls):
         cls.FROM("users/valid_user_3.json")
-        cls.CHANGE_VALUE("last_name", "ex*mple")
+        cls.CHANGE_VALUE("last_name", "ex\nmple")
         cls.POST("/users")
         cls.CODE_ASSERT(400)
 
