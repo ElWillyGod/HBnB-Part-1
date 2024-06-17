@@ -47,12 +47,12 @@ class TestPlaces(HTTPTestClass):
         '''
 
         cls.FROM(f"users/valid_user_{num}.json")
-        name = cls.SAVE_VALUE("name")
+        email = cls.SAVE_VALUE("email")
         cls.POST("/users")
         cls.CODE_ASSERT(201)
         cls.GET("/users")
         cls.CODE_ASSERT(200)
-        return cls.GET_VALUE_WITH("name", name, "id")
+        return cls.GET_VALUE_WITH("email", email, "id")
 
     @classmethod
     def createPlace(cls,
