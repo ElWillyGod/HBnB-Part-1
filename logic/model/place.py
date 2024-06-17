@@ -29,7 +29,7 @@ class Place(TrackedObject):
                  id: str = None,
                  created_at: str = None,
                  updated_at: str = None,
-                 update: bool = False
+                 update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
         if not idExists(host_id):

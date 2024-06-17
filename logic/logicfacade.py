@@ -64,14 +64,15 @@ class LogicFacade(ABC):
         old_data = Persistence.get(id, typePlural)
         if old_data is None or len(old_data) == 0:
             raise IDNotFoundError("id not found")
+        updated = []
         for key in data:
-            if data[key] == old_data[key]:
-                data[key] = None
+            if data[key] != old_data[key]:
+                updated.append(key)
         data["id"] = id
         data["created_at"] = old_data["created_at"]
         data["updated_at"] = None
-        updated = getClassByName(type)(**data, update=True)
-        Persistence.update(id, typePlural, updated.toJson())
+        data_updated = getClassByName(type)(**data, update=updated)
+        Persistence.update(id, typePlural, data_updated.toJson())
 
     @staticmethod
     def createObjectByJson(type: str, data: dict) -> None:

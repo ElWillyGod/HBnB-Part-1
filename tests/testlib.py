@@ -130,11 +130,15 @@ class HTTPTestClass:
         cls.json[key] = value
 
     @classmethod
-    def SAVE_VALUE(cls, key: str):
+    def SAVE_VALUE(cls, key: str) -> None:
         '''
             Gets value from key of sent json.
         '''
         return cls.json[key]
+
+    @classmethod
+    def REMOVE_VALUE(cls, key: str) -> None:
+        cls.json.pop(key)
 
     @classmethod
     def GET_VALUE_WITH(cls,
@@ -179,8 +183,6 @@ class HTTPTestClass:
         try:
             json = cls.lastResponse.json()
         except Exception:
-            json = ""
-        if json is None:
             json = ""
         print(f"{cls.prefix}{headers=}\n{json=}\n{text=}{cls.suffix}")
 
