@@ -81,7 +81,7 @@ def create_Cities():
     """
     data = request.get_json()
 
-    if not data:
+    if val.isNoneFields('city', data):
         return jsonify({'error': "Invalid data"}), 400
 
     name = data['name']
@@ -217,7 +217,7 @@ def update_Cities(city_id):
     if not val.idChecksum(city_id):
         return jsonify({'error': "Invalid ID format"}), 400
 
-    if (not data or not val.isNameValid(data['name']) or 
+    if (val.isNoneFields('city', data) or not val.isNameValid(data['name']) or 
         not val.isCountryValid(data['country_code'])):
         return jsonify({'error': "Invalid data"}), 400
 

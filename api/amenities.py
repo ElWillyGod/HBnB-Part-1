@@ -41,7 +41,7 @@ def create_Amenities():
     """
     data = request.get_json()
 
-    if not data or not val.isNameValid(data['name']):
+    if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
         return jsonify({'error': "Invalid data"}), 400
 
     try:
@@ -162,7 +162,7 @@ def update_Amenities(amenity_id):
     """
     data = request.get_json()
 
-    if not data or not val.isNameValid(data['name']):
+    if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
         return jsonify({'error': "Invalid data"}), 400
 
     if not val.idChecksum(amenity_id):

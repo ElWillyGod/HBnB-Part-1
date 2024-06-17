@@ -52,7 +52,7 @@ def create_User():
     """
     data = request.get_json()
 
-    if not data:
+    if val.isNoneFields('user', data):
         return jsonify({'error': "Invalid data or missing fields"}), 400
 
     email = data.get('email')
@@ -224,7 +224,7 @@ def update_User(user_id):
 
     data = request.get_json()
 
-    if not data:
+    if val.isNoneFields('user', data):
         return jsonify({'error': "Invalid data"}), 400
 
     email = data.get('email')

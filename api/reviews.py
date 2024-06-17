@@ -55,7 +55,7 @@ def create_Review(place_id):
     """
     data = request.get_json()
 
-    if not data or not val.idChecksum(place_id) or not val.isStrValid('comment'):
+    if val.isNoneFields('review', data) or not val.idChecksum(place_id) or not val.isStrValid('comment'):
         return jsonify({'error': 'Invalid data'}), 400
 
     if not (1 <= data['rating'] <= 5):
@@ -279,7 +279,8 @@ def update_review(review_id):
     """
     data = request.get_json()
 
-    if not data or not val.idChecksum(review_id) or not val.isStrValid('comment'):
+    if (val.isNoneFields('review', data) or not val.idChecksum(review_id) or
+        not val.isStrValid('comment')):
         return jsonify({'error': 'Invalid data'}), 400
 
     if not (1 <= data['rating'] <= 5):

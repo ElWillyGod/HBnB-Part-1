@@ -34,6 +34,8 @@ def isStrValid(string: str, ignoreStr: str="", ignoreDigits=True) -> bool:
         Checks if the string does not have any special character aside
         from chars from ignoreStr.
     '''
+    if len(string) == 0:
+        return False
 
     if not string.isascii():
         return False
@@ -142,3 +144,32 @@ def isEmailValid(email: str) -> bool:
         return False
 
     return True
+
+
+def isNoneFields(enty: str, data: dict) -> bool:
+
+    required_fields = []
+
+    if enty == 'user':
+        required_fields = ['email', 'first_name', 'last_name']
+
+    if enty == 'city':
+        required_fields = ['name', 'country_code']
+
+    if enty == 'amenity':
+        required_fields = ['name']
+
+    if enty == 'place':
+        required_fields = ['name', 'description', 'address', 'city_id',
+                           'latitude', 'longitude', 'host_id', 'number_of_rooms',
+                           'number_of_bathrooms', 'price_per_night', 'max_guests',
+                           'amenity_ids']
+    if enty == 'review':
+        required_fields = ['user_id', 'rating', 'comment']
+
+    for field in required_fields:
+
+        if field not in data:
+            return True
+
+    return False
