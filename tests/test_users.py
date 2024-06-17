@@ -315,7 +315,49 @@ class TestUsers(HTTPTestClass):
         cls.POST("/users")
         cls.CODE_ASSERT(400)
 
-        cls.CHANGE_VALUE("email", "example@gmail")
+        cls.CHANGE_VALUE("email", "example@")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "Hola😀@gmail.com")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "Hola@gm😀ail.com")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("email", "Hola@gmail.co😀m")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+    @classmethod
+    def test_25_invalid_first_name_POST(cls):
+        cls.FROM("users/valid_user_2.json")
+        cls.CHANGE_VALUE("first_name", "ex*mple")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("first_name", "prr😀m")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("first_name", "777")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+    @classmethod
+    def test_26_invalid_first_name_POST(cls):
+        cls.FROM("users/valid_user_3.json")
+        cls.CHANGE_VALUE("last_name", "ex*mple")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("last_name", "prr😀m")
+        cls.POST("/users")
+        cls.CODE_ASSERT(400)
+
+        cls.CHANGE_VALUE("last_name", "777")
         cls.POST("/users")
         cls.CODE_ASSERT(400)
 

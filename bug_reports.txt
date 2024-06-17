@@ -10,3 +10,5 @@ De Test #24 de users:
     Email no puede tener espacios. Sin embargo lo crea igual.
 
 
+De Tests de countries y cities:
+    Error en doesCountryExist, me ocupo yo.
