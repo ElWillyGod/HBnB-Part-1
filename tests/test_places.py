@@ -19,12 +19,10 @@ class TestPlaces(HTTPTestClass):
         '''
 
         cls.FROM(f"cities/valid_city_{num}.json")
-        name = cls.SAVE_VALUE("name")
         cls.POST("/cities")
         cls.CODE_ASSERT(201)
-        cls.GET("/cities")
-        cls.CODE_ASSERT(200)
-        return cls.GET_VALUE_WITH("name", name, "id")
+        id = cls.GET_RESPONSE_VALUE("id")
+        return id
 
     @classmethod
     def createAmenity(cls, num: int) -> str:
@@ -38,7 +36,7 @@ class TestPlaces(HTTPTestClass):
         cls.CODE_ASSERT(201)
         cls.GET("/amenities")
         cls.CODE_ASSERT(200)
-        return cls.GET_VALUE_WITH("name", name, "id")
+        return cls.GET_RESPONSE_WITH("name", name, "id")
 
     @classmethod
     def createUser(cls, num: int) -> str:
@@ -52,7 +50,7 @@ class TestPlaces(HTTPTestClass):
         cls.CODE_ASSERT(201)
         cls.GET("/users")
         cls.CODE_ASSERT(200)
-        return cls.GET_VALUE_WITH("email", email, "id")
+        return cls.GET_RESPONSE_WITH("email", email, "id")
 
     @classmethod
     def createPlace(cls,
@@ -112,7 +110,7 @@ class TestPlaces(HTTPTestClass):
         cls.CODE_ASSERT(200)
 
         # Search in result for a place with this name and get the id
-        id = cls.GET_VALUE_WITH("name", cls.json["name"], "id")
+        id = cls.GET_RESPONSE_WITH("name", cls.json["name"], "id")
 
         # Assert that all values are correct
         for key in cls.json:

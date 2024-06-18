@@ -19,9 +19,9 @@ class TestAmenities(HTTPTestClass):
         cls.GET("/amenities")
         cls.CODE_ASSERT(200)
         try:
-            return cls.GET_VALUE_WITH("name", name, "id")
+            return cls.GET_RESPONSE_WITH("name", name, "id")
         except Exception:
-            return cls.GET_VALUE_WITH("name", f"{name}updated", "id")
+            return cls.GET_RESPONSE_WITH("name", f"{name}updated", "id")
 
     @classmethod
     def createPostGet(cls, path: str) -> tuple[str, str]:
@@ -33,7 +33,7 @@ class TestAmenities(HTTPTestClass):
         cls.GET(f"/amenities")
         cls.CODE_ASSERT(200)
 
-        id: str = cls.GET_VALUE_WITH("name", name, "id")
+        id: str = cls.GET_RESPONSE_WITH("name", name, "id")
         return name, id
 
     @classmethod
@@ -51,7 +51,7 @@ class TestAmenities(HTTPTestClass):
 
             cls.GET("/amenities")
             cls.CODE_ASSERT(200)
-            id = cls.GET_VALUE_WITH("name", name, "id")
+            id = cls.GET_RESPONSE_WITH("name", name, "id")
 
             cls.GET(f"/amenities/{id}")
             cls.CODE_ASSERT(200)

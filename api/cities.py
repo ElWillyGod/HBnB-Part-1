@@ -8,13 +8,13 @@ PUT /cities/{city_id}: Update an existing city's information.
 DELETE /cities/{city_id}: Delete a specific city.
 """
 from api import app
-from flask import jsonify, request
+from flask import request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validation as val
 
 
-@app.route('/countries/<country_code>/cities')
+@app.get('/countries/<country_code>/cities')
 def get_Cities_For_Contr(country_code):
     """
     Retrieve cities for a specific country
@@ -36,18 +36,18 @@ def get_Cities_For_Contr(country_code):
         description: Country not found
     """
     if not val.isCountryValid(country_code):
-        return jsonify({'error': "Invalid country code"}), 400
+        return {'error': "Invalid country code"}, 400
 
     try:
         cities = LogicFacade.getContryCities(country_code)
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify(cities), 200
+    return cities, 200
 
 
-@app.route('/cities', methods=["POST"])
+@app.post('/cities')
 def create_Cities():
     """
     Create a new city
@@ -82,28 +82,28 @@ def create_Cities():
     data = request.get_json()
 
     if val.isNoneFields('city', data):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     name = data['name']
     code = data['country_code']
 
     if not val.isNameValid(name) or not val.isCountryValid(code):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     try:
-        LogicFacade.createObjectByJson("city", data)
+        city = LogicFacade.createObjectByJson("city", data)
 
     except (logicexceptions.CountryNotFoundError) as message:
-        return jsonify({'error': str(message)}), 400
+        return {'error': str(message)}, 400
 
     except (logicexceptions.CityNameDuplicated) as message:
-        return jsonify({'error': str(message)}), 409
+        return {'error': str(message)}, 409
 
-    return jsonify({'message': "City created successfully"}), 201
+    return city, 201
 
 
 
-@app.route('/cities')
+@app.get('/cities')
 def get_All_Cities():
     """
     Retrieve all cities
@@ -128,12 +128,12 @@ def get_All_Cities():
     cities = LogicFacade.getByType("city")
 
     if cities is not None and len(cities) > 0:
-        return jsonify(cities), 200
+        return cities, 200
 
-    return jsonify({'message': "A list of all cities"}), 200
+    return {'message': "A list of all cities"}, 200
 
 
-@app.route('/cities/<city_id>')
+@app.get('/cities/<city_id>')
 def get_Cities(city_id):
     """
     Retrieve a city by ID
@@ -165,17 +165,17 @@ def get_Cities(city_id):
     """
 
     if not val.idChecksum(city_id):
-        return jsonify({'error': "Invalid ID format"}), 400
+        return {'error': "Invalid ID format"}, 400
 
     try:
         city = LogicFacade.getByID(city_id, "city")
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify(city), 200
+    return city, 200
 
 
-@app.route('/cities/<city_id>', methods=["PUT"])
+@app.put('/cities/<city_id>')
 def update_Cities(city_id):
     """
     Update a city by ID
@@ -217,33 +217,33 @@ def update_Cities(city_id):
     data = request.get_json()
 
     if not val.idChecksum(city_id):
-        return jsonify({'error': "Invalid ID format"}), 400
+        return {'error': "Invalid ID format"}, 400
 
     if val.isNoneFields('city', data):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     name = data['name']
     code = data['country_code']
 
     if not val.isNameValid(name) or not val.isCountryValid(code):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     try:
-        LogicFacade.updateByID(city_id, "city", data)
+        city = LogicFacade.updateByID(city_id, "city", data)
 
     except (logicexceptions.CountryNotFoundError) as message:
-        return jsonify({'error': str(message)}), 400
+        return {'error': str(message)}, 400
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
     except (logicexceptions.CityNameDuplicated) as message2:
-        return jsonify({'error': str(message2)}), 409
+        return {'error': str(message2)}, 409
 
-    return jsonify({"message": "City updated successfully"}), 201
+    return city, 201
 
 
-@app.route('/cities/<city_id>', methods=["DELETE"])
+@app.delete('/cities/<city_id>')
 def delete_Cities(city_id):
     """
     Delete a city by ID
@@ -265,12 +265,12 @@ def delete_Cities(city_id):
         description: City not found
     """
     if not val.idChecksum(city_id):
-        return jsonify({'error': 'Invalid ID'}), 400
+        return {'error': 'Invalid ID'}, 400
 
     try:
         LogicFacade.deleteByID(city_id, "city")
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify({'message': "City deleted successfully"}), 204
+    return "", 204

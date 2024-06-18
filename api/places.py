@@ -3,17 +3,17 @@
 POST /places: Create a new place.
 GET /places: Retrieve a list of all places.
 GET /places/{place_id}: Retrieve detailed information about a specific place.
-PUT /places/{place_id}: Update an existing place’s information.
+PUT /places/{place_id}: Update an existing place's information.
 DELETE /places/{place_id}: Delete a specific place.
 """
 from api import app
-from flask import jsonify, request
+from flask import request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validation as val
 
 
-@app.route('/places', methods=["POST"])
+@app.post('/places')
 def create_Place():
     """
     Create a new place
@@ -82,20 +82,20 @@ def create_Place():
     data = request.get_json()
 
     if val.isNoneFields('place', data):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     if not val.idChecksum(data['host_id']):
-        return jsonify({'error': "Invalid host ID"}), 400
+        return {'error': "Invalid host ID"}, 400
 
     if not val.idChecksum(data['city_id']):
-        return jsonify({'error': "Invalid city ID"}), 400
+        return {'error': "Invalid city ID"}, 400
 
     if not (val.isLatitudeValid(data['latitude']) and
             val.isLongitudeValid(data['longitude'])):
-        return jsonify({'error': "Invalid location"}), 400
+        return {'error': "Invalid location"}, 400
 
     if not val.isNameValid(data['name']):
-        return jsonify({'error': "Invalid name"}), 400
+        return {'error': "Invalid name"}, 400
 
     if not (isinstance(data['number_of_rooms'], int) and
             isinstance(data['number_of_bathrooms'], int) and
@@ -105,22 +105,22 @@ def create_Place():
             data['number_of_bathrooms'] >= 0 and
             data['max_guests'] > 0 and
             data['price_per_night'] > 0):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     for amenity_id in data['amenity_ids']:
         if not val.idChecksum(amenity_id):
-            return jsonify({'error': f'Invalid amenity ID: {amenity_id}'}), 400
+            return {'error': f'Invalid amenity ID: {amenity_id}'}, 400
 
     try:
-        LogicFacade.createObjectByJson('place', data)
+        place = LogicFacade.createObjectByJson('place', data)
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
 
-    return jsonify({'message':'Place created successfully'}), 201
+    return place, 201
 
 
-@app.route('/places')
+@app.get('/places')
 def get_All_Places():
     """
     Retrieve all places
@@ -185,9 +185,9 @@ def get_All_Places():
     """
     places = LogicFacade.getByType('place')
 
-    return jsonify(places), 200
+    return places, 200
 
-@app.route('/places/<place_id>')
+@app.get('/places/<place_id>')
 def get_Place(place_id):
     """
     Retrieve details of a specific place by its ID
@@ -259,18 +259,18 @@ def get_Place(place_id):
         description: Place not found
     """
     if not val.idChecksum(place_id):
-        return jsonify({'message': "Invalid ID"}), 400
+        return {'message': "Invalid ID"}, 400
 
     try:
         place = LogicFacade.getByID(place_id, 'place')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify(place), 200
+    return place, 200
 
 
-@app.route('/places/<place_id>', methods=['PUT'])
+@app.put('/places/<place_id>')
 def update_Place(place_id):
     """
     Update an existing place's information
@@ -345,39 +345,39 @@ def update_Place(place_id):
         description: Place ID not found
     """
     if not val.idChecksum(place_id):
-        return jsonify({'error': "Invalid ID"}), 400
+        return {'error': "Invalid ID"}, 400
 
     data = request.get_json()
 
     if val.isNoneFields('place', data):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     if not (val.isLatitudeValid(data['latitude']) and val.isLongitudeValid(data['longitude'])):
-        return jsonify({'error': "Invalid location"}), 400
+        return {'error': "Invalid location"}, 400
 
     if not (isinstance(data['number_of_rooms'], int) and (data['number_of_rooms'] > 0) and
             isinstance(data['number_of_bathrooms'], int) and
             (data['number_of_bathrooms'] >= 0) and isinstance(data['max_guests'], int) and
             data['max_guests'] > 0 and
             isinstance(data['price_per_night'], (int, float)) and data['price_per_night'] > 0):
-        return jsonify({'error': "Invalid data of rooms"}), 400
+        return {'error': "Invalid data of rooms"}, 400
 
     if not val.idChecksum(data['city_id']):
-        return jsonify({'error': "Invalid city ID"}), 400
+        return {'error': "Invalid city ID"}, 400
 
     for amenity_id in data['amenity_ids']:
         if not val.idChecksum(amenity_id):
-            return jsonify({'error': 'Invalid amenity ID'}), 400
+            return {'error': 'Invalid amenity ID'}, 400
 
     try:
-        LogicFacade.updateByID(place_id, 'place', data)
+        place = LogicFacade.updateByID(place_id, 'place', data)
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify({"message": 'Place updated successfully'}), 201
+    return place, 201
 
 
-@app.route('/places/<place_id>', methods=['DELETE'])
+@app.delete('/places/<place_id>')
 def delete_Place(place_id):
     """
     Delete a specific place by its ID
@@ -399,14 +399,14 @@ def delete_Place(place_id):
         description: Place not found
     """
     if not val.idChecksum(place_id):
-        return jsonify({'error': "Invalid place ID"}), 400
+        return {'error': "Invalid place ID"}, 400
     try:
         LogicFacade.deleteByID(place_id, 'place')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify({'message': 'Place deleted successfully'}), 204
+    return "", 204
 
 
 '''     

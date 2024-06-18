@@ -44,7 +44,7 @@ class TestCities(HTTPTestClass):
         cls.GET(f"/cities")
         cls.CODE_ASSERT(200)
 
-        id = cls.GET_VALUE_WITH("name", name, "id")
+        id = cls.GET_RESPONSE_WITH("name", name, "id")
 
         for key in cls.json:
             cls.VALUE_ASSERT(key, cls.json[key])

@@ -35,7 +35,7 @@ class TestUsers(HTTPTestClass):
         email = cls.SAVE_VALUE("email")
         cls.GET("/users")
         cls.CODE_ASSERT(200)
-        return cls.GET_VALUE_WITH("email", email, "id")
+        return cls.GET_RESPONSE_WITH("email", email, "id")
 
     @classmethod
     def createPostGet(cls, path: str) -> tuple[str, str]:
@@ -47,7 +47,7 @@ class TestUsers(HTTPTestClass):
         cls.GET(f"/users")
         cls.CODE_ASSERT(200)
 
-        id: str = cls.GET_VALUE_WITH("email", email, "id")
+        id: str = cls.GET_RESPONSE_WITH("email", email, "id")
         return email, id
 
     @classmethod
@@ -67,7 +67,7 @@ class TestUsers(HTTPTestClass):
 
             cls.GET("/users")
             cls.CODE_ASSERT(200)
-            id = cls.GET_VALUE_WITH("email", email, "id")
+            id = cls.GET_RESPONSE_WITH("email", email, "id")
 
             cls.GET(f"/users/{id}")
             cls.CODE_ASSERT(200)

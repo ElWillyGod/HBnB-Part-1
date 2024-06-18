@@ -59,7 +59,7 @@ class LogicFacade(ABC):
         Persistence.delete(id, typePlural)
 
     @staticmethod
-    def updateByID(id: str, type: str, data: dict) -> None:
+    def updateByID(id: str, type: str, data: dict) -> dict:
         typePlural: str = getPlural(type)
         old_data = Persistence.get(id, typePlural)
         if old_data is None or len(old_data) == 0:
@@ -73,13 +73,15 @@ class LogicFacade(ABC):
         data["updated_at"] = None
         data_updated = getClassByName(type)(**data, update=updated)
         Persistence.update(id, typePlural, data_updated.toJson())
+        return Persistence.get(id, typePlural)
 
     @staticmethod
-    def createObjectByJson(type: str, data: dict) -> None:
+    def createObjectByJson(type: str, data: dict) -> dict:
         typePlural = getPlural(type)
         new = getClassByName(type)(**data)
         id = new.id
         Persistence.save(id, typePlural, new.toJson())
+        return Persistence.get(id, typePlural)
 
     @staticmethod
     def getAllCountries() -> dict:

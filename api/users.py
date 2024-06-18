@@ -7,13 +7,13 @@ PUT /users/{user_id}: Update an existing user.
 DELETE /users/{user_id}: Delete a user.
 """
 from api import app
-from flask import jsonify, request
+from flask import request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validation as val
 
 
-@app.route("/users", methods=["POST"])
+@app.post("/users")
 def create_User():
     """
     Create a new user.
@@ -53,7 +53,7 @@ def create_User():
     data = request.get_json()
 
     if val.isNoneFields('user', data):
-        return jsonify({'error': "Invalid data or missing fields"}), 400
+        return {'error': "Invalid data or missing fields"}, 400
 
     email = data.get('email')
     first_name = data.get('first_name')
@@ -62,22 +62,22 @@ def create_User():
     if (not val.isStrValid(email) or not val.isNameValid(first_name) or
         not val.isNameValid(last_name)):
 
-        return jsonify({'error': "Invalid data or missing fields"}), 400
+        return {'error': "Invalid data or missing fields"}, 400
 
     if not val.isEmailValid(email):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     try:
-        LogicFacade.createObjectByJson("user", data)
+        user = LogicFacade.createObjectByJson("user", data)
 
     except (logicexceptions.EmailDuplicated) as message:
 
-        return jsonify({'error': str(message)}), 409
+        return {'error': str(message)}, 409
 
-    return jsonify({'message':"User created successfully"}), 201
+    return user, 201
 
 
-@app.route('/users')
+@app.get('/users')
 def get_Users_All():
     """
     Retrieve details of a specific user.
@@ -112,12 +112,12 @@ def get_Users_All():
     users = LogicFacade.getByType("user")
 
     if users is not None and len(users) > 0:
-        return jsonify(users), 200
+        return users, 200
 
-    return jsonify({'message': "Details of the specified user"}), 200
+    return {'message': "Details of the specified user"}, 200
 
 
-@app.route('/users/<user_id>')
+@app.get('/users/<user_id>')
 def get_User(user_id):
     """
     Update an existing user.
@@ -161,20 +161,20 @@ def get_User(user_id):
     """
 
     if not val.idChecksum(user_id):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     try:
 
-        data = LogicFacade.getByID(user_id, 'user')
+        users = LogicFacade.getByID(user_id, 'user')
 
     except (logicexceptions.IDNotFoundError) as message:
         
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify(data), 200
+    return users, 200
 
 
-@app.route('/users/<user_id>', methods=["PUT"])
+@app.put('/users/<user_id>')
 def update_User(user_id):
     """
     Update an existing user.
@@ -220,12 +220,12 @@ def update_User(user_id):
     """
 
     if not val.idChecksum(user_id):
-        return jsonify({'error': 'Invalid id'}), 400
+        return {'error': 'Invalid id'}, 400
 
     data = request.get_json()
 
     if val.isNoneFields('user', data):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     email = data.get('email')
     first_name = data.get('first_name')
@@ -234,24 +234,24 @@ def update_User(user_id):
     if (not val.isStrValid(email) or not val.isNameValid(first_name) or
         not val.isNameValid(last_name)):
 
-        return jsonify({'error': "Invalid data or missing fields"}), 400
+        return {'error': "Invalid data or missing fields"}, 400
 
     if not val.isEmailValid(email):
-        return jsonify({'error': "Invalid email"}), 400
+        return {'error': "Invalid email"}, 400
 
     try:
-        LogicFacade.updateByID(user_id, "user", data)
+        user = LogicFacade.updateByID(user_id, "user", data)
 
     except (logicexceptions.EmailDuplicated) as message:
 
-        return jsonify({'error': str(message)}), 409
+        return {'error': str(message)}, 409
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify({'message': "User updated successfully"}), 201
+    return user, 201
 
-@app.route('/users/<user_id>', methods=["DELETE"])
+@app.delete('/users/<user_id>')
 def delete_user(user_id):
     """
     Delete a user.
@@ -273,12 +273,12 @@ def delete_user(user_id):
         description: User ID not found
     """
     if not val.idChecksum(user_id):
-        return jsonify({'error': 'Invalid user ID'}), 400
+        return {'error': 'Invalid user ID'}, 400
 
     try:
         LogicFacade.deleteByID(user_id, "user")
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify({'message': 'User deleted successfully'}), 204
+    return "", 204

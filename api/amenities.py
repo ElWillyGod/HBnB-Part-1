@@ -3,16 +3,16 @@
 POST /amenities: Create a new amenity.
 GET /amenities: Retrieve a list of all amenities.
 GET /amenities/{amenity_id}: Retrieve detailed information about a specific amenity.
-PUT /amenities/{amenity_id}: Update an existing amenity’s information.
+PUT /amenities/{amenity_id}: Update an existing amenity's information.
 DELETE /amenities/{amenity_id}: Delete a specific amenity."""
 from api import app
-from flask import request, jsonify
+from flask import request
 from logic import logicexceptions
 from logic.logicfacade import LogicFacade
 import api.validation as val
 
 
-@app.route('/amenities', methods=["POST"])
+@app.post('/amenities')
 def create_Amenities():
     """
     Create a new amenity
@@ -42,18 +42,18 @@ def create_Amenities():
     data = request.get_json()
 
     if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     try:
         LogicFacade.createObjectByJson('amenity', data)
 
     except (logicexceptions.AmenityNameDuplicated) as message:
-        return jsonify({'error': str(message)}), 409
+        return {'error': str(message)}, 409
 
-    return jsonify({'message': "Amenity created successfully"}), 201
+    return {'message': "Amenity created successfully"}, 201
 
 
-@app.route('/amenities')
+@app.get('/amenities')
 def get_all_amenities():
     """
     Retrieve a list of all amenities
@@ -81,12 +81,9 @@ def get_all_amenities():
     """
     amenities = LogicFacade.getByType('amenity')
 
-    if amenities is not None and len(amenities) >0:
-        return jsonify(amenities), 200
+    return amenities, 200
 
-    return jsonify({'message': ""}), 200
-
-@app.route('/amenities/<amenity_id>')
+@app.get('/amenities/<amenity_id>')
 def get_amenities(amenity_id):
     """
     Retrieve an amenity by ID
@@ -115,18 +112,18 @@ def get_amenities(amenity_id):
         description: Amenity not found
     """
     if not val.idChecksum(amenity_id):
-        return jsonify({'error': "Invalid ID"}), 400
+        return {'error': "Invalid ID"}, 400
 
     try:
         amenities = LogicFacade.getByID(amenity_id, 'amenity')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify(amenities), 200
+    return amenities, 200
 
 
-@app.route('/amenities/<amenity_id>', methods=["PUT"])
+@app.put('/amenities/<amenity_id>')
 def update_Amenities(amenity_id):
     """
     Update an amenity by ID
@@ -163,24 +160,24 @@ def update_Amenities(amenity_id):
     data = request.get_json()
 
     if val.isNoneFields('amenity', data) or not val.isNameValid(data['name']):
-        return jsonify({'error': "Invalid data"}), 400
+        return {'error': "Invalid data"}, 400
 
     if not val.idChecksum(amenity_id):
-        return jsonify({'error': 'Invalid ID format'}), 400
+        return {'error': 'Invalid ID format'}, 400
 
     try:
-        LogicFacade.updateByID(amenity_id, 'amenity', data)
+        amenity = LogicFacade.updateByID(amenity_id, 'amenity', data)
 
     except (logicexceptions.AmenityNameDuplicated) as message:
-        return jsonify({'error': str(message)}), 409
+        return {'error': str(message)}, 409
 
     except (logicexceptions.IDNotFoundError) as message2:
-        return jsonify({'error': str(message2)}), 404
+        return {'error': str(message2)}, 404
 
-    return jsonify({'message': "Amenity updated successfully"}), 200
+    return amenity, 200
     
 
-@app.route('/amenities/<amenity_id>', methods=["DELETE"])
+@app.delete('/amenities/<amenity_id>')
 def delete_Amenities(amenity_id):
     """
     Delete an amenity by ID
@@ -202,12 +199,12 @@ def delete_Amenities(amenity_id):
         description: Amenity not found
     """
     if not val.idChecksum(amenity_id):
-        return jsonify({'message': "Invalid ID format"}), 400
+        return {'message': "Invalid ID format"}, 400
 
     try:
         LogicFacade.deleteByID(amenity_id, 'amenity')
 
     except (logicexceptions.IDNotFoundError) as message:
-        return jsonify({'error': str(message)}), 404
+        return {'error': str(message)}, 404
 
-    return jsonify({'message': "Amenity deleted successfully"}), 204
+    return "", 204

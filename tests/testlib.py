@@ -148,7 +148,15 @@ class HTTPTestClass:
         cls.json.pop(key)
 
     @classmethod
-    def GET_VALUE_WITH(cls,
+    def GET_RESPONSE(cls) -> dict:
+        return cls.lastResponse.json()
+
+    @classmethod
+    def GET_RESPONSE_VALUE(cls, key: str) -> dict:
+        return cls.lastResponse.json()[key]
+
+    @classmethod
+    def GET_RESPONSE_WITH(cls,
                        key: str,
                        value: str,
                        key_target: str
