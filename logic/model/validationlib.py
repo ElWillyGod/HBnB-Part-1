@@ -79,6 +79,6 @@ def doesCountryExist(country_code: str) -> bool:
 
     for country in getCountries():
         if country["code"] == country_code:
-            return False
+            return True
 
-    return True
+    return False

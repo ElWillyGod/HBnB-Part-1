@@ -82,7 +82,7 @@ def create_Place():
     data = request.get_json()
 
     if val.isNoneFields('place', data):
-        return jsonify({'error': "este mensaje se le escapo a alison"}), 400
+        return jsonify({'error': "Invalid data"}), 400
 
     if not (val.isLatitudeValid(data['latitude']) and val.isLongitudeValid(data['longitude'])):
         return jsonify({'error': "Invalid data"}), 400

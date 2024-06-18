@@ -4,7 +4,7 @@ GET /countries/{country_code}/cities: Retrieve all cities belonging to a specifi
 POST /cities: Create a new city.
 GET /cities: Retrieve all cities.
 GET /cities/{city_id}: Retrieve details of a specific city.
-PUT /cities/{city_id}: Update an existing city’s information.
+PUT /cities/{city_id}: Update an existing city's information.
 DELETE /cities/{city_id}: Delete a specific city.
 """
 from api import app
@@ -93,8 +93,10 @@ def create_Cities():
     try:
         LogicFacade.createObjectByJson("city", data)
 
-    except (logicexceptions.CityNameDuplicated) as message:
+    except (logicexceptions.CountryNotFoundError) as message:
+        return jsonify({'error': str(message)}), 400
 
+    except (logicexceptions.CityNameDuplicated) as message:
         return jsonify({'error': str(message)}), 409
 
     return jsonify({'message': "City created successfully"}), 201
@@ -217,19 +219,28 @@ def update_Cities(city_id):
     if not val.idChecksum(city_id):
         return jsonify({'error': "Invalid ID format"}), 400
 
-    if (val.isNoneFields('city', data) or not val.isNameValid(data['name']) or 
-        not val.isCountryValid(data['country_code'])):
+    if val.isNoneFields('city', data):
+        return jsonify({'error': "Invalid data"}), 400
+
+    name = data['name']
+    code = data['country_code']
+
+    if not val.isNameValid(name) or not val.isCountryValid(code):
         return jsonify({'error': "Invalid data"}), 400
 
     try:
         LogicFacade.updateByID(city_id, "city", data)
 
+    except (logicexceptions.CountryNotFoundError) as message:
+        return jsonify({'error': str(message)}), 400
+
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify({'error': str(message)}), 404
+
     except (logicexceptions.CityNameDuplicated) as message2:
         return jsonify({'error': str(message2)}), 409
 
-    return jsonify({"message": "City updated successfully"}), 200
+    return jsonify({"message": "City updated successfully"}), 201
 
 
 @app.route('/cities/<city_id>', methods=["DELETE"])

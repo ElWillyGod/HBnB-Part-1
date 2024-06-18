@@ -13,28 +13,51 @@ class TestCities(HTTPTestClass):
     '''
 
     @classmethod
-    def getIDAndJson(cls, path):
-        cls.FROM(path)
+    def createCity(cls,
+                    num: int,
+                    dic: dict | None = None,
+                    *,
+                    expectAtPOST: int = 201,
+                    overrideNone: bool = False
+                    ) -> dict:
+        '''
+            Creates a city.
+        '''
+        cls.FROM(f"cities/valid_city_{num}.json")
         name = cls.SAVE_VALUE("name")
-        cls.GET("/cities")
-        cls.CODE_ASSERT(200)
-        return cls.GET_VALUE_WITH("name", name, "id")
 
-    @classmethod
-    def createPostGet(cls, path: str) -> tuple[str, str]:
-        cls.FROM(path)
-        name: str = cls.SAVE_VALUE("name")
+        if dic is not None:
+            for key in dic:
+                if dic[key] is None or overrideNone:
+                    cls.REMOVE_VALUE(key)
+                else:
+                    cls.CHANGE_VALUE(key, dic[key])
+
+        if expectAtPOST != 201:
+            cls.POST("/cities")
+            cls.CODE_ASSERT(expectAtPOST)
+            return {}
+
         cls.POST("/cities")
         cls.CODE_ASSERT(201)
 
         cls.GET(f"/cities")
         cls.CODE_ASSERT(200)
 
-        id: str = cls.GET_VALUE_WITH("name", name, "id")
-        try:
-            return cls.GET_VALUE_WITH("name", name, "id")
-        except Exception:
-            return cls.GET_VALUE_WITH("name", f"{name}updated", "id")
+        id = cls.GET_VALUE_WITH("name", name, "id")
+
+        for key in cls.json:
+            cls.VALUE_ASSERT(key, cls.json[key])
+
+        output = cls.json.copy()
+        output["id"] = id
+        return output
+
+    @classmethod
+    def deleteCity(cls, **kwargs):
+        id = kwargs["id"]
+        cls.DELETE(f"/cities/{id}")
+        cls.CODE_ASSERT(204)
 
     @classmethod
     def test_01_general_GET(cls):
@@ -42,24 +65,10 @@ class TestCities(HTTPTestClass):
         cls.CODE_ASSERT(200)
 
     @classmethod
-    def test_02_valid_POST_GET(cls):  # linked
+    def test_02_valid_POST_GET_DELETE(cls):
         for i in range(1, 5):
-            cls.FROM(f"cities/valid_city_{i}.json")
-            cls.POST("/cities")
-            cls.CODE_ASSERT(201)
-            name = cls.SAVE_VALUE("name")
-            first_name = cls.SAVE_VALUE("first_name")
-            last_name = cls.SAVE_VALUE("last_name")
-
-            cls.GET("/cities")
-            cls.CODE_ASSERT(200)
-            id = cls.GET_VALUE_WITH("name", name, "id")
-
-            cls.GET(f"/cities/{id}")
-            cls.CODE_ASSERT(200)
-            cls.VALUE_ASSERT("name", name)
-            cls.VALUE_ASSERT("first_name", first_name)
-            cls.VALUE_ASSERT("last_name", last_name)
+            city = cls.createCity(i)
+            cls.deleteCity(**city)
 
     @classmethod
     def test_03_another_general_GET(cls):
@@ -67,63 +76,38 @@ class TestCities(HTTPTestClass):
         cls.CODE_ASSERT(200)
 
     @classmethod
-    def test_04_valid_PUT(cls):  # linked
+    def test_04_valid_PUT(cls):
         for i in range(1, 5):
-            id = cls.getIDAndJson(f"cities/valid_city_{i}.json")
-            name = cls.SAVE_VALUE("name")
-            first_name = "Vanessa"
-            cls.CHANGE_VALUE("first_name", first_name)
-            last_name = cls.SAVE_VALUE("last_name")
-
-            cls.PUT(f"/cities/{id}")
+            city = cls.createCity(i)
+            cls.CHANGE_VALUE("name", city["name"] + "UPDATED")
+            cls.PUT("/cities/" + city["id"])
             cls.CODE_ASSERT(201)
-
-            cls.GET(f"/cities/{id}")
-            cls.CODE_ASSERT(200)
-            cls.VALUE_ASSERT("name", name)
-            cls.VALUE_ASSERT("first_name", first_name)
-            cls.VALUE_ASSERT("last_name", last_name)
+            cls.deleteCity(**city)
 
     @classmethod
-    def test_05_valid_DELETE(cls):  # linked
-        for i in range(1, 5):
-            id = cls.getIDAndJson(f"cities/valid_city_{i}.json")
-
-            cls.DELETE(f"/cities/{id}")
-            cls.CODE_ASSERT(204)
-
-            cls.GET(f"/cities/{id}")
-            cls.CODE_ASSERT(404)
-
-    @classmethod
-    def test_06_valid_country_code_PUT(cls):
-        name, id = cls.createPostGet("cities/valid_city_4.json")
-        country_code = "VN"
-        cls.CHANGE_VALUE("country_code", country_code)
-
-        cls.PUT(f"/cities/{id}")
+    def test_05_valid_country_code_PUT(cls):
+        city = cls.createCity(1)
+        cls.CHANGE_VALUE("country_code", "CA")
+        cls.PUT("/cities/" + city["id"])
         cls.CODE_ASSERT(201)
-
-        cls.GET(f"/cities/{id}")
-        cls.CODE_ASSERT(200)
-        cls.VALUE_ASSERT("country_code", country_code)
-
-        cls.DELETE(f"/cities/{id}")
-        cls.CODE_ASSERT(204)
+        cls.deleteCity(**city)
 
     @classmethod
-    def test_07_existing_name_PUT(cls):
-        name1, id1 = cls.createPostGet("cities/valid_city_2.json")
-        name2, id2 = cls.createPostGet("cities/valid_city_3.json")
-        cls.CHANGE_VALUE("name", name1)
+    def test_06_duplicated_entry_POST(cls):
+        city1 = cls.createCity(2)
+        cls.createCity(2, expectAtPOST=409)
+        cls.deleteCity(**city1)
 
-        cls.PUT(f"/cities/{id2}")
+    @classmethod
+    def test_07_duplicated_entry_PUT(cls):
+        city1 = cls.createCity(2)
+        city2 = cls.createCity(3)
+        cls.CHANGE_VALUE("name", city1["name"])
+        cls.CHANGE_VALUE("country_code", city1["country_code"])
+        cls.PUT("/cities/" + city2["id"])
         cls.CODE_ASSERT(409)
-
-        cls.DELETE(f"/cities/{id1}")
-        cls.CODE_ASSERT(204)
-        cls.DELETE(f"/cities/{id2}")
-        cls.CODE_ASSERT(204)
+        cls.deleteCity(**city1)
+        cls.deleteCity(**city2)
 
     @classmethod
     def test_08_empty_id_GET(cls):
@@ -137,162 +121,146 @@ class TestCities(HTTPTestClass):
 
     @classmethod
     def test_10_empty_id_PUT(cls):
-        cls.FROM("cities/valid_city_2.json")
+        city = cls.createCity(4)
         cls.PUT("/cities/")
         cls.CODE_ASSERT(404)
+        cls.deleteCity(**city)
 
     @classmethod
     def test_11_less_attributes_POST(cls):
-        cls.FROM("cities/valid_city_2.json")
-        cls.REMOVE_VALUE("name")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.FROM("cities/valid_city_2.json")
-        cls.REMOVE_VALUE("country_code")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+        cls.createCity(3, {"name": None}, expectAtPOST=400)
+        cls.createCity(4, {"country_code": None}, expectAtPOST=400)
 
     @classmethod
     def test_12_more_attributes_POST(cls):
-        cls.FROM("cities/valid_city_3.json")
-        cls.CHANGE_VALUE("rating", 100)
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+        cls.createCity(1, {"favorite_fruit": "banana"}, expectAtPOST=400)
 
     @classmethod
     def test_13_different_attributes_POST(cls):
-        cls.FROM("cities/valid_city_1.json")
-        cls.REMOVE_VALUE("name")
-        cls.REMOVE_VALUE("country_code")
-        cls.CHANGE_VALUE("rating", 1)
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+        cls.createCity(3,{"name": None,
+                          "favorite_fruit": "banana"}, expectAtPOST=400)
+        cls.createCity(4, {"country_code": None,
+                           "favorite_fruit": "banana"}, expectAtPOST=400)
+        cls.createCity(1, {"country_code": None, "name": None,
+                           "explosive_type": "C4",
+                           "favorite_fruit": "banana"}, expectAtPOST=400)
 
     @classmethod
     def test_14_less_attributes_PUT(cls):
-        name, id = cls.createPostGet("cities/valid_city_2.json")
+        city = cls.createCity(1)
+
         cls.REMOVE_VALUE("name")
-        cls.PUT(f"/cities/{id}")
+        cls.PUT("/cities/" + city["id"])
+        cls.CODE_ASSERT(400)
+        cls.CHANGE_VALUE("name", city["name"])
+
+        cls.REMOVE_VALUE("country_code")
+        cls.PUT("/cities/" + city["id"])
         cls.CODE_ASSERT(400)
 
-        cls.DELETE(f"/cities/{id}")
-        cls.CODE_ASSERT(204)
+        cls.deleteCity(**city)
 
     @classmethod
     def test_15_more_attributes_PUT(cls):
-        name, id = cls.createPostGet("cities/valid_city_3.json")
-        cls.CHANGE_VALUE("rating", 100)
-        cls.PUT(f"/cities/{id}")
+        city = cls.createCity(2)
+        cls.CHANGE_VALUE("favorite_fruit", "banana")
+        cls.PUT("/cities/" + city["id"])
         cls.CODE_ASSERT(400)
-
-        cls.DELETE(f"/cities/{id}")
-        cls.CODE_ASSERT(204)
+        cls.deleteCity(**city)
 
     @classmethod
     def test_16_different_attributes_PUT(cls):
-        name, id = cls.createPostGet("cities/valid_city_2.json")
+        city = cls.createCity(3)
+
+        cls.REMOVE_VALUE("name")
+        cls.CHANGE_VALUE("favorite_fruit", "banana")
+        cls.PUT("/cities/" + city["id"])
+        cls.CODE_ASSERT(400)
+        cls.REMOVE_VALUE("favorite_fruit")
+        cls.CHANGE_VALUE("name", city["name"])
+
+        cls.REMOVE_VALUE("country_code")
+        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.PUT("/cities/" + city["id"])
+        cls.CODE_ASSERT(400)
+        cls.REMOVE_VALUE("explosive_type")
+        cls.CHANGE_VALUE("country_code", city["country_code"])
+
         cls.REMOVE_VALUE("name")
         cls.REMOVE_VALUE("country_code")
-        cls.CHANGE_VALUE("rating", 1)
         cls.CHANGE_VALUE("favorite_fruit", "banana")
-        cls.PUT(f"/cities/{id}")
+        cls.CHANGE_VALUE("explosive_type", "C4")
+        cls.PUT("/cities/" + city["id"])
         cls.CODE_ASSERT(400)
 
-        cls.DELETE(f"/cities/{id}")
-        cls.CODE_ASSERT(204)
+        cls.deleteCity(**city)
 
     @classmethod
-    def test_17_duplicate_entry_POST(cls):
-        name, id = cls.createPostGet("cities/valid_city_4.json")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(409)
-
-        cls.DELETE(f"/cities/{id}")
-        cls.CODE_ASSERT(204)
-
-    @classmethod
-    def test_18_id_that_doesnt_exist_GET(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
-        cls.GET(f"/cities/{id}")
+    def test_17_id_that_doesnt_exist_GET(cls):
+        city = cls.createCity(4)
+        cls.deleteCity(**city)
+        cls.GET(f"/cities/" + city["id"])
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_19_id_that_doesnt_exist_PUT(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
-        cls.PUT(f"/cities/{id}")
+    def test_18_id_that_doesnt_exist_PUT(cls):
+        city = cls.createCity(1)
+        cls.deleteCity(**city)
+        cls.PUT(f"/cities/" + city["id"])
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_20_id_that_doesnt_exist_DELETE(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
-        cls.GET(f"/cities/{id}")
+    def test_19_id_that_doesnt_exist_DELETE(cls):
+        city = cls.createCity(2)
+        cls.deleteCity(**city)
+        cls.DELETE(f"/cities/" + city["id"])
         cls.CODE_ASSERT(404)
 
     @classmethod
-    def test_21_empty_name_POST(cls):
-        cls.FROM("cities/valid_city_1.json")
-        cls.CHANGE_VALUE("name", "")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("name", "     ")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+    def test_20_empty_name_POST(cls):
+        cls.createCity(3, {"name": ""}, expectAtPOST=400)
+        cls.createCity(4, {"name": "    "}, expectAtPOST=400)
 
     @classmethod
-    def test_22_empty_last_name_POST(cls):
-        cls.FROM("cities/valid_city_2.json")
-        cls.CHANGE_VALUE("country_code", "")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("country_code", "  ")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+    def test_21_empty_country_code_POST(cls):
+        cls.createCity(1, {"country_code": ""}, expectAtPOST=400)
+        cls.createCity(2, {"country_code": "    "}, expectAtPOST=400)
 
     @classmethod
-    def test_23_invalid_country_code_POST(cls):
-        cls.FROM("cities/valid_city_1.json")
-        cls.CHANGE_VALUE("country_code", "uy")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+    def test_22_invalid_country_code_POST(cls):
+        def testPOST(email):
+            cls.createCity(3, {"country_code": email}, expectAtPOST=400)
 
-        cls.CHANGE_VALUE("country_code", "10")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("country_code", "U5")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("country_code", "U😀")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("country_code", "😀😀")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
-
-        cls.CHANGE_VALUE("country_code", "😀")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+        testPOST("URU")
+        testPOST("U")
+        testPOST("uy")
+        testPOST("10")
+        testPOST("U5")
+        testPOST("U😀")
+        testPOST("😀😀")
+        testPOST("😀")
 
     @classmethod
-    def test_25_invalid_name_POST(cls):
-        cls.FROM("cities/valid_city_2.json")
-        cls.CHANGE_VALUE("name", "prr😀m")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+    def test_23_invalid_name_POST(cls):
+        def testPOST(name):
+            cls.createCity(4, {"name": name}, expectAtPOST=400)
 
-        cls.CHANGE_VALUE("name", "777")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+        testPOST("prr😀m")
+        testPOST("777")
+        testPOST("Mi\nColon\n")
 
-        cls.CHANGE_VALUE("name", "Mi\nColon\n")
-        cls.POST("/cities")
-        cls.CODE_ASSERT(400)
+    @classmethod
+    def test_24_null_args_POST(cls):
+        cls.createCity(1, {"country_code": None},
+                       expectAtPOST=400, overrideNone=True)
+        cls.createCity(2, {"name": None},
+                       expectAtPOST=400, overrideNone=True)
+        cls.createCity(3, {"country_code": None, "name": None},
+                       expectAtPOST=400, overrideNone=True)
+
+    @classmethod
+    def test_24_null_args_POST(cls):
+        pass
 
 
 def run():

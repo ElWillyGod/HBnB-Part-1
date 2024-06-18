@@ -8,6 +8,7 @@ from typing import Any
 import requests
 import json
 from pathlib import Path
+import subprocess
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -25,11 +26,13 @@ class HTTPTestClass:
     '''
 
     URL: str = "http://127.0.0.1:5000/"
+    savefolderpath: str = "../persistence/storage/"
 
     assertionsPassed: int = 0
     assertionsFailed: int = 0
     testsPassed: int = 0
     testsFailed: int = 0
+    num_http: int = 0
     lastResponse: requests.Response | None = None
     json: dict = {}
     headers: dict = {'Content-type': 'application/json',
@@ -172,6 +175,7 @@ class HTTPTestClass:
     def GET(cls, endpoint: str) -> dict:
         response = requests.get(f"{HTTPTestClass.URL}{endpoint}")
         cls.lastResponse = response
+        cls.num_http += 1
         return response
 
     @classmethod
@@ -194,6 +198,7 @@ class HTTPTestClass:
                                  json=cls.json,
                                  headers=cls.headers)
         cls.lastResponse = response
+        cls.num_http += 1
         return response
 
     @classmethod
@@ -202,13 +207,19 @@ class HTTPTestClass:
                                  json=cls.json,
                                  headers=cls.headers)
         cls.lastResponse = response
+        cls.num_http += 1
         return response
 
     @classmethod
     def DELETE(cls, endpoint: str) -> dict:
         response = requests.delete(f"{HTTPTestClass.URL}{endpoint}")
         cls.lastResponse = response
+        cls.num_http += 1
         return response
+
+    @classmethod
+    def Teardown(cls) -> None:
+        subprocess.run(["rm", "-f", "*.json", cls.savefolderpath])
 
     @classmethod
     def run(cls) -> None:
@@ -240,6 +251,8 @@ class HTTPTestClass:
                 print(f"{cls.prefix}{RED}{name} did not find key to check:" +
                       f"{RESET}\n\t{e}{cls.suffix}")
                 cls.testsFailed += 1
+            finally:
+                cls.Teardown()
 
         if cls.testsFailed == 0:
             print(f"{cls.prefix}{GREEN}All tests from " +
@@ -252,6 +265,7 @@ class HTTPTestClass:
                   f"{cls.__name__} failed: ", end="")
         tests_total = cls.testsPassed + cls.testsFailed
         assertions_total = cls.assertionsFailed + cls.assertionsPassed
-        print(f"{RESET}{cls.testsPassed}/{tests_total} - " +
-              f"{cls.assertionsPassed}/{assertions_total}" +
+        print(f"{RESET}{cls.testsPassed}/{tests_total} Tests, " +
+              f"{cls.assertionsPassed}/{assertions_total} Assertions, " +
+              f"{cls.num_http} HTTP Requests." +
               f"{cls.suffix}\n")
