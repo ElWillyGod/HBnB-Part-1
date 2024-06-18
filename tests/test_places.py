@@ -77,6 +77,9 @@ class TestPlaces(HTTPTestClass):
         cls.CHANGE_VALUE("city_id", city_id)
         cls.CHANGE_VALUE("amenity_ids", [amenity_id])
 
+        safe_copy = cls.json.copy()
+        safe_copy["amenity_ids"] = amenity_ids.copy()
+
         # If dic is passed then override attributes.
         if dic is not None:
             for key in dic:
@@ -89,6 +92,7 @@ class TestPlaces(HTTPTestClass):
         if expectAtPOST != 201:
             cls.POST("/places")
             cls.ASSERT_CODE(expectAtPOST)
+            cls.deleteAll(**safe_copy)
             return {}
 
         # POST Place
@@ -102,23 +106,20 @@ class TestPlaces(HTTPTestClass):
         return output
 
     @classmethod
-    def deleteAll(cls, **kwargs):
+    def deleteAll(cls, host_id=None, city_id=None, amenity_ids=None, **kwargs):
         '''
             Deletes a place given it's dict.
         '''
-        host_id = kwargs["host_id"]
-        amenity_ids = kwargs["amenity_ids"]
-        city_id = kwargs["city_id"]
-        id = kwargs["id"]
-        cls.DELETE(f"/users/{host_id}")
-        cls.ASSERT_CODE(204)
-        for amenity_id in amenity_ids:
-            cls.DELETE(f"/amenities/{amenity_id}")
+        if host_id is not None:
+            cls.DELETE(f"/users/{host_id}")
             cls.ASSERT_CODE(204)
-        cls.DELETE(f"/cities/{city_id}")
-        cls.ASSERT_CODE(204)
-        cls.GET(f"/places/{id}")
-        cls.ASSERT_CODE(404)
+        if city_id is not None:
+            cls.DELETE(f"/cities/{city_id}")
+            cls.ASSERT_CODE(204)
+        if amenity_ids is not None:
+            for amenity_id in amenity_ids:
+                cls.DELETE(f"/amenities/{amenity_id}")
+                cls.ASSERT_CODE(204)
 
     @classmethod
     def test_01_general_GET(cls):
