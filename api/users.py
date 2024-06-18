@@ -39,12 +39,6 @@ def create_User():
     responses:
       201:
         description: User created successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: User created successfully
       400:
         description: Invalid request data or missing fields
       409:
@@ -93,21 +87,6 @@ def get_Users_All():
     responses:
       200:
         description: Details of the specified user
-        schema:
-          type: object
-          properties:
-            user_id:
-              type: string
-              description: ID of the user
-            email:
-              type: string
-              description: Email address of the user
-            first_name:
-              type: string
-              description: First name of the user
-            last_name:
-              type: string
-              description: Last name of the user
     """
     users = LogicFacade.getByType("user")
 
@@ -148,12 +127,6 @@ def get_User(user_id):
     responses:
       201:
         description: User updated successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: User updated successfully
       400:
         description: Invalid request data or missing fields
       404:
@@ -196,21 +169,18 @@ def update_User(user_id):
             email:
               type: string
               description: Updated email address of the user
+              example: juanpepe@gmail.com
             first_name:
               type: string
               description: Updated first name of the user
+              example: juan
             last_name:
               type: string
-              description: Updated last name of the user
+              description: Updated last name of the 
+              example: pepe
     responses:
       201:
         description: User updated successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: User updated successfully
       400:
         description: Invalid request data or missing fields
       404:

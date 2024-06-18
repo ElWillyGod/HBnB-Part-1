@@ -19,17 +19,6 @@ def get_All_Countries():
     responses:
       200:
         description: A list of all countries
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              country_code:
-                type: string
-                description: The ISO code of the country
-              name:
-                type: string
-                description: The name of the country
     """
     countries = LogicFacade.getAllCountries()
 
@@ -51,16 +40,7 @@ def get_Countries(country_code):
         description: ISO code of the country (e.g., 'US' for United States)
     responses:
       200:
-        description: Details of the country
-        schema:
-          type: object
-          properties:
-            country_code:
-              type: string
-              description: The ISO code of the country
-            name:
-              type: string
-              description: The name of the country
+        description: All countries retrieved
       404:
         description: Country not found
     """

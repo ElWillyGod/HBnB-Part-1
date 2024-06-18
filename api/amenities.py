@@ -99,13 +99,6 @@ def get_amenities(amenity_id):
     responses:
       200:
         description: Amenity details
-        schema:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              type: string
       400:
         description: Bad request, invalid ID format
       404:

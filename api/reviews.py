@@ -36,18 +36,14 @@ def create_Review(place_id):
             rating:
               type: integer
               description: Rating for the place (1 to 5)
+              example: 5
             comment:
               type: string
               description: Optional comment about the place
+              example: muy bueno
     responses:
       201:
         description: Review created successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: Review created successfully
       400:
         description: Invalid request data or missing fields
       404:
@@ -93,23 +89,6 @@ def get_User_Reviews(user_id):
     responses:
       200:
         description: List of reviews written by the user
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              review_id:
-                type: string
-                description: ID of the review
-              place_id:
-                type: string
-                description: ID of the place being reviewed
-              rating:
-                type: integer
-                description: Rating given by the user (1 to 5)
-              comment:
-                type: string
-                description: Optional comment by the user
       400:
         description: Invalid user ID format
       404:
@@ -145,23 +124,6 @@ def get_Place_Reviews(place_id):
     responses:
       200:
         description: List of reviews for the place
-        schema:
-          type: array
-          items:
-            type: object
-            properties:
-              review_id:
-                type: string
-                description: ID of the review
-              user_id:
-                type: string
-                description: ID of the user who wrote the review
-              rating:
-                type: integer
-                description: Rating given by the user (1 to 5)
-              comment:
-                type: string
-                description: Optional comment by the user
       400:
         description: Invalid place ID format
       404:
@@ -199,24 +161,6 @@ def get_review(review_id):
     responses:
       200:
         description: Detailed information about the review
-        schema:
-          type: object
-          properties:
-            review_id:
-              type: string
-              description: ID of the review
-            user_id:
-              type: string
-              description: ID of the user who wrote the review
-            place_id:
-              type: string
-              description: ID of the place being reviewed
-            rating:
-              type: integer
-              description: Rating given by the user (1 to 5)
-            comment:
-              type: string
-              description: Optional comment by the user
       400:
         description: Invalid review ID format
       404:
@@ -266,12 +210,6 @@ def update_review(review_id):
     responses:
       200:
         description: Review updated successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: Review updated successfully
       400:
         description: Invalid request data or missing fields
       404:

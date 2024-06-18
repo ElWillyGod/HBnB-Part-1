@@ -149,15 +149,6 @@ def get_Cities(city_id):
     responses:
       200:
         description: City details
-        schema:
-          type: object
-          properties:
-            id:
-              type: string
-            name:
-              type: string
-            country_code:
-              type: string
       400:
         description: Bad request, invalid ID format
       404:

@@ -30,36 +30,17 @@ def create_Place():
             name:
               type: string
               description: The name of the place
+              example: Casa de playa
             description:
               type: string
               description: Description of the place
-            address:
-              type: string
-              description: Address of the place
+              example: es una casa en la playa
             city_id:
               type: string
               description: ID of the city where the place is located
-            latitude:
-              type: number
-              description: Latitude coordinate of the place
-            longitude:
-              type: number
-              description: Longitude coordinate of the place
             host_id:
               type: string
               description: ID of the host of the place
-            number_of_rooms:
-              type: integer
-              description: Number of rooms in the place
-            number_of_bathrooms:
-              type: integer
-              description: Number of bathrooms in the place
-            max_guests:
-              type: integer
-              description: Maximum number of guests the place can accommodate
-            price_per_night:
-              type: number
-              description: Price per night for staying at the place
             amenity_ids:
               type: array
               items:
@@ -68,12 +49,6 @@ def create_Place():
     responses:
       201:
         description: Place created successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: Place created successfully
       400:
         description: Invalid request data or missing fields
       404:
@@ -144,33 +119,12 @@ def get_All_Places():
               description:
                 type: string
                 description: Description of the place
-              address:
-                type: string
-                description: Address of the place
               city_id:
                 type: string
                 description: ID of the city where the place is located
-              latitude:
-                type: number
-                description: Latitude coordinate of the place
-              longitude:
-                type: number
-                description: Longitude coordinate of the place
               host_id:
                 type: string
                 description: ID of the host of the place
-              number_of_rooms:
-                type: integer
-                description: Number of rooms in the place
-              number_of_bathrooms:
-                type: integer
-                description: Number of bathrooms in the place
-              max_guests:
-                type: integer
-                description: Maximum number of guests the place can accommodate
-              price_per_night:
-                type: number
-                description: Price per night for staying at the place
               amenities:
                 type: array
                 items:
@@ -215,33 +169,12 @@ def get_Place(place_id):
             description:
               type: string
               description: Description of the place
-            address:
-              type: string
-              description: Address of the place
             city_id:
               type: string
               description: ID of the city where the place is located
-            latitude:
-              type: number
-              description: Latitude coordinate of the place
-            longitude:
-              type: number
-              description: Longitude coordinate of the place
             host_id:
               type: string
               description: ID of the host of the place
-            number_of_rooms:
-              type: integer
-              description: Number of rooms in the place
-            number_of_bathrooms:
-              type: integer
-              description: Number of bathrooms in the place
-            max_guests:
-              type: integer
-              description: Maximum number of guests the place can accommodate
-            price_per_night:
-              type: number
-              description: Price per night for staying at the place
             amenities:
               type: array
               items:
@@ -295,36 +228,12 @@ def update_Place(place_id):
             description:
               type: string
               description: Description of the place
-            address:
-              type: string
-              description: Address of the place
             city_id:
               type: string
               description: ID of the city where the place is located
-            latitude:
-              type: number
-              description: Latitude coordinate of the place
-            longitude:
-              type: number
-              description: Longitude coordinate of the place
             host_id:
               type: string
               description: ID of the host of the place
-            number_of_rooms:
-              type: integer
-              description: Number of rooms in the place
-            number_of_bathrooms:
-              type: integer
-              description: Number of bathrooms in the place
-            max_guests:
-              type: integer
-              description: Maximum number of guests
-            max_guests:
-              type: integer
-              description: Maximum number of guests the place can accommodate
-            price_per_night:
-              type: number
-              description: Price per night for staying at the place
             amenity_ids:
               type: array
               items:
@@ -333,12 +242,6 @@ def update_Place(place_id):
     responses:
       200:
         description: Place updated successfully
-        schema:
-          type: object
-          properties:
-            message:
-              type: string
-              example: Place updated successfully
       400:
         description: Invalid request data or missing fields
       404:
