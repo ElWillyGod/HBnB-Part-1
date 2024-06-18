@@ -1,28 +1,20 @@
+
 '''
-    Defines this folder as a package
+    Package where endpoints and type validations are made.
 '''
+
 from flask import Flask
 from flasgger import Swagger
 
-app = Flask(__name__)
-template = {
-    "swagger": "2.0",
-    "info": {
-        "title": "HBNB API",
-        "description": "API for Holberton AirBNB project",
-        "contact": {
-            "responsibleDeveloper": "Wilson Antognazza, Matias Davezac, Alison Alvez",
-            "email": "alisonalvez05@gmailcom, w@w.com, m@a.com",
-        },
-        "version": "0.0.1"
-    },
-    "basePath": "/",
-    "schemes": [
-        "http",
-        "https"
-    ],
-}
+from api.swagger import template
+
+app = Flask("AirBnB-MWA")
 
 swagger = Swagger(app, template=template)
 
-import api.main
+import api.amenities
+import api.cities
+import api.countries
+import api.places
+import api.reviews
+import api.users

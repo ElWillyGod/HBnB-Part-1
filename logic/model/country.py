@@ -8,7 +8,7 @@
 
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import doesCountryExist
-from logic.logicexceptions import CountryNotFoundError
+from logic.model.logicexceptions import CountryNotFoundError
 
 
 class Country(TrackedObject):

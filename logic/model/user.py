@@ -7,7 +7,7 @@
 
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isUserEmailDuplicated
-from logic.logicexceptions import EmailDuplicated
+from logic.model.logicexceptions import EmailDuplicated
 
 
 class User(TrackedObject):

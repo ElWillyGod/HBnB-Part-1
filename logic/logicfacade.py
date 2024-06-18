@@ -9,9 +9,10 @@ from abc import ABC
 
 from logic.model.classes import getPlural, getClassByName
 from logic.model.countrieslib import getCountry, getCountries
-from logic.logicexceptions import IDNotFoundError
+from logic.model.logicexceptions import IDNotFoundError
 from logic.model.validationlib import idExists
 from logic import DM as Persistence
+from logic.model.linkeddeleter import raiseDeleteEvent
 
 
 class LogicFacade(ABC):
@@ -54,8 +55,10 @@ class LogicFacade(ABC):
     @staticmethod
     def deleteByID(id: str, type: str) -> None:
         typePlural = getPlural(type)
-        if not idExists(id, typePlural):
+        call = Persistence.get(id, typePlural)
+        if call is None or len(call) == 0:
             raise IDNotFoundError("id not found")
+        raiseDeleteEvent(type, call)
         Persistence.delete(id, typePlural)
 
     @staticmethod

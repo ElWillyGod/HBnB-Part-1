@@ -5,7 +5,7 @@
 
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import idExists
-from logic.logicexceptions import IDNotFoundError
+from logic.model.logicexceptions import IDNotFoundError
 
 
 class Place(TrackedObject):

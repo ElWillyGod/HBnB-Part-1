@@ -6,7 +6,7 @@
 
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import isAmenityDuplicated
-from logic.logicexceptions import AmenityNameDuplicated
+from logic.model.logicexceptions import AmenityNameDuplicated
 
 
 class Amenity(TrackedObject):

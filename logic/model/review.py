@@ -6,7 +6,7 @@
 
 from logic.model.trackedobject import TrackedObject
 from logic.model.validationlib import idExists, isOwnerIDTheSame
-from logic.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
+from logic.model.logicexceptions import IDNotFoundError, TryingToReviewOwnPlace
 
 
 class Review(TrackedObject):

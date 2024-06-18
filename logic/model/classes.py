@@ -1,6 +1,6 @@
 
 '''
-    quickdoc
+    Warning: Changes to classes may affect all layers.
 '''
 
 from logic.model.user import User
@@ -34,11 +34,12 @@ def getPlural(name: str) -> str:
 
 def getClassByName(name):
     '''
-        Gets a class by it's singular name (classes[0])
+        Gets a class by it's singular name (classes[0]) or
+        plural name (classes[1])
     '''
 
     for cls in classes:
-        if cls[0] == name:
+        if cls[0] == name or cls[1] == name:
             return cls[2]
 
     raise ValueError("class not found")

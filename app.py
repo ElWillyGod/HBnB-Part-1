@@ -2,7 +2,6 @@
 
 '''
     Aplication runner.
-    WIP
 '''
 
 from api import app
