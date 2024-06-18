@@ -15,22 +15,22 @@ class TestCountries(HTTPTestClass):
     @classmethod
     def test_01_general_GET(cls):
         cls.GET("/countries")
-        cls.CODE_ASSERT(200)
+        cls.ASSERT_CODE(200)
 
-        cls.VALUE_ASSERT("code", "UY")
-        cls.VALUE_ASSERT("name", "Uruguay")
+        cls.ASSERT_VALUE("code", "UY")
+        cls.ASSERT_VALUE("name", "Uruguay")
 
-        cls.VALUE_ASSERT("code", "AR")
-        cls.VALUE_ASSERT("name", "Argentina")
+        cls.ASSERT_VALUE("code", "AR")
+        cls.ASSERT_VALUE("name", "Argentina")
 
-        cls.VALUE_ASSERT("code", "ES")
-        cls.VALUE_ASSERT("name", "Spain")
+        cls.ASSERT_VALUE("code", "ES")
+        cls.ASSERT_VALUE("name", "Spain")
 
-        cls.VALUE_ASSERT("code", "US")
-        cls.VALUE_ASSERT("name", "United States")
+        cls.ASSERT_VALUE("code", "US")
+        cls.ASSERT_VALUE("name", "United States")
 
-        cls.VALUE_ASSERT("code", "BR")
-        cls.VALUE_ASSERT("name", "Brazil")
+        cls.ASSERT_VALUE("code", "BR")
+        cls.ASSERT_VALUE("name", "Brazil")
 
 
 def run():

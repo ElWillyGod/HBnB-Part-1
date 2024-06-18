@@ -20,9 +20,8 @@ class TestPlaces(HTTPTestClass):
 
         cls.FROM(f"cities/valid_city_{num}.json")
         cls.POST("/cities")
-        cls.CODE_ASSERT(201)
-        id = cls.GET_RESPONSE_VALUE("id")
-        return id
+        cls.ASSERT_CODE(201)
+        return cls.GET_RESPONSE_VALUE("id")
 
     @classmethod
     def createAmenity(cls, num: int) -> str:
@@ -31,12 +30,9 @@ class TestPlaces(HTTPTestClass):
         '''
 
         cls.FROM(f"amenities/valid_amenity_{num}.json")
-        name = cls.SAVE_VALUE("name")
         cls.POST("/amenities")
-        cls.CODE_ASSERT(201)
-        cls.GET("/amenities")
-        cls.CODE_ASSERT(200)
-        return cls.GET_RESPONSE_WITH("name", name, "id")
+        cls.ASSERT_CODE(201)
+        return cls.GET_RESPONSE_VALUE("id")
 
     @classmethod
     def createUser(cls, num: int) -> str:
@@ -45,12 +41,9 @@ class TestPlaces(HTTPTestClass):
         '''
 
         cls.FROM(f"users/valid_user_{num}.json")
-        email = cls.SAVE_VALUE("email")
         cls.POST("/users")
-        cls.CODE_ASSERT(201)
-        cls.GET("/users")
-        cls.CODE_ASSERT(200)
-        return cls.GET_RESPONSE_WITH("email", email, "id")
+        cls.ASSERT_CODE(201)
+        return cls.GET_RESPONSE_VALUE("id")
 
     @classmethod
     def createPlace(cls,
@@ -95,31 +88,17 @@ class TestPlaces(HTTPTestClass):
         # If expected to fail at POST don't continue
         if expectAtPOST != 201:
             cls.POST("/places")
-            cls.CODE_ASSERT(expectAtPOST)
-            cls.deleteAll(host_id=host_id,
-                          city_id=city_id,
-                          amenity_ids=amenity_ids)
+            cls.ASSERT_CODE(expectAtPOST)
             return {}
 
         # POST Place
         cls.POST("/places")
-        cls.CODE_ASSERT(201)  # 201
-
-        # GET all places
-        cls.GET(f"/places")
-        cls.CODE_ASSERT(200)
-
-        # Search in result for a place with this name and get the id
-        id = cls.GET_RESPONSE_WITH("name", cls.json["name"], "id")
-
-        # Assert that all values are correct
-        for key in cls.json:
-            cls.VALUE_ASSERT(key, cls.json[key])
+        cls.ASSERT_CODE(201)  # 201
 
         # Return dictionary of place + id
         output = cls.json.copy()
         output["amenity_ids"] = amenity_ids.copy()  # Deep copy
-        output["id"] = id
+        output["id"] = cls.GET_RESPONSE_VALUE("id")
         return output
 
     @classmethod
@@ -130,18 +109,21 @@ class TestPlaces(HTTPTestClass):
         host_id = kwargs["host_id"]
         amenity_ids = kwargs["amenity_ids"]
         city_id = kwargs["city_id"]
+        id = kwargs["id"]
         cls.DELETE(f"/users/{host_id}")
-        cls.CODE_ASSERT(204)
+        cls.ASSERT_CODE(204)
         for amenity_id in amenity_ids:
             cls.DELETE(f"/amenities/{amenity_id}")
-            cls.CODE_ASSERT(204)
+            cls.ASSERT_CODE(204)
         cls.DELETE(f"/cities/{city_id}")
-        cls.CODE_ASSERT(204)
+        cls.ASSERT_CODE(204)
+        cls.GET(f"/places/{id}")
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_01_general_GET(cls):
         cls.GET("/places")
-        cls.CODE_ASSERT(200)
+        cls.ASSERT_CODE(200)
 
     @classmethod
     def test_02_valid_POST_GET_DELETE(cls):
@@ -152,7 +134,7 @@ class TestPlaces(HTTPTestClass):
     @classmethod
     def test_03_another_general_GET(cls):
         cls.GET("/places")
-        cls.CODE_ASSERT(200)
+        cls.ASSERT_CODE(200)
 
     @classmethod
     def test_04_description_PUT(cls):
@@ -161,27 +143,27 @@ class TestPlaces(HTTPTestClass):
         description = "UPDATED"
         cls.CHANGE_VALUE("description", description)
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(201)
+        cls.ASSERT_CODE(201)
 
         cls.GET(f"/places/{id}")
-        cls.CODE_ASSERT(200)
-        cls.VALUE_ASSERT("description", description)
+        cls.ASSERT_CODE(200)
+        cls.ASSERT_VALUE("description", description)
 
     @classmethod
     def test_05_empty_id_GET(cls):
         cls.GET("/places/")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_06_empty_id_DELETE(cls):
         cls.DELETE("/places/")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_07_empty_id_PUT(cls):
         place = cls.createPlace(2)
         cls.PUT("/places/")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_08_less_attributes_POST(cls):
@@ -210,23 +192,23 @@ class TestPlaces(HTTPTestClass):
         id = place["id"]
         cls.REMOVE_VALUE("name")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("name", place["name"])
 
         cls.REMOVE_VALUE("host_id")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("host_id", place["host_id"])
 
         cls.REMOVE_VALUE("city_id")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("city_id", place["city_id"])
 
         cls.REMOVE_VALUE("host_id")
         cls.REMOVE_VALUE("city_id")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("host_id", place["host_id"])
         cls.CHANGE_VALUE("city_id", place["city_id"])
 
@@ -236,7 +218,7 @@ class TestPlaces(HTTPTestClass):
         id = place["id"]
         cls.CHANGE_VALUE("rating", 100)
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
 
     @classmethod
     def test_13_different_attributes_PUT(cls):
@@ -245,28 +227,28 @@ class TestPlaces(HTTPTestClass):
         cls.REMOVE_VALUE("description")
         cls.CHANGE_VALUE("rating", 100)
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("description", place["description"])
         cls.REMOVE_VALUE("rating")
 
         cls.REMOVE_VALUE("name")
         cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("name", place["name"])
         cls.REMOVE_VALUE("favorite_fruit")
 
         cls.REMOVE_VALUE("host_id")
         cls.CHANGE_VALUE("explosive_type", "C4")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("host_id", place["host_id"])
         cls.REMOVE_VALUE("explosive_type")
 
         cls.REMOVE_VALUE("city_id")
         cls.CHANGE_VALUE("car", "Toyota")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("city_id", place["city_id"])
         cls.REMOVE_VALUE("car")
 
@@ -275,7 +257,7 @@ class TestPlaces(HTTPTestClass):
         cls.CHANGE_VALUE("explosive_type", "C4")
         cls.CHANGE_VALUE("car", "Toyota")
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("host_id", place["host_id"])
         cls.CHANGE_VALUE("city_id", place["city_id"])
         cls.REMOVE_VALUE("explosive_type")
@@ -287,7 +269,7 @@ class TestPlaces(HTTPTestClass):
         id = place["id"]
         cls.deleteAll(**place)
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_15_id_that_doesnt_exist_PUT(cls):
@@ -295,7 +277,7 @@ class TestPlaces(HTTPTestClass):
         id = place["id"]
         cls.deleteAll(**place)
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_16_id_that_doesnt_exist_DELETE(cls):
@@ -303,7 +285,7 @@ class TestPlaces(HTTPTestClass):
         id = place["id"]
         cls.deleteAll(**place)
         cls.PUT(f"/places/{id}")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_17_empty_strings_POST(cls):

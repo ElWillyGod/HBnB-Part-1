@@ -82,7 +82,7 @@ class HTTPTestClass:
             cls._ASSERTION_FAILURE(errormsg)
 
     @classmethod
-    def CODE_ASSERT(cls,
+    def ASSERT_CODE(cls,
                     code_expected: int,
                     errormsg: str | None = None
                     ) -> None:
@@ -91,7 +91,7 @@ class HTTPTestClass:
         cls._ASSERT(code, code_expected, errormsg)
 
     @classmethod
-    def VALUE_ASSERT(cls,
+    def ASSERT_VALUE(cls,
             key: str,
             value_expected: Any,
             errormsg: str | None = None
@@ -152,7 +152,7 @@ class HTTPTestClass:
         return cls.lastResponse.json()
 
     @classmethod
-    def GET_RESPONSE_VALUE(cls, key: str) -> dict:
+    def GET_RESPONSE_VALUE(cls, key: str):
         return cls.lastResponse.json()[key]
 
     @classmethod

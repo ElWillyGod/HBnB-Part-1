@@ -45,12 +45,12 @@ def create_Amenities():
         return {'error': "Invalid data"}, 400
 
     try:
-        LogicFacade.createObjectByJson('amenity', data)
+        amenity = LogicFacade.createObjectByJson('amenity', data)
 
     except (logicexceptions.AmenityNameDuplicated) as message:
         return {'error': str(message)}, 409
 
-    return {'message': "Amenity created successfully"}, 201
+    return amenity, 201
 
 
 @app.get('/amenities')

@@ -35,19 +35,19 @@ class TestCities(HTTPTestClass):
 
         if expectAtPOST != 201:
             cls.POST("/cities")
-            cls.CODE_ASSERT(expectAtPOST)
+            cls.ASSERT_CODE(expectAtPOST)
             return {}
 
         cls.POST("/cities")
-        cls.CODE_ASSERT(201)
+        cls.ASSERT_CODE(201)
 
         cls.GET(f"/cities")
-        cls.CODE_ASSERT(200)
+        cls.ASSERT_CODE(200)
 
         id = cls.GET_RESPONSE_WITH("name", name, "id")
 
         for key in cls.json:
-            cls.VALUE_ASSERT(key, cls.json[key])
+            cls.ASSERT_VALUE(key, cls.json[key])
 
         output = cls.json.copy()
         output["id"] = id
@@ -57,12 +57,12 @@ class TestCities(HTTPTestClass):
     def deleteCity(cls, **kwargs):
         id = kwargs["id"]
         cls.DELETE(f"/cities/{id}")
-        cls.CODE_ASSERT(204)
+        cls.ASSERT_CODE(204)
 
     @classmethod
     def test_01_general_GET(cls):
         cls.GET("/cities")
-        cls.CODE_ASSERT(200)
+        cls.ASSERT_CODE(200)
 
     @classmethod
     def test_02_valid_POST_GET_DELETE(cls):
@@ -73,7 +73,7 @@ class TestCities(HTTPTestClass):
     @classmethod
     def test_03_another_general_GET(cls):
         cls.GET("/cities")
-        cls.CODE_ASSERT(200)
+        cls.ASSERT_CODE(200)
 
     @classmethod
     def test_04_valid_PUT(cls):
@@ -81,14 +81,14 @@ class TestCities(HTTPTestClass):
             city = cls.createCity(i)
             cls.CHANGE_VALUE("name", city["name"] + "UPDATED")
             cls.PUT("/cities/" + city["id"])
-            cls.CODE_ASSERT(201)
+            cls.ASSERT_CODE(201)
 
     @classmethod
     def test_05_valid_country_code_PUT(cls):
         city = cls.createCity(1)
         cls.CHANGE_VALUE("country_code", "CA")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(201)
+        cls.ASSERT_CODE(201)
 
     @classmethod
     def test_06_duplicated_entry_POST(cls):
@@ -102,23 +102,23 @@ class TestCities(HTTPTestClass):
         cls.CHANGE_VALUE("name", city1["name"])
         cls.CHANGE_VALUE("country_code", city1["country_code"])
         cls.PUT("/cities/" + city2["id"])
-        cls.CODE_ASSERT(409)
+        cls.ASSERT_CODE(409)
 
     @classmethod
     def test_08_empty_id_GET(cls):
         cls.GET("/cities/")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_09_empty_id_DELETE(cls):
         cls.DELETE("/cities/")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_10_empty_id_PUT(cls):
         cls.createCity(4)
         cls.PUT("/cities/")
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_11_less_attributes_POST(cls):
@@ -145,19 +145,19 @@ class TestCities(HTTPTestClass):
 
         cls.REMOVE_VALUE("name")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.CHANGE_VALUE("name", city["name"])
 
         cls.REMOVE_VALUE("country_code")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
 
     @classmethod
     def test_15_more_attributes_PUT(cls):
         city = cls.createCity(2)
         cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
 
     @classmethod
     def test_16_different_attributes_PUT(cls):
@@ -166,14 +166,14 @@ class TestCities(HTTPTestClass):
         cls.REMOVE_VALUE("name")
         cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.REMOVE_VALUE("favorite_fruit")
         cls.CHANGE_VALUE("name", city["name"])
 
         cls.REMOVE_VALUE("country_code")
         cls.CHANGE_VALUE("explosive_type", "C4")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
         cls.REMOVE_VALUE("explosive_type")
         cls.CHANGE_VALUE("country_code", city["country_code"])
 
@@ -182,28 +182,28 @@ class TestCities(HTTPTestClass):
         cls.CHANGE_VALUE("favorite_fruit", "banana")
         cls.CHANGE_VALUE("explosive_type", "C4")
         cls.PUT("/cities/" + city["id"])
-        cls.CODE_ASSERT(400)
+        cls.ASSERT_CODE(400)
 
     @classmethod
     def test_17_id_that_doesnt_exist_GET(cls):
         city = cls.createCity(4)
         cls.deleteCity(**city)
         cls.GET(f"/cities/" + city["id"])
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_18_id_that_doesnt_exist_PUT(cls):
         city = cls.createCity(1)
         cls.deleteCity(**city)
         cls.PUT(f"/cities/" + city["id"])
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_19_id_that_doesnt_exist_DELETE(cls):
         city = cls.createCity(2)
         cls.deleteCity(**city)
         cls.DELETE(f"/cities/" + city["id"])
-        cls.CODE_ASSERT(404)
+        cls.ASSERT_CODE(404)
 
     @classmethod
     def test_20_empty_name_POST(cls):
