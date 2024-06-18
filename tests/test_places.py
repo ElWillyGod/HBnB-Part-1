@@ -149,6 +149,8 @@ class TestPlaces(HTTPTestClass):
         cls.ASSERT_CODE(200)
         cls.ASSERT_VALUE("description", description)
 
+        cls.deleteAll(**place)
+
     @classmethod
     def test_05_empty_id_GET(cls):
         cls.GET("/places/")
@@ -161,7 +163,7 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def test_07_empty_id_PUT(cls):
-        place = cls.createPlace(2)
+        cls.createPlace(2)
         cls.PUT("/places/")
         cls.ASSERT_CODE(404)
 
@@ -175,7 +177,7 @@ class TestPlaces(HTTPTestClass):
 
     @classmethod
     def test_09_more_attributes_POST(cls):
-        cls.createPlace(1, {"rating": 100}, expectAtPOST=400)
+        cls.createPlace(3, {"rating": 100}, expectAtPOST=400)
 
     @classmethod
     def test_10_different_attributes_POST(cls):

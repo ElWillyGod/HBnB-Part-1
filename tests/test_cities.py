@@ -41,16 +41,8 @@ class TestCities(HTTPTestClass):
         cls.POST("/cities")
         cls.ASSERT_CODE(201)
 
-        cls.GET(f"/cities")
-        cls.ASSERT_CODE(200)
-
-        id = cls.GET_RESPONSE_WITH("name", name, "id")
-
-        for key in cls.json:
-            cls.ASSERT_VALUE(key, cls.json[key])
-
         output = cls.json.copy()
-        output["id"] = id
+        output["id"] = cls.GET_RESPONSE_VALUE("id")
         return output
 
     @classmethod

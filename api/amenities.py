@@ -167,7 +167,7 @@ def update_Amenities(amenity_id):
     except (logicexceptions.IDNotFoundError) as message2:
         return {'error': str(message2)}, 404
 
-    return amenity, 200
+    return amenity, 201
     
 
 @app.delete('/amenities/<amenity_id>')

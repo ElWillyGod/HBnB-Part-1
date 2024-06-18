@@ -29,6 +29,12 @@ def userDeletedEvent(object: dict) -> None:
         DM.delete(place["id"], "places")
         raiseDeleteEvent("place", place)
 
+    reviews = DM.get_by_property("reviews", "user_id", object["id"])
+
+    for review in reviews:
+        DM.delete(review["id"], "reviews")
+        raiseDeleteEvent("review", review)
+
 def raiseDeleteEvent(type: str, object: dict) -> None:
     '''
         Called when an object is deleted.

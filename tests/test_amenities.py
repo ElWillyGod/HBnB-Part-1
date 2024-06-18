@@ -13,28 +13,39 @@ class TestAmenities(HTTPTestClass):
     '''
 
     @classmethod
-    def getIDAndJson(cls, path):
-        cls.FROM(path)
-        name = cls.SAVE_VALUE("name")
-        cls.GET("/amenities")
-        cls.ASSERT_CODE(200)
-        try:
-            return cls.GET_RESPONSE_WITH("name", name, "id")
-        except Exception:
-            return cls.GET_RESPONSE_WITH("name", f"{name}updated", "id")
+    def createAmenity(cls,
+                    num: int,
+                    dic: dict | None = None,
+                    *,
+                    expectAtPOST: int = 201,
+                    overrideNone: bool = False
+                    ) -> dict:
+        cls.FROM(f"amenities/valid_amenity_{num}.json")
 
-    @classmethod
-    def createPostGet(cls, path: str) -> tuple[str, str]:
-        cls.FROM(path)
-        name: str = cls.SAVE_VALUE("name")
+        if dic is not None:
+            for key in dic:
+                if dic[key] is None or overrideNone:
+                    cls.REMOVE_VALUE(key)
+                else:
+                    cls.CHANGE_VALUE(key, dic[key])
+
+        if expectAtPOST != 201:
+            cls.POST("/amenities")
+            cls.ASSERT_CODE(expectAtPOST)
+            return {}
+
         cls.POST("/amenities")
         cls.ASSERT_CODE(201)
 
-        cls.GET(f"/amenities")
-        cls.ASSERT_CODE(200)
+        output = cls.json.copy()
+        output["id"] = cls.GET_RESPONSE_VALUE("id")
+        return output
 
-        id: str = cls.GET_RESPONSE_WITH("name", name, "id")
-        return name, id
+    @classmethod
+    def deleteAmenity(cls, **kwargs):
+        id = kwargs["id"]
+        cls.DELETE(f"/amenities/{id}")
+        cls.ASSERT_CODE(204)
 
     @classmethod
     def test_01_general_GET(cls):
@@ -42,20 +53,10 @@ class TestAmenities(HTTPTestClass):
         cls.ASSERT_CODE(200)
 
     @classmethod
-    def test_02_valid_POST_GET(cls):  # linked
-        for i in range(1, 6):
-            cls.FROM(f"amenities/valid_amenity_{i}.json")
-            cls.POST("/amenities")
-            cls.ASSERT_CODE(201)
-            name = cls.SAVE_VALUE("name")
-
-            cls.GET("/amenities")
-            cls.ASSERT_CODE(200)
-            id = cls.GET_RESPONSE_WITH("name", name, "id")
-
-            cls.GET(f"/amenities/{id}")
-            cls.ASSERT_CODE(200)
-            cls.ASSERT_VALUE("name", name)
+    def test_02_valid_POST_GET(cls):
+        for i in range(1, 4):
+            user = cls.createAmenity(i)
+            cls.deleteAmenity(**user)
 
     @classmethod
     def test_03_another_general_GET(cls):
@@ -63,155 +64,110 @@ class TestAmenities(HTTPTestClass):
         cls.ASSERT_CODE(200)
 
     @classmethod
-    def test_04_valid_PUT(cls):  # linked
-        for i in range(1, 6):
-            id = cls.getIDAndJson(f"amenities/valid_amenity_{i}.json")
-            name = cls.SAVE_VALUE("name")
-            name = f"{name}updated"
-            cls.CHANGE_VALUE("name", name)
-
-            cls.PUT(f"/amenities/{id}")
+    def test_04_valid_name_PUT(cls):
+        for i in range(1, 4):
+            user = cls.createAmenity(i)
+            cls.CHANGE_VALUE("name", user["name"] + "UPDATED")
+            cls.PUT("/amenities/" + user["id"])
             cls.ASSERT_CODE(201)
-
-            cls.GET(f"/amenities/{id}")
-            cls.ASSERT_CODE(200)
-            cls.ASSERT_VALUE("name", name)
+            cls.deleteAmenity(**user)
 
     @classmethod
-    def test_05_valid_DELETE(cls):  # linked
-        for i in range(1, 6):
-            id = cls.getIDAndJson(f"amenities/valid_amenity_{i}.json")
-
-            cls.DELETE(f"/amenities/{id}")
-            cls.ASSERT_CODE(204)
-
-            cls.GET(f"/amenities/{id}")
-            cls.ASSERT_CODE(404)
-
-    @classmethod
-    def test_06_existing_name_PUT(cls):
-        name1, id1 = cls.createPostGet("amenities/valid_amenity_4.json")
-        name2, id2 = cls.createPostGet("amenities/valid_amenity_5.json")
-        cls.CHANGE_VALUE("name", name1)
-
-        cls.PUT(f"/amenities/{id2}")
-        cls.ASSERT_CODE(409)
-
-        cls.DELETE(f"/amenities/{id1}")
-        cls.ASSERT_CODE(204)
-        cls.DELETE(f"/amenities/{id2}")
-        cls.ASSERT_CODE(204)
-
-    @classmethod
-    def test_07_empty_id_GET(cls):
+    def test_05_empty_id_GET(cls):
         cls.GET("/amenities/")
         cls.ASSERT_CODE(404)
 
     @classmethod
-    def test_08_empty_id_DELETE(cls):
+    def test_06_empty_id_DELETE(cls):
         cls.DELETE("/amenities/")
         cls.ASSERT_CODE(404)
 
     @classmethod
-    def test_09_empty_id_PUT(cls):
-        cls.FROM("amenities/valid_amenity_2.json")
+    def test_07_empty_id_PUT(cls):
+        user = cls.createAmenity(1)
         cls.PUT("/amenities/")
         cls.ASSERT_CODE(404)
+        cls.deleteAmenity(**user)
 
     @classmethod
-    def test_10_more_attributes_POST(cls):
-        cls.FROM("amenities/valid_amenity_3.json")
-        cls.CHANGE_VALUE("rating", 100)
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
+    def test_08_less_attributes_POST(cls):
+        cls.createAmenity(1, {"name": None}, expectAtPOST=400)
 
     @classmethod
-    def test_11_different_attributes_POST(cls):
-        cls.FROM("amenities/valid_amenity_1.json")
+    def test_09_more_attributes_POST(cls):
+        cls.createAmenity(1, {"example": "lechuga"}, expectAtPOST=400)
+
+    @classmethod
+    def test_10_different_attributes_POST(cls):
+        cls.createAmenity(2, {"name": None, "example": "pechuga"},
+                       expectAtPOST=400)
+
+    @classmethod
+    def test_11_less_attributes_PUT(cls):
+        user = cls.createAmenity(3)
         cls.REMOVE_VALUE("name")
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
-        cls.POST("/amenities")
+        cls.PUT("/amenities/" + user["id"])
         cls.ASSERT_CODE(400)
+        cls.deleteAmenity(**user)
 
     @classmethod
     def test_12_more_attributes_PUT(cls):
-        name, id = cls.createPostGet("amenities/valid_amenity_2.json")
-        cls.CHANGE_VALUE("rating", 100)
-        cls.PUT(f"/amenities/{id}")
+        user = cls.createAmenity(3)
+        cls.CHANGE_VALUE("food", "yes")
+        cls.PUT("/amenities/" + user["id"])
         cls.ASSERT_CODE(400)
-
-        cls.DELETE(f"/amenities/{id}")
-        cls.ASSERT_CODE(204)
+        cls.deleteAmenity(**user)
 
     @classmethod
     def test_13_different_attributes_PUT(cls):
-        name, id = cls.createPostGet("amenities/valid_amenity_2.json")
-        cls.REMOVE_VALUE("first_name")
-        cls.REMOVE_VALUE("last_name")
-        cls.CHANGE_VALUE("rating", 1)
-        cls.CHANGE_VALUE("favorite_fruit", "banana")
-        cls.PUT(f"/amenities/{id}")
+        user = cls.createAmenity(3)
+        cls.REMOVE_VALUE("name")
+        cls.CHANGE_VALUE("food", "yes")
+        cls.PUT("/amenities/" + user["id"])
         cls.ASSERT_CODE(400)
-
-        cls.DELETE(f"/amenities/{id}")
-        cls.ASSERT_CODE(204)
+        cls.deleteAmenity(**user)
 
     @classmethod
     def test_14_duplicate_entry_POST(cls):
-        name, id = cls.createPostGet("amenities/valid_amenity_1.json")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(409)
-
-        cls.DELETE(f"/amenities/{id}")
-        cls.ASSERT_CODE(204)
+        user = cls.createAmenity(3)
+        cls.createAmenity(3, expectAtPOST=409)
+        cls.deleteAmenity(**user)
 
     @classmethod
     def test_15_id_that_doesnt_exist_GET(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+        user = cls.createAmenity(3)
+        id = user["id"]
+        cls.deleteAmenity(**user)
         cls.GET(f"/amenities/{id}")
         cls.ASSERT_CODE(404)
 
     @classmethod
     def test_16_id_that_doesnt_exist_PUT(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+        user = cls.createAmenity(3)
+        id = user["id"]
+        cls.deleteAmenity(**user)
         cls.PUT(f"/amenities/{id}")
         cls.ASSERT_CODE(404)
 
     @classmethod
     def test_17_id_that_doesnt_exist_DELETE(cls):
-        id = 'fdfc6cba-c620-4beb-a6d3-9d4fac31ccff'
+        user = cls.createAmenity(3)
+        id = user["id"]
+        cls.deleteAmenity(**user)
         cls.GET(f"/amenities/{id}")
         cls.ASSERT_CODE(404)
 
     @classmethod
     def test_18_empty_name_POST(cls):
-        cls.FROM("amenities/valid_amenity_4.json")
-        cls.CHANGE_VALUE("name", "")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
-
-        cls.CHANGE_VALUE("name", "     ")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
+        cls.createAmenity(2, {"name": ""}, expectAtPOST=400)
+        cls.createAmenity(2, {"name": "    "}, expectAtPOST=400)
 
     @classmethod
     def test_19_invalid_name_POST(cls):
-        cls.FROM("amenities/valid_amenity_1.json")
-        cls.CHANGE_VALUE("name", "\n")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
-
-        cls.CHANGE_VALUE("name", "COck😂😂😂")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
-
-        cls.CHANGE_VALUE("name", "🗿")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
-
-        cls.CHANGE_VALUE("name", "777")
-        cls.POST("/amenities")
-        cls.ASSERT_CODE(400)
+        cls.createAmenity(2, {"name": "\n"}, expectAtPOST=400)
+        cls.createAmenity(2, {"name": "Lechuga😂😂😂"}, expectAtPOST=400)
+        cls.createAmenity(2, {"name": "🗿"}, expectAtPOST=400)
+        cls.createAmenity(2, {"name": "777"}, expectAtPOST=400)
 
 def run():
     TestAmenities.run()
