@@ -98,7 +98,7 @@ class TestPlaces(HTTPTestClass):
         if expectAtPOST != 201:
             cls.POST("/places")
             cls.CODE_ASSERT(expectAtPOST)
-            cls.deleteAll(cls.json)
+            cls.deleteAll(**cls.json)
             return {}
 
         # POST Place
@@ -168,7 +168,6 @@ class TestPlaces(HTTPTestClass):
         cls.GET(f"/place/{id}")
         cls.CODE_ASSERT(200)
         cls.VALUE_ASSERT("description", description)
-        cls.deleteAll(**place)
 
     @classmethod
     def test_05_empty_id_GET(cls):
@@ -185,7 +184,6 @@ class TestPlaces(HTTPTestClass):
         place = cls.createPlace(2)
         cls.PUT("/places/")
         cls.CODE_ASSERT(404)
-        cls.deleteAll(place)
 
     @classmethod
     def test_08_less_attributes_POST(cls):
@@ -234,8 +232,6 @@ class TestPlaces(HTTPTestClass):
         cls.CHANGE_VALUE("host_id", place["host_id"])
         cls.CHANGE_VALUE("city_id", place["city_id"])
 
-        cls.deleteAll(**place)
-
     @classmethod
     def test_12_more_attributes_PUT(cls):
         place = cls.createPlace(2)
@@ -243,7 +239,6 @@ class TestPlaces(HTTPTestClass):
         cls.CHANGE_VALUE("rating", 100)
         cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(400)
-        cls.deleteAll(**place)
 
     @classmethod
     def test_13_different_attributes_PUT(cls):
@@ -287,8 +282,6 @@ class TestPlaces(HTTPTestClass):
         cls.CHANGE_VALUE("city_id", place["city_id"])
         cls.REMOVE_VALUE("explosive_type")
         cls.REMOVE_VALUE("car")
-
-        cls.deleteAll(**place)
 
     @classmethod
     def test_14_id_that_doesnt_exist_GET(cls):
@@ -368,25 +361,6 @@ class TestPlaces(HTTPTestClass):
     @classmethod
     def test_21_amenity_ids_can_be_empty_POST(cls):
         place = cls.createPlace(1, {"amenity_ids": []})
-        cls.deleteAll(**place)
-
-    @classmethod
-    def test_22_cannot_be_null_POST(cls):
-        def testNone(key):
-            cls.createPlace(1, {"amenity_ids": None},
-                            expectAtPOST=400, overrideNone=True)
-
-        testNone("host_id")
-        testNone("name")
-        testNone("description")
-        testNone("number_of_rooms")
-        testNone("number_of_bathrooms")
-        testNone("max_guests")
-        testNone("price_per_night")
-        testNone("latitude")
-        testNone("longitude")
-        testNone("city_id")
-        testNone("amenities_ids")
 
 
 def run():

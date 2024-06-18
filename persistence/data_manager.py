@@ -5,7 +5,6 @@
 """
 
 import json
-import logging
 import os
 import glob
 from persistence.data_manager_interface import IPersistenceManager

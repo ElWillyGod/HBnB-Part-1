@@ -8,7 +8,9 @@ from typing import Any
 import requests
 import json
 from pathlib import Path
-import subprocess
+from glob import glob
+import time
+
 
 RED = "\033[31m"
 GREEN = "\033[32m"
@@ -26,7 +28,9 @@ class HTTPTestClass:
     '''
 
     URL: str = "http://127.0.0.1:5000/"
-    savefolderpath: str = "../persistence/storage/"
+    savefolderpath: str = "persistence/storage"
+    _root_path = Path(__file__).parent.parent.resolve()
+    savefolderpath = f"{_root_path}/{savefolderpath}/*.json"
 
     assertionsPassed: int = 0
     assertionsFailed: int = 0
@@ -219,7 +223,9 @@ class HTTPTestClass:
 
     @classmethod
     def Teardown(cls) -> None:
-        subprocess.run(["rm", "-f", "*.json", cls.savefolderpath])
+        files = glob(cls.savefolderpath)
+        for file in files:
+            Path.unlink(Path(file))
 
     @classmethod
     def run(cls) -> None:
@@ -236,6 +242,7 @@ class HTTPTestClass:
 
         print(f"{cls.prefix}{BLUE}Running {cls.__name__}...{cls.suffix}")
         for name in tests:
+            time.sleep(0.1)
             print(f"{cls.prefix}{YELLOW}Running {name}...{cls.suffix}")
             try:
                 tests[name]()

@@ -164,7 +164,7 @@ def isNoneFields(enty: str, data: dict) -> bool:
         required_fields = ['name']
 
     if enty == 'place':
-        required_fields = ['name', 'description', 'address', 'city_id',
+        required_fields = ['name', 'description', 'city_id',  # 'address',
                            'latitude', 'longitude', 'host_id', 'number_of_rooms',
                            'number_of_bathrooms', 'price_per_night', 'max_guests',
                            'amenity_ids']

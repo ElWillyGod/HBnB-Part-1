@@ -28,9 +28,9 @@ class City(TrackedObject):
         if not doesCountryExist(country_code):
             raise CountryNotFoundError(
                 f"country '{country_code}' not found")
-        self.country_code = country_code
         if update is None or "name" in update:
             if isCityNameDuplicated(name, country_code):
                 raise CityNameDuplicated(
                     f"{name} already exists in {country_code}")
         self.name = name
+        self.country_code = country_code

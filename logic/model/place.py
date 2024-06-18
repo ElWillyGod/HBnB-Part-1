@@ -32,8 +32,13 @@ class Place(TrackedObject):
                  update: dict | None = None
                  ) -> None:
         super().__init__(id, created_at, updated_at)
-        if not idExists(host_id):
-            raise idExists("host_id does not exist")
+        if not idExists(host_id, "users"):
+            raise IDNotFoundError("host_id does not exist")
+        if not idExists(city_id, "cities"):
+            raise IDNotFoundError("city_id does not exist")
+        for id in amenity_ids:
+            if not idExists(id, "amenities"):
+                raise IDNotFoundError(f"'{id}' in amenity_ids does not exist")
         self.host_id = host_id
         self.name = name
         self.description = description
@@ -43,10 +48,5 @@ class Place(TrackedObject):
         self.price_per_night = price_per_night
         self.latitude = latitude
         self.longitude = longitude
-        if not idExists(city_id):
-            raise idExists("city_id does not exist")
         self.city_id = city_id
-        for id in amenity_ids:
-            if not idExists(id):
-                raise IDNotFoundError(f"'{id}' in amenity_ids does not exist")
         self.amenity_ids = amenity_ids

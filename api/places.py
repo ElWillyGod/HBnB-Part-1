@@ -84,14 +84,18 @@ def create_Place():
     if val.isNoneFields('place', data):
         return jsonify({'error': "Invalid data"}), 400
 
-    if not (val.isLatitudeValid(data['latitude']) and val.isLongitudeValid(data['longitude'])):
+    if not (val.isLatitudeValid(data['latitude']) and
+            val.isLongitudeValid(data['longitude'])):
         return jsonify({'error': "Invalid data"}), 400
 
-    if not (isinstance(data['number_of_rooms'], int) and (data['number_of_rooms'] > 0) and
+    if not (isinstance(data['number_of_rooms'], int) and
             isinstance(data['number_of_bathrooms'], int) and
-            (data['number_of_bathrooms'] >= 0) and isinstance(data['max_guests'], int) and
+            isinstance(data['max_guests'], int) and
+            isinstance(data['price_per_night'], (int, float)) and
+            data['number_of_rooms'] > 0 and
+            data['number_of_bathrooms'] >= 0 and
             data['max_guests'] > 0 and
-            isinstance(data['price_per_night'], (int, float)) and data['price_per_night'] > 0):
+            data['price_per_night'] > 0):
         return jsonify({'error': "Invalid data"}), 400
 
     if not val.idChecksum(data['city_id']):
@@ -174,9 +178,6 @@ def get_All_Places():
                 description: Date and time when the place was last updated
     """
     places = LogicFacade.getByType('place')
-
-    if not (places is None or len(places) == 0):
-        return jsonify({'message': 'A list of all places'}), 200
 
     return jsonify(places), 200
 
