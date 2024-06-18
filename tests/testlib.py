@@ -16,6 +16,8 @@ RED = "\033[31m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
 BLUE = "\033[34m"
+CYAN = "\033[36m"
+MAGENTA = "\033[35m"
 RESET = "\033[0m"
 
 
@@ -240,7 +242,7 @@ class HTTPTestClass:
                  attr.find("test") != -1
                 }
 
-        print(f"{cls.prefix}{BLUE}Running {cls.__name__}...{cls.suffix}")
+        print(f"{cls.prefix}{MAGENTA}Running {cls.__name__}...{cls.suffix}")
         for name in tests:
             time.sleep(0.1)
             print(f"{cls.prefix}{YELLOW}Running {name}...{cls.suffix}")
@@ -249,10 +251,14 @@ class HTTPTestClass:
                 cls.testsPassed += 1
             except AssertionError as e:
                 print(f"{cls.prefix}{RED}Check failed on {name}:{RESET}\n" +
-                      f"{e}{cls.suffix}")
-                cls.PRINT_JSON()
-                print(f"\t{cls.lastResponse.reason}")
-                print(f"\t{cls.lastResponse.text}")
+                      f"{e}{cls.suffix}\n")
+                print(f"\t[{cls.lastResponse.request.method}]")
+                print(f"\t-{cls.lastResponse.request.url}")
+                print(f"\t-{cls.lastResponse.reason}")
+                print(f"\n\t{RED}RESPONSE:{RESET}")
+                print(f"{cls.lastResponse.text}")
+                print(f"\n\t{RED}JSON:{RESET}")
+                print(f"{cls.json}\n")
                 cls.testsFailed += 1
             except KeyError as e:
                 print(f"{cls.prefix}{RED}{name} did not find key to check:" +

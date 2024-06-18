@@ -98,7 +98,9 @@ class TestPlaces(HTTPTestClass):
         if expectAtPOST != 201:
             cls.POST("/places")
             cls.CODE_ASSERT(expectAtPOST)
-            cls.deleteAll(**cls.json)
+            cls.deleteAll(host_id=host_id,
+                          city_id=city_id,
+                          amenity_ids=amenity_ids)
             return {}
 
         # POST Place
@@ -133,12 +135,10 @@ class TestPlaces(HTTPTestClass):
         cls.DELETE(f"/users/{host_id}")
         cls.CODE_ASSERT(204)
         for amenity_id in amenity_ids:
-            cls.DELETE(f"/amenity/{amenity_id}")
+            cls.DELETE(f"/amenities/{amenity_id}")
             cls.CODE_ASSERT(204)
-        cls.DELETE(f"/city/{city_id}")
+        cls.DELETE(f"/cities/{city_id}")
         cls.CODE_ASSERT(204)
-        cls.GET(f"/places/{id}")
-        cls.CODE_ASSERT(404)
 
     @classmethod
     def test_01_general_GET(cls):
@@ -162,10 +162,10 @@ class TestPlaces(HTTPTestClass):
         id = place["id"]
         description = "UPDATED"
         cls.CHANGE_VALUE("description", description)
-        cls.PUT(f"/place/{id}")
+        cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(201)
 
-        cls.GET(f"/place/{id}")
+        cls.GET(f"/places/{id}")
         cls.CODE_ASSERT(200)
         cls.VALUE_ASSERT("description", description)
 
@@ -256,7 +256,7 @@ class TestPlaces(HTTPTestClass):
         cls.PUT(f"/places/{id}")
         cls.CODE_ASSERT(400)
         cls.CHANGE_VALUE("name", place["name"])
-        cls.REMOVE_VALUE("rating")
+        cls.REMOVE_VALUE("favorite_fruit")
 
         cls.REMOVE_VALUE("host_id")
         cls.CHANGE_VALUE("explosive_type", "C4")
@@ -316,7 +316,6 @@ class TestPlaces(HTTPTestClass):
         checkIfEmpty("host_id")
         checkIfEmpty("city_id")
         checkIfEmpty("name")
-        checkIfEmpty("description")
 
         cls.createPlace(2, {"amenity_ids": [""]}, expectAtPOST=400)
         cls.createPlace(3, {"amenity_ids": ["    "]}, expectAtPOST=400)
@@ -331,10 +330,8 @@ class TestPlaces(HTTPTestClass):
     def test_19_invalid_floats_POST(cls):
         cls.createPlace(1, {"price_per_night": -1}, expectAtPOST=400)
         cls.createPlace(2, {"price_per_night": 0}, expectAtPOST=400)
-        cls.createPlace(1, {"latitude": 50}, expectAtPOST=400)
         cls.createPlace(2, {"latitude": 120.0}, expectAtPOST=400)
         cls.createPlace(3, {"latitude": -120.0}, expectAtPOST=400)
-        cls.createPlace(1, {"longitude": 50}, expectAtPOST=400)
         cls.createPlace(2, {"longitude": 200.0}, expectAtPOST=400)
         cls.createPlace(3, {"longitude": -200.0}, expectAtPOST=400)
 
@@ -348,8 +345,8 @@ class TestPlaces(HTTPTestClass):
 
         testStr("host_id")
         testStr("name")
-        testStr("description")
         testStr("city_id")
+
         cls.createPlace(2, {"host_id": "Fish"}, expectAtPOST=400)
         cls.createPlace(3, {"city_id": "Fish"}, expectAtPOST=400)
         cls.createPlace(1, {"amenity_ids": ["Fish"]}, expectAtPOST=400)

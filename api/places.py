@@ -84,9 +84,18 @@ def create_Place():
     if val.isNoneFields('place', data):
         return jsonify({'error': "Invalid data"}), 400
 
+    if not val.idChecksum(data['host_id']):
+        return jsonify({'error': "Invalid host ID"}), 400
+
+    if not val.idChecksum(data['city_id']):
+        return jsonify({'error': "Invalid city ID"}), 400
+
     if not (val.isLatitudeValid(data['latitude']) and
             val.isLongitudeValid(data['longitude'])):
-        return jsonify({'error': "Invalid data"}), 400
+        return jsonify({'error': "Invalid location"}), 400
+
+    if not val.isNameValid(data['name']):
+        return jsonify({'error': "Invalid name"}), 400
 
     if not (isinstance(data['number_of_rooms'], int) and
             isinstance(data['number_of_bathrooms'], int) and
@@ -98,12 +107,9 @@ def create_Place():
             data['price_per_night'] > 0):
         return jsonify({'error': "Invalid data"}), 400
 
-    if not val.idChecksum(data['city_id']):
-        return jsonify({'error': "Invalid city ID"}), 400
-
     for amenity_id in data['amenity_ids']:
         if not val.idChecksum(amenity_id):
-            return jsonify({'error': 'Invalid amenity ID'}), 400
+            return jsonify({'error': f'Invalid amenity ID: {amenity_id}'}), 400
 
     try:
         LogicFacade.createObjectByJson('place', data)
@@ -368,7 +374,7 @@ def update_Place(place_id):
     except (logicexceptions.IDNotFoundError) as message:
         return jsonify({'error': str(message)}), 404
 
-    return jsonify({"message": 'Place updated successfully'}), 200
+    return jsonify({"message": 'Place updated successfully'}), 201
 
 
 @app.route('/places/<place_id>', methods=['DELETE'])
